@@ -8,20 +8,19 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
+import javafx.scene.control.*
+import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
+import javafx.scene.text.Text
+import javafx.stage.Modality
 import javafx.stage.Stage
-
-import java.time.format.DateTimeFormatter
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
-import javafx.scene.layout.VBox
-import javafx.scene.text.Text
-import javafx.stage.Modality
 
 
 fun main(args: Array<String>) {
@@ -32,7 +31,9 @@ class Main : Application() {
     private val windowSize = 50
     private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-    private val series: XYChart.Series<String, Number> = XYChart.Series()
+    private val series: XYChart.Series<String, Number> = XYChart.Series<String, Number>().apply{
+        name = "Data"
+    }
     private val scheduledExecutorService: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
 
     @Throws(Exception::class)
@@ -51,11 +52,31 @@ class Main : Application() {
             animated = false
         }
 
-        val lineChart = LineChart(xAxis, yAxis).apply {
-            title = "Realtime JavaFX Charts"
+        for (i in 0 until windowSize)
+            addDataPoint(windowSize - i)
+
+        val lineChart1 = LineChart(xAxis, yAxis).apply {
+            title = "Altitude"
             animated = false
             data.add(series)
-            series.name = "Data Series"
+        }
+
+        val lineChart2 = LineChart(xAxis, yAxis).apply {
+            title = "Pedal Frequency"
+            animated = false
+            data.add(series)
+        }
+
+        val lineChart3 = LineChart(xAxis, yAxis).apply {
+            title = "Power"
+            animated = false
+            data.add(series)
+        }
+
+        val lineChart4 = LineChart(xAxis, yAxis).apply {
+            title = "Heart Rate"
+            animated = false
+            data.add(series)
         }
 
         val menuBar = MenuBar().apply {
@@ -91,12 +112,34 @@ class Main : Application() {
             menus.add(helpMenu)
         }
 
-        for (i in 0 until windowSize)
-            addDataPoint(windowSize - i)
-
         primaryStage.apply {
             title = "JavaFX Realtime Chart"
-            val vBox = VBox(menuBar, lineChart)
+            val chartBox = GridPane().apply {
+                add(lineChart1, 0, 0)
+                add(lineChart2, 0, 1)
+                add(lineChart3, 1, 0)
+                add(lineChart4, 1, 1)
+            }
+            val playBox = HBox().apply {
+                val slider = Slider().apply{
+                    min = 0.0;
+                    max = 100.0;
+                    value = 40.0;
+                    isShowTickLabels = true;
+                    isShowTickMarks = true;
+                    majorTickUnit = 50.0;
+                    minorTickCount = 5;
+                    blockIncrement = 10.0;
+                }
+
+                val buttonCurrent = Button("Pause")
+                buttonCurrent.setPrefSize(100.0, 20.0)
+
+                val buttonProjected = Button("Start Recording")
+                buttonProjected.setPrefSize(100.0, 20.0)
+                children.addAll(slider, buttonCurrent, buttonProjected)
+            }
+            val vBox = VBox(menuBar, chartBox, playBox)
             scene = Scene(vBox, 800.0, 600.0)
             show()
         }
