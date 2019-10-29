@@ -17,7 +17,7 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 
 fun main(args: Array<String>) {
-    Application.launch(*args)
+    Application.launch(Main::class.java, *args)
 }
 
 class Main : Application() {
