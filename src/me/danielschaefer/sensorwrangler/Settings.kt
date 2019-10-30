@@ -1,0 +1,10 @@
+package me.danielschaefer.sensorwrangler
+
+import java.time.format.DateTimeFormatter
+
+/**
+ * General Settings for the entire program
+ */
+open class Settings {
+    val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
+}
