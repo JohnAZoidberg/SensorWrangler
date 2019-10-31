@@ -4,6 +4,7 @@ import javafx.application.Application
 import javafx.application.Platform
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
+import me.danielschaefer.sensorwrangler.Settings
 import me.danielschaefer.sensorwrangler.gui.Graph
 import me.danielschaefer.sensorwrangler.sensors.RandomSensor
 import me.danielschaefer.sensorwrangler.sensors.RandomWalkSensor
@@ -11,8 +12,11 @@ import kotlin.system.exitProcess
 
 class App: Application() {
     private val wrangler = SensorWrangler()
+    val settings = Settings()
 
     override fun start(primaryStage: Stage) {
+        instance = this
+
         val dummyPowerSensor = RandomSensor(1000).apply {
             minValue = 0
             maxValue = 10
@@ -57,5 +61,9 @@ class App: Application() {
         // TODO: Properly close all stages
         // TODO: Stop all Executors
         exitProcess(0);
+    }
+
+    companion object {
+        var instance: App? = null;
     }
 }
