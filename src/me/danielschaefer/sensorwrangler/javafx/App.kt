@@ -1,11 +1,13 @@
 package me.danielschaefer.sensorwrangler.javafx
 
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.gui.Graph
 import me.danielschaefer.sensorwrangler.sensors.RandomSensor
 import me.danielschaefer.sensorwrangler.sensors.RandomWalkSensor
+import kotlin.system.exitProcess
 
 class App: Application() {
     private val wrangler = SensorWrangler()
@@ -50,11 +52,10 @@ class App: Application() {
         MainWindow(primaryStage, wrangler)
     }
 
-    @Throws(Exception::class)
     override fun stop() {
-        super.stop()
-        // TODO: Think about whether we need to do this,
-        //       as the program is going to exit anyways
-        //scheduledExecutorService.shutdownNow()
+        Platform.exit()
+        // TODO: Properly close all stages
+        // TODO: Stop all Executors
+        exitProcess(0);
     }
 }

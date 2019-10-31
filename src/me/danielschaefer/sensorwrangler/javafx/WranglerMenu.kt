@@ -10,7 +10,6 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
-import kotlin.system.exitProcess
 
 fun createMenuBar(primaryStage: Stage): MenuBar {
     return MenuBar().apply {
@@ -21,8 +20,6 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             items.add(MenuItem("Exit").apply {
                 onAction = EventHandler {
                     Platform.exit()
-                    // TODO: Properly close all stages
-                    exitProcess(0);
                 }
             })
         }
