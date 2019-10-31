@@ -9,18 +9,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class MappedList<E, F> extends TransformationList<E, F> {
-    public class ListElement<T> {
-        private int index;
-        private T value;
-        public ListElement(int index, T value) {
-            this.index = index;
-            this.value = value;
-        }
-
-        public int getIndex() { return index; }
-        public T getValue() { return value; }
-    }
-    private final Function<ListElement<F>, E> mapper;
+    protected final Function<ListElement<F>, E> mapper;
 
     public MappedList(ObservableList<? extends F> source, Function<ListElement<F>, E> mapper) {
         super(source);
@@ -98,6 +87,7 @@ public class MappedList<E, F> extends TransformationList<E, F> {
             public List<E> getRemoved() {
                 ArrayList<E> res = new ArrayList<>(c.getRemovedSize());
                 for(F e: c.getRemoved()) {
+                    // TODO: think about which index to put
                     ListElement<F> foo = new ListElement(1, e);
                     res.add(mapper.apply(foo));
                 }
