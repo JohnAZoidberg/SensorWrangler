@@ -6,13 +6,16 @@ import java.time.LocalTime
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
-class RandomSensor(val updateInterval: Long = 250) : Sensor("RandomSensor") {
+class RandomSensor(val updateInterval: Long = 250) : Sensor() {
     var minValue = -10;
     var maxValue = 10;
 
+    override val title: String = "RandomSensor" + Random.nextInt(0, 100)
+
     override val measurements: List<Measurement> = listOf(Measurement(Measurement.Unit.METER).apply{
-        description = "Random measurement"
+        description = "Random measurement " + Random.nextInt(0, 100)
         startDate = LocalTime.now()
     })
 

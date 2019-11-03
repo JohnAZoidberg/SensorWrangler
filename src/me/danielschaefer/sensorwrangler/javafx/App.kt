@@ -11,7 +11,7 @@ import me.danielschaefer.sensorwrangler.sensors.RandomWalkSensor
 import kotlin.system.exitProcess
 
 class App: Application() {
-    private val wrangler = SensorWrangler()
+    val wrangler = SensorWrangler()
     val settings = Settings()
 
     override fun start(primaryStage: Stage) {
@@ -46,7 +46,7 @@ class App: Application() {
         wrangler.sensors.add(dummyGyro)
 
         val dummyWalker = RandomWalkSensor()
-        wrangler.sensors.add(dummyGyro)
+        wrangler.sensors.add(dummyWalker)
 
         wrangler.charts.add(Graph("Foobar", arrayOf("Time", "Power"), dummyPowerSensor.measurements[0]).apply {
             windowSize = 15
