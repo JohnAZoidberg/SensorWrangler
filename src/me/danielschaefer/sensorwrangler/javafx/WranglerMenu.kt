@@ -4,10 +4,8 @@ import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Scene
-import javafx.scene.control.Hyperlink
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
+import javafx.scene.control.*
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
@@ -33,7 +31,11 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         }
 
         val chartMenu = Menu("Charts").apply {
-            items.add(MenuItem("Add"))
+            items.add(MenuItem("Add").apply {
+                onAction = EventHandler {
+                    showAddChartsPopup(primaryStage)
+                }
+            })
             items.add(MenuItem("Manage All"))
         }
 
@@ -53,12 +55,73 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
     }
 }
 
+fun getMeasurements(): MutableList<String?> {
+    if (App.instance == null)
+        return mutableListOf()
+
+    val foo = mutableListOf<String?>()
+    for (sensor in App.instance!!.wrangler.sensors) {
+        for (measurement in sensor.measurements) {
+            foo.add("${sensor.title}: ${measurement.description}")
+        }
+    }
+    return foo
+}
+
+fun showAddChartsPopup(stage: Stage) {
+    Stage().apply {
+        initModality(Modality.APPLICATION_MODAL)
+        initOwner(stage)
+
+        val formGrid = GridPane().apply {
+            padding = Insets(25.0)
+            hgap = 10.0
+            vgap = 10.0
+
+            val typeDropdown = ComboBox<String>().apply{
+                items.add("LineChart")
+                items.add("TODO: Scatterplot")
+            }
+
+            val xAxisMeasurement = ComboBox<String>().apply{
+                items.setAll(getMeasurements())
+            }
+
+            val yAxisMeasurement = ComboBox<String>().apply{
+                items.setAll(getMeasurements())
+            }
+
+            add(Text("Chart Type"), 0, 0)
+            add(typeDropdown, 1, 0)
+            add(Text("Label"), 1, 1)
+            add(Text("Measurement"), 2, 1)
+            add(Text("X-Axis"), 0, 2)
+            //add(xAxisMeasurement, 2, 2)
+            add(Text("Time"), 2, 2)
+            add(Text("Y-Axis"), 0, 3)
+            add(yAxisMeasurement, 2, 3)
+            add(Button("Add"), 0, 4)
+        }
+
+        scene = Scene(formGrid)
+        title = "Add LineChart"
+
+        // Which Measurement on which axis
+        // Axis labels
+
+
+        sizeToScene()
+        show()
+    }
+}
+
 fun showAboutPopup(stage: Stage) {
     Stage().apply{
         initModality(Modality.APPLICATION_MODAL)
         initOwner(stage)
 
         // TODO: Rewrite this with something better than bunching Text objects together
+        // TODO: Add information about available sensors, virtual sensors and charts
         val titleText   = Text("SensorWrangler ${App.instance!!.settings.version}")
         val sensorText  = Text("Built-in sensor drivers:")
         val virtualSensorText = Text("Available virtual sensor types")
