@@ -9,8 +9,10 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
+import javafx.stage.FileChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
+
 
 fun createMenuBar(primaryStage: Stage): MenuBar {
     return MenuBar().apply {
@@ -21,6 +23,51 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             items.add(MenuItem("Exit").apply {
                 onAction = EventHandler {
                     Platform.exit()
+                }
+            })
+        }
+
+        val recordingMenu = Menu("Recording").apply {
+            items.add(MenuItem("Start Recording").apply {
+                onAction = EventHandler {
+                    Stage().apply {
+                        initModality(Modality.APPLICATION_MODAL)
+                        initOwner(primaryStage)
+
+                        val filePathLabel = Text("No file selected")
+                        var filePath: String? = null
+                        val chooseFileButton = Button("Choose Logfile").apply {
+                            setOnAction {
+                                val fileChooser = FileChooser()
+                                fileChooser.title = "Open Resource File"
+                                val file = fileChooser.showOpenDialog(primaryStage)
+                                if (file != null) {
+                                    filePathLabel.text = file.absolutePath
+                                    filePath = file.absolutePath
+                                    sizeToScene()
+                                }
+                            }
+                        }
+                        val startRecordingButton = Button("Start recording").apply {
+                            setOnAction {
+                                if (filePath != null) {
+                                    App.instance!!.wrangler.startRecording(filePath as String)
+                                    close()
+                                } else {
+                                    Alert(primaryStage, "Must select file", "Before starting logging, you must select a log file").show()
+                                }
+                            }
+                        }
+
+                        val vBox = VBox(filePathLabel, chooseFileButton, startRecordingButton).apply {
+                            padding = Insets(25.0)
+                        }
+                        scene = Scene(vBox)
+                        title = "Add LineChart"
+
+                        sizeToScene()
+                        show()
+                    }
                 }
             })
         }
@@ -49,6 +96,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         }
 
         menus.add(fileMenu)
+        menus.add(recordingMenu)
         menus.add(sensorMenu)
         menus.add(chartMenu)
         menus.add(helpMenu)

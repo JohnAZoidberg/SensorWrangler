@@ -24,7 +24,6 @@ class RandomSensor(val updateInterval: Long = 250) : Sensor() {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
             Platform.runLater {
                 val random = ThreadLocalRandom.current().nextInt(minValue, maxValue + 1)
-                println("$title measured: $random")
                 measurements[0].values.add(random.toDouble())
             }
         }, 0, updateInterval, TimeUnit.MILLISECONDS)

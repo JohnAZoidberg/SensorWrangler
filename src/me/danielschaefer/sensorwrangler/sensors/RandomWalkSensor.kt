@@ -34,7 +34,6 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
                     val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1)
                     newPos = currentPos + random.toDouble()
                 } while (newPos < minValue || newPos > maxValue)
-                //println("$title measured: $newPos")
                 measurements[0].values.add(newPos)
             }
         }, 0, updateInterval, TimeUnit.MILLISECONDS)
