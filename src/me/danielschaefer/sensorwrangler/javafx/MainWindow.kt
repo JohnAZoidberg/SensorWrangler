@@ -51,6 +51,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 }
             }
 
+            // TODO: Make this useful
             val playBox = HBox().apply {
                 val slider = Slider().apply {
                     min = 0.0;
@@ -70,7 +71,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 buttonProjected.setPrefSize(100.0, 20.0)
                 children.addAll(slider, buttonCurrent, buttonProjected)
             }
-            val vBox = VBox(createMenuBar(primaryStage), allChartsBox, playBox)
+            val vBox = VBox(createMenuBar(primaryStage), allChartsBox)
 
             scene = Scene(vBox, 800.0, 600.0)
             // TODO: Set an icon for the program - how to embed resources in the .jar?
