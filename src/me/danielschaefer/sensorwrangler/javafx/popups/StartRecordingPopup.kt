@@ -8,7 +8,7 @@ import javafx.scene.text.Text
 import javafx.stage.DirectoryChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.Alert
+import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.App
 
 class StartRecordingPopup(val parentStage: Stage): Stage() {
