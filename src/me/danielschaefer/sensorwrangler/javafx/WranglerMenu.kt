@@ -38,23 +38,29 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                         var targetDirPath: String? = null
                         val chooseFileButton = Button("Choose log directory").apply {
                             setOnAction {
-                                val targetDirChooser = DirectoryChooser()
-                                targetDirChooser.title = "Chooose log directory"
-                                val file = targetDirChooser.showDialog(primaryStage)
-                                if (file != null) {
-                                    targetDirPathLabel.text = file.absolutePath
-                                    targetDirPath = file.absolutePath
-                                    sizeToScene()
+                                DirectoryChooser().apply {
+                                    title = "Chooose log directory"
+                                    showDialog(primaryStage)?.let {
+                                        targetDirPathLabel.text = it.absolutePath
+                                        targetDirPath = it.absolutePath
+                                        sizeToScene()
+                                    }
                                 }
                             }
                         }
                         val startRecordingButton = Button("Start recording").apply {
                             setOnAction {
-                                if (targetDirPath != null) {
+                                if (targetDirPath == null) {
+                                    Alert(
+                                        primaryStage,
+                                        "Must select file",
+                                        "Before starting logging, you must select a log file"
+                                    ).show()
+                                    return@setOnAction
+                                }
+                                targetDirPath?.let {
                                     App.instance!!.wrangler.startRecording("${targetDirPath}/wrangler.log")
                                     close()
-                                } else {
-                                    Alert(primaryStage, "Must select file", "Before starting logging, you must select a log file").show()
                                 }
                             }
                         }
