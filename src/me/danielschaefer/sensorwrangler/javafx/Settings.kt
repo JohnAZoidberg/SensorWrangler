@@ -14,6 +14,7 @@ import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
+import me.danielschaefer.sensorwrangler.javafx.dialogs.AddChartPopup
 
 
 class Settings(val parentStage: Stage) : Stage() {
@@ -41,6 +42,7 @@ class Settings(val parentStage: Stage) : Stage() {
                         selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->
                             // TODO: Cache these for better performance
                             val chartDetailTable = TableView<TableRow>().apply {
+                                // Have columns expand to fill all available space
                                 columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
                                 val firstCol = TableColumn<TableRow, Text>().apply {
@@ -64,11 +66,18 @@ class Settings(val parentStage: Stage) : Stage() {
                         })
                     }
 
+                    val addChartButton = Button("Add Chart").apply {
+                        setOnAction {
+                            AddChartPopup(this@Settings)
+                        }
+                    }
+                    val chartListSidebar = VBox(chartList, addChartButton)
+
                     val separator = Separator().apply {
                         orientation = Orientation.VERTICAL
                         padding = Insets(10.0)
                     }
-                    children.addAll(chartList, separator, chartDetail)
+                    children.addAll(chartListSidebar, separator, chartDetail)
                 })
 
                 val tab3 = Tab("Formulas", HBox().apply {
