@@ -25,7 +25,7 @@ class Settings(val parentStage: Stage) : Stage() {
 
         val mainContent = VBox().apply {
             val tabPane = TabPane().apply {
-                val tab1 = Tab("Sensors", HBox(Label("Show all planes available")))
+                val tab1 = Tab("Sensors", HBox(Label("All Sensors")))
 
                 val tab2 = Tab("Charts", HBox().apply {
                     var chartDetail = VBox()
@@ -89,7 +89,7 @@ class Settings(val parentStage: Stage) : Stage() {
                 })
 
                 val tab3 = Tab("Formulas", HBox().apply {
-                    children.addAll(Label("Configure formulas (virtual sensors created by applying measurements to a formula"))
+                    children.addAll(Label("Configure formulas (virtual sensors created by applying measurements to a formula)"))
                 })
                 tabs.addAll(tab1, tab2, tab3)
 

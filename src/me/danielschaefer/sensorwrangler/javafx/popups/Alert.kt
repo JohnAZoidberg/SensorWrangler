@@ -9,7 +9,7 @@ import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
 
-class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() {
+open class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() {
     init {
         initModality(Modality.APPLICATION_MODAL)
         initOwner(parent)
@@ -31,3 +31,5 @@ class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() {
         show()
     }
 }
+
+class TodoAlert(parent: Stage) : Alert(parent, "TODO", "This functionality is not yet implemented") { }

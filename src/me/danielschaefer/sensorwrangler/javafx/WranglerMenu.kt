@@ -9,13 +9,14 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.javafx.dialogs.AboutPopup
 import me.danielschaefer.sensorwrangler.javafx.dialogs.AddChartPopup
 import me.danielschaefer.sensorwrangler.javafx.dialogs.StartRecordingPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.TodoAlert
 
 
 fun createMenuBar(primaryStage: Stage): MenuBar {
     return MenuBar().apply {
         val fileMenu = Menu("File").apply {
-            items.add(MenuItem("Open"))
-            items.add(MenuItem("Save"))
+            items.add(MenuItem("Open").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
+            items.add(MenuItem("Save").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
             items.add(MenuItem("Settings").apply {
                 onAction = EventHandler {
                     Settings(primaryStage)
@@ -37,8 +38,8 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         }
 
         val sensorMenu = Menu("Sensors").apply {
-            items.add(MenuItem("Add"))
-            items.add(MenuItem("Manage All"))
+            items.add(MenuItem("Add").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
+            items.add(MenuItem("Manage All").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
         }
 
         val chartMenu = Menu("Charts").apply {
@@ -47,7 +48,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                     AddChartPopup(primaryStage)
                 }
             })
-            items.add(MenuItem("Manage All"))
+            items.add(MenuItem("Manage All").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
         }
 
         val helpMenu = Menu("Help").apply {
