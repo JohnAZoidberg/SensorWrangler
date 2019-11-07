@@ -19,7 +19,11 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         val fileMenu = Menu("File").apply {
             items.add(MenuItem("Open"))
             items.add(MenuItem("Save"))
-            items.add(MenuItem("Settings"))
+            items.add(MenuItem("Settings").apply {
+                onAction = EventHandler {
+                    Settings(primaryStage)
+                }
+            })
             items.add(MenuItem("Exit").apply {
                 onAction = EventHandler {
                     Platform.exit()

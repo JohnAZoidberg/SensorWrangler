@@ -50,23 +50,18 @@ class App: Application() {
 
         wrangler.charts.add(Graph("Foobar", arrayOf("Time", "Power"), dummyPowerSensor.measurements[0]).apply {
             windowSize = 15
-            shown = true
         })
         wrangler.charts.add(Graph("BarFoo", arrayOf("Time", "Force")).apply {
             windowSize = 50
-            shown = true
         })
         wrangler.charts.add(Graph("BarFoo2", arrayOf("Time", "Force"), dummyWalker.measurements[0]).apply {
             windowSize = 20
-            shown = true
         })
         wrangler.charts.add(Graph("BarFoo3", arrayOf("Time", "Acceleration"), dummyGyro.measurements[0]).apply {
             windowSize = 40
-            shown = true
         })
         wrangler.charts.add(Graph("BarFoo4", arrayOf("Time", "Acceleration"), dummyGyro.measurements[0]).apply {
             windowSize = 40
-            shown = true
         })
 
         MainWindow(primaryStage, wrangler)

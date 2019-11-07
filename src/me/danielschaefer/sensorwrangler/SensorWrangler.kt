@@ -7,6 +7,9 @@ import java.io.FileWriter
 
 
 class SensorWrangler() {
+    val sensors: MutableList<Sensor> = mutableListOf()
+    val charts: MutableList<Chart> = mutableListOf()
+
     fun startRecording(logPath: String) {
         val fstream = FileWriter(logPath, true)
         fstream.write("Sensor,Measurement,Value\n")
@@ -26,6 +29,8 @@ class SensorWrangler() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    val sensors: MutableList<Sensor> = mutableListOf()
-    val charts: MutableList<Chart> = mutableListOf()
+    // TODO: Do we want charts to be a map indexed by the title?
+    fun findChartByTitle(title: String): Chart? {
+        return charts.filter { it.title == title }[0]
+    }
 }

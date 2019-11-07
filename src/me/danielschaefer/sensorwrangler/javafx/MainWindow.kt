@@ -43,9 +43,17 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         val chartDropdown = ComboBox<String>().apply {
                             items.addAll(App.instance!!.wrangler.charts.map { it.title })
                             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
-                                val selectedChart = App.instance!!.wrangler.charts.filter { it.title == newValue }[0]
-                                //val newChart = LineChart<Number, Number>(NumberAxis().apply{ label = newValue}, NumberAxis())
-                                chartBox.children[0] = createFxChart(selectedChart)
+                                oldValue?.let {
+                                    App.instance!!.wrangler.findChartByTitle(oldValue)?.let {
+                                        it.shown = false
+                                    }
+                                }
+
+                                App.instance!!.wrangler.findChartByTitle(newValue)?.let {
+                                    it.shown = true
+                                    //val newChart = LineChart<Number, Number>(NumberAxis().apply{ label = newValue}, NumberAxis())
+                                    chartBox.children[0] = createFxChart(it)
+                                }
                                 println("From $oldValue to $newValue")
                             })
                         }

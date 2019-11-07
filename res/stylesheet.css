@@ -1,0 +1,3 @@
+.tab-pane > .tab-content-area > * {
+    -fx-padding: 10 10 10 10;
+}
