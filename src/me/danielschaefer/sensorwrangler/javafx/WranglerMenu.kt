@@ -9,7 +9,7 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
-import javafx.stage.FileChooser
+import javafx.stage.DirectoryChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
 
@@ -34,24 +34,24 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                         initModality(Modality.APPLICATION_MODAL)
                         initOwner(primaryStage)
 
-                        val filePathLabel = Text("No file selected")
-                        var filePath: String? = null
-                        val chooseFileButton = Button("Choose Logfile").apply {
+                        val targetDirPathLabel = Text("No file selected")
+                        var targetDirPath: String? = null
+                        val chooseFileButton = Button("Choose log directory").apply {
                             setOnAction {
-                                val fileChooser = FileChooser()
-                                fileChooser.title = "Open Resource File"
-                                val file = fileChooser.showOpenDialog(primaryStage)
+                                val targetDirChooser = DirectoryChooser()
+                                targetDirChooser.title = "Chooose log directory"
+                                val file = targetDirChooser.showDialog(primaryStage)
                                 if (file != null) {
-                                    filePathLabel.text = file.absolutePath
-                                    filePath = file.absolutePath
+                                    targetDirPathLabel.text = file.absolutePath
+                                    targetDirPath = file.absolutePath
                                     sizeToScene()
                                 }
                             }
                         }
                         val startRecordingButton = Button("Start recording").apply {
                             setOnAction {
-                                if (filePath != null) {
-                                    App.instance!!.wrangler.startRecording(filePath as String)
+                                if (targetDirPath != null) {
+                                    App.instance!!.wrangler.startRecording("${targetDirPath}/wrangler.log")
                                     close()
                                 } else {
                                     Alert(primaryStage, "Must select file", "Before starting logging, you must select a log file").show()
@@ -59,7 +59,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                             }
                         }
 
-                        val vBox = VBox(filePathLabel, chooseFileButton, startRecordingButton).apply {
+                        val vBox = VBox(targetDirPathLabel, chooseFileButton, startRecordingButton).apply {
                             padding = Insets(25.0)
                         }
                         scene = Scene(vBox)
