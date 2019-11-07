@@ -28,7 +28,7 @@ class Settings(val parentStage: Stage) : Stage() {
                 val tab1 = Tab("Sensors", HBox(Label("Show all planes available")))
 
                 val tab2 = Tab("Charts", HBox().apply {
-                    var chartDetail = VBox(Text("Chart detail"))
+                    var chartDetail = VBox()
 
                     val chartList = ListView<Text>().apply {
                         val charts: ObservableList<Text> = FXCollections.observableList(mutableListOf())
@@ -39,30 +39,37 @@ class Settings(val parentStage: Stage) : Stage() {
 
                         items = charts
 
+                        // TODO: Cache these for better performance
                         selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->
-                            // TODO: Cache these for better performance
-                            val chartDetailTable = TableView<TableRow>().apply {
-                                // Have columns expand to fill all available space
-                                columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+                            // TODO: Pass Chart object to avoid searching and possible failure
+                            val chart = App.instance!!.wrangler.findChartByTitle(newValue.text)
+                            chart?.let {
+                                val chartDetailTable = TableView<TableRow>().apply {
+                                    // Have columns expand to fill all available space
+                                    columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
-                                val firstCol = TableColumn<TableRow, Text>().apply {
-                                    cellValueFactory = PropertyValueFactory("firstName")
-                                }
-                                val secondCol = TableColumn<TableRow, Text>().apply {
-                                    cellValueFactory = PropertyValueFactory("lastName")
-                                }
-                                columns.setAll(firstCol, secondCol)
+                                    val firstCol = TableColumn<TableRow, Text>().apply {
+                                        cellValueFactory = PropertyValueFactory("firstName")
+                                    }
+                                    val secondCol = TableColumn<TableRow, Text>().apply {
+                                        cellValueFactory = PropertyValueFactory("lastName")
+                                    }
+                                    columns.setAll(firstCol, secondCol)
 
-                                // TODO: Pass Chart object to avoid searching and possible failure
-                                val chart = App.instance!!.wrangler.findChartByTitle(newValue.text)
-                                chart?.let {
                                     items.setAll(
                                         TableRow("Title", chart.title),
-                                        TableRow("Currently shown?", StringUtil.yesNo(chart.shown)))
+                                        TableRow("Currently shown?", StringUtil.yesNo(chart.shown))
+                                    )
                                 }
+
+                                val removeChartButton = Button("Remove Chart").apply {
+                                    setOnAction {
+                                        App.instance!!.wrangler.charts.remove(chart)
+                                    }
+                                }
+
+                                chartDetail.children.setAll(chartDetailTable, removeChartButton)
                             }
-                            Text(newValue.text)
-                            chartDetail.children.setAll(chartDetailTable)
                         })
                     }
 
@@ -72,6 +79,7 @@ class Settings(val parentStage: Stage) : Stage() {
                         }
                     }
                     val chartListSidebar = VBox(chartList, addChartButton)
+                    chartListSidebar.children.add(chartDetail)
 
                     val separator = Separator().apply {
                         orientation = Orientation.VERTICAL
