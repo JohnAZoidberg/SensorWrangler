@@ -3,6 +3,7 @@ package me.danielschaefer.sensorwrangler.javafx
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
+import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.chart.CategoryAxis
@@ -26,7 +27,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     init {
         primaryStage.apply {
             title = "SensorWrangler"
+
             val allChartsBox = GridPane().apply {
+                padding = Insets(25.0)
+
                 val rows = jfxSettings.rows;
                 val cols = jfxSettings.cols;
 
