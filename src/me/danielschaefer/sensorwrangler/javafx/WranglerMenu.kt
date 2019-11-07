@@ -6,9 +6,9 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.dialogs.AboutPopup
-import me.danielschaefer.sensorwrangler.javafx.dialogs.AddChartPopup
-import me.danielschaefer.sensorwrangler.javafx.dialogs.StartRecordingPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.AboutPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.TodoAlert
 
 

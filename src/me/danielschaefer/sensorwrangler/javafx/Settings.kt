@@ -14,7 +14,7 @@ import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
-import me.danielschaefer.sensorwrangler.javafx.dialogs.AddChartPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 
 class Settings(val parentStage: Stage) : Stage() {

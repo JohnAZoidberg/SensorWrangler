@@ -1,4 +1,4 @@
-package me.danielschaefer.sensorwrangler.javafx.dialogs
+package me.danielschaefer.sensorwrangler.javafx.popups
 
 import javafx.geometry.Insets
 import javafx.scene.Scene
