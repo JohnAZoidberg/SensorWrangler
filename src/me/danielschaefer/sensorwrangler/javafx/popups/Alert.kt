@@ -2,6 +2,7 @@ package me.danielschaefer.sensorwrangler.javafx.popups
 
 import javafx.event.EventHandler
 import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.layout.VBox
@@ -20,8 +21,9 @@ open class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() 
                 close()
             }
         }
-        val vBox = VBox(textLabel, okButton).apply {
+        val vBox = VBox(15.0, textLabel, okButton).apply {
             padding = Insets(25.0)
+            alignment = Pos.CENTER;
         }
 
         scene = Scene(vBox)
