@@ -118,9 +118,11 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     if (chart.yAxis != null) {
                         // Need to attach it to chart, otherwise it gets garbage collected
                         // TODO: Remove this really bad hack
-                        chart.mappedList = MappedList(chart.yAxis.values) {
-                            val foo: XYChart.Data<String, Number> = XYChart.Data("${it.index}", it.value)
-                            foo
+                        if (chart.mappedList == null) {
+                            chart.mappedList = MappedList(chart.yAxis.values) {
+                                val foo: XYChart.Data<String, Number> = XYChart.Data("${it.index}", it.value)
+                                foo
+                            }
                         }
 
                         val emptyList = mutableListOf<XYChart.Data<String, Number>>()
