@@ -35,6 +35,11 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                     StartRecordingPopup(primaryStage)
                 }
             })
+            items.add(MenuItem("Stop Recording").apply {
+                onAction = EventHandler {
+                    App.instance!!.wrangler.stopRecording()
+                }
+            })
         }
 
         val sensorMenu = Menu("Sensors").apply {

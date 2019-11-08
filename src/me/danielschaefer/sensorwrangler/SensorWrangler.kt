@@ -10,23 +10,39 @@ class SensorWrangler() {
     val sensors: MutableList<Sensor> = mutableListOf()
     val charts: MutableList<Chart> = mutableListOf()
 
+    private var recordingWriter: FileWriter? = null
+    private var recordingListeners: MutableList<ListChangeListener<Double>> = mutableListOf()
+
     fun startRecording(logPath: String) {
-        val fstream = FileWriter(logPath, true)
-        fstream.write("Sensor,Measurement,Value\n")
+        recordingWriter = FileWriter(logPath, true)
+
+        // CSV header
+        recordingWriter?.write("Sensor,Measurement,Value\n")
+
+        // Values
         for (sensor in sensors) {
             for (measurement in sensor.measurements) {
-                measurement.values.addListener(ListChangeListener {
+                val recordingListener = ListChangeListener<Double> {
                     it.next()
-                    for (x in it.addedSubList) {
-                        fstream.write("${sensor.title},${measurement.description},$x\n")
+                    // Assumption is that it's an append only operation
+                    for (newValue in it.addedSubList) {
+                        recordingWriter?.write("${sensor.title},${measurement.description},$newValue\n")
                     }
-                    fstream.flush()
-                })
+                    recordingWriter?.flush()
+                }
+                recordingListeners.add(recordingListener)
+                measurement.values.addListener(recordingListener)
             }
         }
     }
+
     fun stopRecording() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        for (sensor in sensors)
+            for (measurement in sensor.measurements)
+                for (listener in recordingListeners)
+                    measurement.values.removeListener(listener)
+
+        recordingWriter?.close()
     }
 
     // TODO: Do we want charts to be a map indexed by the title?
