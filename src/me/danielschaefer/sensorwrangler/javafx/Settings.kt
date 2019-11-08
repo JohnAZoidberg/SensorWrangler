@@ -24,13 +24,12 @@ class Settings(val parentStage: Stage) : Stage() {
 
         val mainContent = VBox().apply {
             tabPane = TabPane().apply {
-                sensorTab = Tab("Sensors", HBox(Label("All Sensors")))
-
+                sensorTab = SensorTab(this@Settings)
                 chartTab = ChartTab(this@Settings)
-
                 formulaTab = Tab("Formulas", HBox().apply {
                     children.addAll(Label("Configure formulas (virtual sensors created by applying measurements to a formula)"))
                 })
+
                 tabs.addAll(sensorTab, chartTab, formulaTab)
 
                 // TODO: Do using CSS .tab-pane > .tab-content-area > * { -fx-padding: 25; }

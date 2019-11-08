@@ -12,31 +12,30 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.StringUtil
-import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.TodoAlert
 
-class ChartTab(parentStage: Stage): Tab("Charts") {
+class SensorTab(parentStage: Stage): Tab("Sensors") {
     init {
         content = HBox().apply {
-            val chartDetail = VBox().apply {
+            val sensorDetail = VBox().apply {
                 HBox.setHgrow(this, Priority.SOMETIMES)
             }
 
-            val chartList = ListView<Text>().apply {
-                val charts: ObservableList<Text> = FXCollections.observableList(mutableListOf())
+            val sensorList = ListView<Text>().apply {
+                val sensors: ObservableList<Text> = FXCollections.observableList(mutableListOf())
 
-                for (chart in App.instance!!.wrangler.charts) {
-                    charts.add(Text(chart.title))
+                for (sensor in App.instance!!.wrangler.sensors) {
+                    sensors.add(Text(sensor.title))
                 }
 
-                items = charts
+                items = sensors
 
                 // TODO: Cache these for better performance
                 selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->
-                    // TODO: Pass Chart object to avoid searching and possible failure
-                    val chart = App.instance!!.wrangler.findChartByTitle(newValue.text)
-                    chart?.let {
-                        val chartDetailTable = TableView<TableRow>().apply {
+                    // TODO: Pass Sensor object to avoid searching and possible failure
+                    val sensor = App.instance!!.wrangler.findSensorByTitle(newValue.text)
+                    sensor?.let {
+                        val sensorDetailTable = TableView<TableRow>().apply {
                             // Have columns expand to fill all available space
                             columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
@@ -53,35 +52,38 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                             columns.setAll(firstCol, secondCol)
 
                             items.setAll(
-                                TableRow("Title", chart.title),
-                                TableRow("Currently shown?", StringUtil.yesNo(chart.shown))
+                                TableRow("Title", sensor.title),
+                                TableRow("Measurements", sensor.measurements.size.toString())
                             )
+                            items.addAll(sensor.measurements.map {
+                                TableRow("", it.description )
+                            })
                         }
 
-                        val removeChartButton = Button("Remove Chart").apply {
+                        val disconnectButton = Button("Disconnect").apply {
                             setOnAction {
-                                App.instance!!.wrangler.charts.remove(chart)
+                                TodoAlert(parentStage)
                             }
                         }
 
-                        chartDetail.children.setAll(chartDetailTable, removeChartButton)
+                        sensorDetail.children.setAll(sensorDetailTable, disconnectButton)
                     }
                 })
             }
 
-            val addChartButton = Button("Add Chart").apply {
+            val addSensorButton = Button("Add Sensor").apply {
                 setOnAction {
-                    AddChartPopup(parentStage)
+                    TodoAlert(parentStage)
                 }
             }
-            val chartListSidebar = VBox(chartList, addChartButton)
-            chartListSidebar.children.add(chartDetail)
+            val sensorListSidebar = VBox(sensorList, addSensorButton)
+            sensorListSidebar.children.add(sensorDetail)
 
             val separator = Separator().apply {
                 orientation = Orientation.VERTICAL
                 padding = Insets(10.0)
             }
-            children.addAll(chartListSidebar, separator, chartDetail)
+            children.addAll(sensorListSidebar, separator, sensorDetail)
         }
     }
 }
