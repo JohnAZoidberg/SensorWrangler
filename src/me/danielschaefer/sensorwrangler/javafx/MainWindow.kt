@@ -3,6 +3,7 @@ package me.danielschaefer.sensorwrangler.javafx
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
+import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.Scene
@@ -13,13 +14,12 @@ import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
-import javafx.scene.layout.GridPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
     private val jfxSettings = JavaFxSettings()
@@ -65,6 +65,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
             // TODO: Make this useful
             val playBox = HBox().apply {
+                padding = Insets(25.0)
+
+                val spacer = fun() = Region().apply {
+                    HBox.setHgrow(this, Priority.ALWAYS)
+                }
+
                 val slider = Slider().apply {
                     min = 0.0;
                     max = 100.0;
@@ -77,13 +83,23 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 }
 
                 val buttonCurrent = Button("Pause")
-                buttonCurrent.setPrefSize(100.0, 20.0)
 
-                val buttonProjected = Button("Start Recording")
-                buttonProjected.setPrefSize(100.0, 20.0)
-                children.addAll(slider, buttonCurrent, buttonProjected)
+                val buttonProjected = Button("Start Recording").apply {
+                    onAction = EventHandler {
+                        if (App.instance!!.wrangler.isRecording.value) {
+                            App.instance!!.wrangler.stopRecording()
+                        } else {
+                            StartRecordingPopup(primaryStage)
+                        }
+                    }
+                    App.instance!!.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
+                        text = if (new) "Stop Recording" else "Start Recording"
+                    })
+                }
+
+                children.addAll(spacer(), buttonProjected)
             }
-            val vBox = VBox(createMenuBar(primaryStage), allChartsBox)
+            val vBox = VBox(createMenuBar(primaryStage), allChartsBox, playBox)
 
             scene = Scene(vBox, 800.0, 600.0)
             // TODO: Set an icon for the program - how to embed resources in the .jar?
