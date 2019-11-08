@@ -9,17 +9,24 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.javafx.App
+import java.io.File
+import java.nio.file.Paths
 
 class StartRecordingPopup(val parentStage: Stage): Stage() {
     init {
         initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
+        // Default to current working directory
+        App.instance!!.settings.recordingDirectory = Paths.get("").toAbsolutePath().toString()
+
         val targetDirPathLabel = Text(App.instance!!.settings.recordingDirectory ?: "No file selected")
         val chooseFileButton = Button("Choose log directory").apply {
             setOnAction {
                 DirectoryChooser().apply {
-                    title = "Chooose log directory"
+                    title = "Choose log directory"
+                    App.instance!!.settings.recordingDirectory?.let { initialDirectory = File(it) }
+
                     showDialog(parentStage)?.let {
                         targetDirPathLabel.text = it.absolutePath
                         App.instance!!.settings.recordingDirectory = it.absolutePath
