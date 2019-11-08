@@ -25,17 +25,19 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
     })
 
     init {
-        // TODO: Tie the lifetime of this to the window
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
-            Platform.runLater {
-                val currentPos = measurements[0].values.last()
-                var newPos: Double
-                do {
-                    val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1)
-                    newPos = currentPos + random.toDouble()
-                } while (newPos < minValue || newPos > maxValue)
-                measurements[0].values.add(newPos)
-            }
-        }, 0, updateInterval, TimeUnit.MILLISECONDS)
+        for (measurement in measurements) {
+            // TODO: Tie the lifetime of this to the window
+            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+                Platform.runLater {
+                    val currentPos = measurement.values.last()
+                    var newPos: Double
+                    do {
+                        val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1)
+                        newPos = currentPos + random.toDouble()
+                    } while (newPos < minValue || newPos > maxValue)
+                    measurement.values.add(newPos)
+                }
+            }, 0, updateInterval, TimeUnit.MILLISECONDS)
+        }
     }
 }
