@@ -89,7 +89,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         if (App.instance!!.wrangler.isRecording.value) {
                             App.instance!!.wrangler.stopRecording()
                         } else {
-                            StartRecordingPopup(primaryStage)
+                            if (App.instance!!.settings.recordingDirectory == null)
+                               StartRecordingPopup(primaryStage)
+                            else
+                                App.instance!!.wrangler.startRecording()
                         }
                     }
                     App.instance!!.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->

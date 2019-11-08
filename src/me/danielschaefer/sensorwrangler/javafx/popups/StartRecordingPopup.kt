@@ -15,15 +15,14 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
         initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
-        val targetDirPathLabel = Text("No file selected")
-        var targetDirPath: String? = null
+        val targetDirPathLabel = Text(App.instance!!.settings.recordingDirectory ?: "No file selected")
         val chooseFileButton = Button("Choose log directory").apply {
             setOnAction {
                 DirectoryChooser().apply {
                     title = "Chooose log directory"
                     showDialog(parentStage)?.let {
                         targetDirPathLabel.text = it.absolutePath
-                        targetDirPath = it.absolutePath
+                        App.instance!!.settings.recordingDirectory = it.absolutePath
                         sizeToScene()
                     }
                 }
@@ -31,7 +30,7 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
         }
         val startRecordingButton = Button("Start recording").apply {
             setOnAction {
-                if (targetDirPath == null) {
+                if (App.instance!!.settings.recordingDirectory == null) {
                     Alert(
                         parentStage,
                         "Must select file",
@@ -39,8 +38,8 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
                     ).show()
                     return@setOnAction
                 }
-                targetDirPath?.let {
-                    App.instance!!.wrangler.startRecording("${targetDirPath}/wrangler.log")
+                App.instance!!.settings.recordingDirectory?.let {
+                    App.instance!!.wrangler.startRecording()
                     close()
                 }
             }

@@ -4,6 +4,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.collections.ListChangeListener
 import me.danielschaefer.sensorwrangler.gui.Chart
+import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.FileWriter
 
@@ -19,9 +20,9 @@ class SensorWrangler() {
     private var recordingListeners: MutableList<ListChangeListener<Double>> = mutableListOf()
     private var recording: ReadOnlyBooleanWrapper = ReadOnlyBooleanWrapper(false)
 
-    fun startRecording(logPath: String) {
+    fun startRecording() {
         recording.value  = true
-        recordingWriter = FileWriter(logPath, true)
+        recordingWriter = FileWriter("${App.instance!!.settings.recordingDirectory}/wrangler.log", true)
 
         // CSV header
         recordingWriter?.write("Sensor,Measurement,Value\n")
