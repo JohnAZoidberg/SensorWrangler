@@ -44,7 +44,13 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
 
         val sensorMenu = Menu("Sensors").apply {
             items.add(MenuItem("Add").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
-            items.add(MenuItem("Manage All").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
+            items.add(MenuItem("Manage All").apply {
+                onAction = EventHandler {
+                    Settings(primaryStage).apply {
+                        tabPane.selectionModel.select(this.sensorTab)
+                    }
+                }
+            })
         }
 
         val chartMenu = Menu("Charts").apply {
@@ -53,7 +59,13 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                     AddChartPopup(primaryStage)
                 }
             })
-            items.add(MenuItem("Manage All").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
+            items.add(MenuItem("Manage All").apply {
+                onAction = EventHandler {
+                    Settings(primaryStage).apply {
+                        tabPane.selectionModel.select(this.chartTab)
+                    }
+                }
+            })
         }
 
         val helpMenu = Menu("Help").apply {

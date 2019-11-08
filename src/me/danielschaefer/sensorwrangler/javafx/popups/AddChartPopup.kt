@@ -1,5 +1,6 @@
 package me.danielschaefer.sensorwrangler.javafx.popups
 
+import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Scene
 import javafx.scene.control.Button
@@ -42,7 +43,11 @@ class AddChartPopup(val parentStage: Stage): Stage() {
             add(Text("Time"), 2, 2)
             add(Text("Y-Axis"), 0, 3)
             add(yAxisMeasurement, 2, 3)
-            add(Button("Add"), 0, 4)
+
+            val addButton = Button("Add").apply {
+                onAction = EventHandler { TodoAlert(parentStage) }
+            }
+            add(addButton, 0, 4)
         }
 
         scene = Scene(formGrid)
