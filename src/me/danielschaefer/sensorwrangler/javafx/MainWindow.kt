@@ -120,8 +120,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         // TODO: Remove this really bad hack
                         if (chart.mappedList == null) {
                             chart.mappedList = MappedList(chart.yAxis.values) {
-                                val foo: XYChart.Data<String, Number> = XYChart.Data("${it.index}", it.value)
-                                foo
+                                 XYChart.Data("${it.index}", it.value as Number)
                             }
                         }
 
