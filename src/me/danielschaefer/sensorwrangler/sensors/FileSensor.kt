@@ -15,7 +15,7 @@ class FileSensor(val filePath: String): Sensor() {
 
     private var connected = false
     private val reader = BufferedReader(FileReader(filePath))
-    private var thread: Thread
+    private var thread: Thread? = null
 
     override fun disconnect(reason: String?) {
         connected = false
@@ -24,13 +24,10 @@ class FileSensor(val filePath: String): Sensor() {
         super.disconnect(reason)
     }
 
-    init {
-        measurements = listOf(Measurement(Measurement.Unit.METER).apply{
-            description = "HeartRate"
-            startDate = LocalTime.now()
-        })
-
+    override fun connect() {
         connected = true
+
+        measurements[0].startDate = LocalTime.now()
         thread = Thread {
             while (connected) {
                 // TODO: Add exception handling for when the file is closed
@@ -46,7 +43,14 @@ class FileSensor(val filePath: String): Sensor() {
                     disconnect("IOException: ${e.message}")
                 }
             }
+        }.apply {
+            start()
         }
-        thread.start()
+    }
+
+    init {
+        measurements = listOf(Measurement(Measurement.Unit.METER).apply{
+            description = "HeartRate"
+        })
     }
 }

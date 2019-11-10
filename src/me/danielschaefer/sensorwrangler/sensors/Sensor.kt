@@ -23,4 +23,9 @@ abstract class Sensor() {
     fun addConnectionChangeListener(listener: ConnectionChangeListener) {
         connectionListeners.add(listener)
     }
+
+    open fun connect() {
+        for (listener in connectionListeners)
+            listener.onConnect()
+    }
 }

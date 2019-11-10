@@ -82,11 +82,29 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             })
                         }
 
-                        val disconnectButton = Button("Disconnect").apply {
+                        // TODO: Handle the default case better
+                        val disconnectButton = Button("Connect").apply {
                             setOnAction {
-                                sensor.disconnect()
+                                sensor.connect()
                             }
                         }
+                        sensor.addConnectionChangeListener(object : ConnectionChangeListener {
+                            override fun onConnect() {
+                                disconnectButton.text = "Disconnect"
+                                disconnectButton.setOnAction {
+                                    // TODO: Add popup for connection dialog
+                                    sensor.connect()
+                                }
+                            }
+
+                            override fun onDisconnect(sensor: Sensor, reason: String?) {
+                                disconnectButton.text = "Connect"
+                                disconnectButton.setOnAction {
+                                    sensor.disconnect()
+                                }
+                            }
+
+                        })
 
                         sensorDetail.children.setAll(sensorDetailTable, disconnectButton)
                     }
@@ -97,7 +115,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                 setOnAction {
                     // TODO: Make generic for all kinds of sensors
                     val fileSensor = FileSensor("/home/zoid/media/clone/active/openant/heartrate.log").apply {
-                        this.addConnectionChangeListener(object: ConnectionChangeListener {
+                        this.addConnectionChangeListener(object: ConnectionChangeAdapter() {
                             override fun onDisconnect(sensor: Sensor, reason: String?) {
                                 reason?.let {
                                     Alert(parentStage, "Sensor disconnected",

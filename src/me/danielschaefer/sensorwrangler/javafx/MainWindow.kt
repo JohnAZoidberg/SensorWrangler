@@ -153,7 +153,6 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                         val emptyList = mutableListOf<XYChart.Data<String, Number>>()
                         series.data = FXCollections.observableList(emptyList)
-                        series.data.addAll(listOf(1, 2, 3, 4, 5).map({ XYChart.Data<String, Number>("foo$it", it) }))
 
                         // TODO: Do this more efficiently without reassigning the entire list
                         chart.mappedList!!.addListener(ListChangeListener {

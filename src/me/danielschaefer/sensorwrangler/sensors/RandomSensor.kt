@@ -24,7 +24,7 @@ class RandomSensor(val updateInterval: Long = 250) : Sensor() {
 
     private var updater: ScheduledExecutorService? = null
 
-    init {
+    override fun connect() {
         // TODO: Tie the lifetime of this to the window
         updater = Executors.newSingleThreadScheduledExecutor().apply {
             scheduleAtFixedRate({

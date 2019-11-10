@@ -27,7 +27,14 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
 
     private var updaters: MutableList<ScheduledExecutorService> = mutableListOf()
 
-    init {
+    override fun disconnect(reason: String?) {
+        for (updater in updaters)
+            updater.shutdown()
+
+        super.disconnect(reason)
+    }
+
+    override fun connect() {
         for (measurement in measurements) {
             // TODO: Tie the lifetime of this to the window
             val updater = Executors.newSingleThreadScheduledExecutor()
@@ -46,10 +53,4 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
         }
     }
 
-    override fun disconnect(reason: String?) {
-        for (updater in updaters)
-            updater.shutdown()
-
-        super.disconnect(reason)
-    }
 }
