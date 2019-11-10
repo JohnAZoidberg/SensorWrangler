@@ -12,7 +12,6 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.gui.Graph
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.*
 
@@ -67,6 +66,7 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
                    "RandomWalkSensor" -> RandomWalkSensor()
                    "RandomSensor" -> RandomSensor()
                    "FileSensor" -> FileSensor("/home/zoid/media/clone/active/openant/heartrate.log")
+                   // TODO: Maybe raise an exception instead?
                    else -> null as Sensor
                }
 
@@ -82,14 +82,6 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
                    }
                })
                App.instance!!.wrangler.sensors.add(newSensor)
-
-               val heartRateChart = Graph("Heart Rate", arrayOf("Time", "BPM"), newSensor.measurements[0]).apply {
-                   windowSize = 25
-                   lowerBound = 70.0
-                   upperBound = 100.0
-                   tickSpacing = 5.0
-               }
-               App.instance!!.wrangler.charts.add(heartRateChart)
 
                close()
            }

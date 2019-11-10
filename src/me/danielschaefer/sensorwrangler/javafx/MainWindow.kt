@@ -124,12 +124,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
         when (chart) {
             is Graph -> {
                 val xAxis = CategoryAxis().apply {
-                    label = "Time/s"
+                    label = chart.axisNames[0]
                     animated = false
                 }
 
                 val yAxis = NumberAxis().apply {
-                    label = "Value"
+                    label = chart.axisNames[1]
                     isAutoRanging = false
                     lowerBound = chart.lowerBound
                     upperBound = chart.upperBound
@@ -140,7 +140,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     title = chart.title
                     animated = false
                     val series = XYChart.Series<String, Number>().apply {
-                        name = "Data"
+                        name = chart.yAxis?.description ?: "Data"
                     }
                     if (chart.yAxis != null) {
                         // Need to attach it to chart, otherwise it gets garbage collected
