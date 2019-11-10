@@ -13,7 +13,10 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.javafx.popups.Alert
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import me.danielschaefer.sensorwrangler.sensors.FileSensor
+import me.danielschaefer.sensorwrangler.sensors.Sensor
 
 class SensorTab(parentStage: Stage): Tab("Sensors") {
     init {
@@ -74,7 +77,20 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
             val addSensorButton = Button("Add Sensor").apply {
                 setOnAction {
-                    val fileSensor = FileSensor("/home/zoid/media/clone/active/openant/heartrate.log")
+                    // TODO: Make generic for all kinds of sensors
+                    val fileSensor = FileSensor("/home/zoid/media/clone/active/openant/heartrate.log").apply {
+                        this.addConnectionChangeListener(object: ConnectionChangeListener {
+                            override fun onDisconnect(sensor: Sensor, reason: String?) {
+                                reason?.let {
+                                    Alert(parentStage, "Sensor disconnected",
+                                        "Sensor ${sensor.title} was disconnected because of:\n$reason")
+                                }
+                                if (reason == null)
+                                    Alert(parentStage, "Sensor disconnected",
+                                        "Sensor ${sensor.title} was disconnected")
+                            }
+                        })
+                    }
                     App.instance!!.wrangler.sensors.add(fileSensor)
 
                     val heartRateChart = Graph("Heart Rate", arrayOf("Time", "BPM"), fileSensor.measurements[0]).apply {

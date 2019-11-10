@@ -46,8 +46,10 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
         }
     }
 
-    override fun disconnect() {
+    override fun disconnect(reason: String?) {
         for (updater in updaters)
             updater.shutdown()
+
+        super.disconnect(reason)
     }
 }

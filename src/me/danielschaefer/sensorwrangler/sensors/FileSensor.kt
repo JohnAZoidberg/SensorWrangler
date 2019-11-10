@@ -4,6 +4,7 @@ import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import java.io.BufferedReader
 import java.io.FileReader
+import java.io.IOException
 import java.lang.Thread.sleep
 import java.time.LocalTime
 
@@ -15,9 +16,11 @@ class FileSensor(val filePath: String): Sensor() {
     private val reader = BufferedReader(FileReader(filePath))
     private var thread: Thread
 
-    override fun disconnect() {
+    override fun disconnect(reason: String?) {
         connected = false
         reader.close()
+
+        super.disconnect(reason)
     }
 
     init {
@@ -30,15 +33,17 @@ class FileSensor(val filePath: String): Sensor() {
         thread = Thread {
             while (connected) {
                 // TODO: Add exception handling for when the file is closed
-                val newValue = reader.readLine()
+                try {
+                    val newValue = reader.readLine()
+                    Platform.runLater {
+                        measurements[0].values.add(newValue.toDouble())
+                    }
 
-                Platform.runLater {
-                    measurements[0].values.add(newValue.toDouble())
+                    println(newValue)
+                    sleep(1000)
+                } catch (e: IOException ) {
+                    disconnect("IOException: ${e.message}")
                 }
-
-
-                println(newValue)
-                sleep(1000)
             }
         }
         thread.start()
