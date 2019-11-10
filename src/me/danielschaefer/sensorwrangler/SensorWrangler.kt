@@ -6,6 +6,7 @@ import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.gui.Chart
+import me.danielschaefer.sensorwrangler.gui.Graph
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.FileWriter
@@ -67,5 +68,18 @@ class SensorWrangler() {
     // TODO: Do we want sensors to be a map indexed by the title?
     fun findSensorByTitle(title: String): Sensor? {
         return sensors.filter { it.title == title }[0]
+    }
+
+    /**
+     * Remove a sensor and charts associated with its measurements
+     */
+    fun removeSensor(sensor: Sensor) {
+        for (measurement in sensor.measurements) {
+            for (chart in charts) {
+                if (chart is Graph && chart.yAxis == measurement)
+                    charts.remove(chart)
+            }
+        }
+        sensors.remove(sensor)
     }
 }

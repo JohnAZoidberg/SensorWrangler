@@ -120,7 +120,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                                     Alert(parentStage, "Sensor is connected",
                                         "Please disconnect the sensor before removing it.")
                                 else
-                                    App.instance!!.wrangler.sensors.remove(sensor)
+                                    App.instance!!.wrangler.removeSensor(sensor)
                             }
                         }
 
