@@ -17,7 +17,7 @@ class AboutPopup(val parentStage: Stage): Stage() {
         val titleText =
             Text("SensorWrangler ${me.danielschaefer.sensorwrangler.javafx.App.instance!!.settings.version}")
         val sensorText = Text("Built-in sensor drivers:")
-        val virtualSensorText = Text("Available virtual sensor types")
+        val virtualSensorText = Text("Available formulas types:")
         val chartText = Text("Available chart types:")
 
         val freeSoftware = Hyperlink("Free Software").apply {
@@ -38,13 +38,13 @@ class AboutPopup(val parentStage: Stage): Stage() {
             freeSoftware,
             Text(
                 """
-                licensed under the terms of the GPLv2 with classpath exception.
+                licensed under the terms of the GNU Public License version 2 (GPLv2).
                 It was developed at the Corporate State University Baden-Württemberg (DHBW) in Stuttgart.
                 Source code hosting and issue tracking is available at
             """.trimIndent()
             ),
             github,
-            Text("\nContributions are always welcome.")
+            Text(".\nContributions are always welcome.")
         )
 
         val email = Hyperlink("<git@danielschaefer.me>").apply {
