@@ -46,6 +46,11 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                             })
                             items.addAll(App.instance!!.wrangler.charts.map { it.title })
                             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                                // No need to do anything if we don't switch to a chart
+                                // TODO: Maybe remove the current chart. Except it's not possible to manually select null
+                                if (newValue == null)
+                                    return@ChangeListener
+
                                 oldValue?.let {
                                     App.instance!!.wrangler.findChartByTitle(oldValue)?.let {
                                         it.shown = false
@@ -57,7 +62,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                     //val newChart = LineChart<Number, Number>(NumberAxis().apply{ label = newValue}, NumberAxis())
                                     chartBox.children[0] = createFxChart(it)
                                 }
-                                println("From $oldValue to $newValue")
+                                println("Switched from chart $oldValue to $newValue")
                             })
                         }
                         chartBox.children.setAll(fxChart, chartDropdown)
