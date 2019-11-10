@@ -51,6 +51,8 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
                 }
             }, 0, updateInterval, TimeUnit.MILLISECONDS)
         }
+
+        super.connect()
     }
 
 }

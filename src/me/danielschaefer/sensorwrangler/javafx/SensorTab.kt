@@ -12,7 +12,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.sensors.*
 
@@ -32,6 +32,9 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
                 // TODO: Cache these for better performance
                 selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->
+                    if (newValue == null)
+                        return@ChangeListener
+
                     // TODO: Pass Sensor object to avoid searching and possible failure
                     val sensor = App.instance!!.wrangler.findSensorByTitle(newValue.text)
                     sensor?.let {
@@ -81,59 +84,48 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                         }
 
                         // TODO: Handle the default case better
-                        val disconnectButton = Button("Connect").apply {
+                        val connectButton = Button("Connect").apply {
                             setOnAction {
                                 sensor.connect()
                             }
                         }
                         sensor.addConnectionChangeListener(object : ConnectionChangeListener {
                             override fun onConnect() {
-                                disconnectButton.text = "Disconnect"
-                                disconnectButton.setOnAction {
+                                connectButton.text = "Disconnect"
+                                connectButton.setOnAction {
                                     // TODO: Add popup for connection dialog
-                                    sensor.connect()
+                                    sensor.disconnect()
                                 }
                             }
 
                             override fun onDisconnect(sensor: Sensor, reason: String?) {
-                                disconnectButton.text = "Connect"
-                                disconnectButton.setOnAction {
-                                    sensor.disconnect()
+                                connectButton.text = "Connect"
+                                connectButton.setOnAction {
+                                    sensor.connect()
                                 }
                             }
 
                         })
 
-                        sensorDetail.children.setAll(sensorDetailTable, disconnectButton)
+                        val removeSensorButton = Button("Remove Sensor").apply {
+                            setOnAction {
+                                if (sensor.isConnected)
+                                    Alert(parentStage, "Sensor is connected",
+                                        "Please disconnect the sensor before removing it.")
+                                else
+                                    App.instance!!.wrangler.sensors.remove(sensor)
+                            }
+                        }
+
+                        val sensorButtons = HBox(10.0, connectButton, removeSensorButton)
+                        sensorDetail.children.setAll(sensorDetailTable, sensorButtons)
                     }
                 })
             }
 
             val addSensorButton = Button("Add Sensor").apply {
                 setOnAction {
-                    // TODO: Make generic for all kinds of sensors
-                    val fileSensor = FileSensor("/home/zoid/media/clone/active/openant/heartrate.log").apply {
-                        this.addConnectionChangeListener(object: ConnectionChangeAdapter() {
-                            override fun onDisconnect(sensor: Sensor, reason: String?) {
-                                reason?.let {
-                                    Alert(parentStage, "Sensor disconnected",
-                                        "Sensor ${sensor.title} was disconnected because of:\n$reason")
-                                }
-                                if (reason == null)
-                                    Alert(parentStage, "Sensor disconnected",
-                                        "Sensor ${sensor.title} was disconnected")
-                            }
-                        })
-                    }
-                    App.instance!!.wrangler.sensors.add(fileSensor)
-
-                    val heartRateChart = Graph("Heart Rate", arrayOf("Time", "BPM"), fileSensor.measurements[0]).apply {
-                        windowSize = 25
-                        lowerBound = 70.0
-                        upperBound = 100.0
-                        tickSpacing = 5.0
-                    }
-                    App.instance!!.wrangler.charts.add(heartRateChart)
+                    AddSensorPopup(parentStage)
                 }
             }
             val sensorListSidebar = VBox(10.0, sensorList, addSensorButton)

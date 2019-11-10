@@ -13,7 +13,6 @@ class FileSensor(val filePath: String): Sensor() {
     override val title: String = "FileSensor" + Random.nextInt(0, 100)
     override val measurements: List<Measurement>
 
-    private var connected = false
     private val reader = BufferedReader(FileReader(filePath))
     private var thread: Thread? = null
 
@@ -25,8 +24,6 @@ class FileSensor(val filePath: String): Sensor() {
     }
 
     override fun connect() {
-        connected = true
-
         measurements[0].startDate = LocalTime.now()
         thread = Thread {
             while (connected) {
@@ -46,6 +43,8 @@ class FileSensor(val filePath: String): Sensor() {
         }.apply {
             start()
         }
+
+        super.connect()
     }
 
     init {

@@ -32,6 +32,9 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
 
                 // TODO: Cache these for better performance
                 selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->
+                    if (newValue == null)
+                        return@ChangeListener
+
                     // TODO: Pass Chart object to avoid searching and possible failure
                     val chart = App.instance!!.wrangler.findChartByTitle(newValue.text)
                     chart?.let {

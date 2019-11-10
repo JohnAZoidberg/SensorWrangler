@@ -6,10 +6,7 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.popups.AboutPopup
-import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
-import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
-import me.danielschaefer.sensorwrangler.javafx.popups.TodoAlert
+import me.danielschaefer.sensorwrangler.javafx.popups.*
 
 
 fun createMenuBar(primaryStage: Stage): MenuBar {
@@ -45,7 +42,9 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         }
 
         val sensorMenu = Menu("Sensors").apply {
-            items.add(MenuItem("Add").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
+            items.add(MenuItem("Add").apply { onAction = EventHandler {
+                AddSensorPopup(primaryStage)
+            }})
             items.add(MenuItem("Manage All").apply {
                 onAction = EventHandler {
                     SettingsWindow(primaryStage).apply {

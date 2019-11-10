@@ -20,8 +20,6 @@ class RandomSensor(val updateInterval: Long = 250) : Sensor() {
         startDate = LocalTime.now()
     })
 
-    var connected: Boolean = false
-
     private var updater: ScheduledExecutorService? = null
 
     override fun connect() {
@@ -35,6 +33,8 @@ class RandomSensor(val updateInterval: Long = 250) : Sensor() {
                 }
             }, 0, updateInterval, TimeUnit.MILLISECONDS)
         }
+
+        super.connect()
     }
 
     override fun disconnect(reason: String?) {
