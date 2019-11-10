@@ -14,9 +14,7 @@ import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.gui.Graph
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
-import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
-import me.danielschaefer.sensorwrangler.sensors.FileSensor
-import me.danielschaefer.sensorwrangler.sensors.Sensor
+import me.danielschaefer.sensorwrangler.sensors.*
 
 class SensorTab(parentStage: Stage): Tab("Sensors") {
     init {
@@ -55,10 +53,30 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             }
                             columns.setAll(firstCol, secondCol)
 
-                            items.setAll(
-                                TableRow("Title", sensor.title),
-                                TableRow("Measurements", sensor.measurements.size.toString())
-                            )
+                            items.clear()
+                            items.add(TableRow("Title", sensor.title))
+
+                            // TODO: Figure out how to generate from the class definition
+                            //       Can/should it be done without reflection?
+                            // Information about a specific type of sensor
+                            when (sensor) {
+                                is FileSensor -> {
+                                    items.add(TableRow("File path", sensor.filePath))
+                                }
+                                is RandomSensor -> {
+                                    items.add(TableRow("Update interval [ms]", sensor.updateInterval.toString()))
+                                    items.add(TableRow("Minimum value", sensor.minValue.toString()))
+                                    items.add(TableRow("Maximum value", sensor.maxValue.toString()))
+                                }
+                                is RandomWalkSensor -> {
+                                    items.add(TableRow("Update interval [ms]", sensor.updateInterval.toString()))
+                                    items.add(TableRow("Minimum value", sensor.minValue.toString()))
+                                    items.add(TableRow("Maximum value", sensor.maxValue.toString()))
+                                    items.add(TableRow("Maximum step distance", sensor.maxStep.toString()))
+                                }
+                            }
+
+                            items.add(TableRow("Measurements", sensor.measurements.size.toString()))
                             items.addAll(sensor.measurements.map {
                                 TableRow("", it.description )
                             })

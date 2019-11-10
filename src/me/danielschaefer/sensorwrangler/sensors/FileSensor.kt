@@ -7,9 +7,10 @@ import java.io.FileReader
 import java.io.IOException
 import java.lang.Thread.sleep
 import java.time.LocalTime
+import kotlin.random.Random
 
 class FileSensor(val filePath: String): Sensor() {
-    override val title: String = "FileSensor at $filePath"
+    override val title: String = "FileSensor" + Random.nextInt(0, 100)
     override val measurements: List<Measurement>
 
     private var connected = false
