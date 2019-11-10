@@ -11,7 +11,7 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 
 
-class Settings(val parentStage: Stage) : Stage() {
+class SettingsWindow(val parentStage: Stage) : Stage() {
     val tabPane: TabPane
     val sensorTab: Tab
     val chartTab: Tab
@@ -24,8 +24,8 @@ class Settings(val parentStage: Stage) : Stage() {
 
         val mainContent = VBox().apply {
             tabPane = TabPane().apply {
-                sensorTab = SensorTab(this@Settings)
-                chartTab = ChartTab(this@Settings)
+                sensorTab = SensorTab(this@SettingsWindow)
+                chartTab = ChartTab(this@SettingsWindow)
                 formulaTab = Tab("Formulas", HBox().apply {
                     children.addAll(Label("Configure formulas (virtual sensors created by applying measurements to a formula)"))
                 })

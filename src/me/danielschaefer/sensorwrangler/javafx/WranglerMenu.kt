@@ -21,7 +21,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
 
             items.add(MenuItem("Settings").apply {
                 onAction = EventHandler {
-                    Settings(primaryStage)
+                    SettingsWindow(primaryStage)
                 }
             })
             items.add(MenuItem("Exit").apply {
@@ -48,7 +48,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             items.add(MenuItem("Add").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
             items.add(MenuItem("Manage All").apply {
                 onAction = EventHandler {
-                    Settings(primaryStage).apply {
+                    SettingsWindow(primaryStage).apply {
                         tabPane.selectionModel.select(this.sensorTab)
                     }
                 }
@@ -63,7 +63,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             })
             items.add(MenuItem("Manage All").apply {
                 onAction = EventHandler {
-                    Settings(primaryStage).apply {
+                    SettingsWindow(primaryStage).apply {
                         tabPane.selectionModel.select(this.chartTab)
                     }
                 }
