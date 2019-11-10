@@ -2,7 +2,9 @@ package me.danielschaefer.sensorwrangler
 
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyBooleanWrapper
+import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Sensor
@@ -14,7 +16,7 @@ class SensorWrangler() {
         get() = recording.readOnlyProperty
 
     val sensors: MutableList<Sensor> = mutableListOf()
-    val charts: MutableList<Chart> = mutableListOf()
+    val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf())
 
     private var recordingWriter: FileWriter? = null
     private var recordingListeners: MutableList<ListChangeListener<Double>> = mutableListOf()

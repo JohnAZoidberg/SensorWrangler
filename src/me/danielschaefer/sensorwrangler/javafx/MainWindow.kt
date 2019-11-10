@@ -41,6 +41,9 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         val chartBox = VBox()
                         val fxChart = LineChart<String, Number>(CategoryAxis(), NumberAxis())
                         val chartDropdown = ComboBox<String>().apply {
+                            App.instance!!.wrangler.charts.addListener(ListChangeListener {
+                                items.setAll(it.list.map { it.title })
+                            })
                             items.addAll(App.instance!!.wrangler.charts.map { it.title })
                             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                                 oldValue?.let {
@@ -123,8 +126,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 val yAxis = NumberAxis().apply {
                     label = "Value"
                     isAutoRanging = false
-                    lowerBound = 25.0
-                    upperBound = -25.0
+                    lowerBound = 50.0
+                    upperBound = 125.0
                     tickUnit = 1.0
                     animated = false
                 }

@@ -4,6 +4,7 @@ import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import java.time.LocalTime
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -24,10 +25,14 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
         values.add(0.0)
     })
 
+    private var updaters: MutableList<ScheduledExecutorService> = mutableListOf()
+
     init {
         for (measurement in measurements) {
             // TODO: Tie the lifetime of this to the window
-            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate({
+            val updater = Executors.newSingleThreadScheduledExecutor()
+            updaters.add(updater)
+            updater.scheduleAtFixedRate({
                 Platform.runLater {
                     val currentPos = measurement.values.last()
                     var newPos: Double
@@ -39,5 +44,10 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
                 }
             }, 0, updateInterval, TimeUnit.MILLISECONDS)
         }
+    }
+
+    override fun disconnect() {
+        for (updater in updaters)
+            updater.shutdown()
     }
 }

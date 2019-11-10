@@ -15,8 +15,10 @@ import me.danielschaefer.sensorwrangler.javafx.popups.TodoAlert
 fun createMenuBar(primaryStage: Stage): MenuBar {
     return MenuBar().apply {
         val fileMenu = Menu("File").apply {
+            // TODO: What should they even do?
             items.add(MenuItem("Open").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
             items.add(MenuItem("Save").apply { onAction = EventHandler { TodoAlert(primaryStage) }})
+
             items.add(MenuItem("Settings").apply {
                 onAction = EventHandler {
                     Settings(primaryStage)

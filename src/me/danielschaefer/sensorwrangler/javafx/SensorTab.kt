@@ -12,7 +12,8 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.popups.TodoAlert
+import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.sensors.FileSensor
 
 class SensorTab(parentStage: Stage): Tab("Sensors") {
     init {
@@ -62,7 +63,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
                         val disconnectButton = Button("Disconnect").apply {
                             setOnAction {
-                                TodoAlert(parentStage)
+                                sensor.disconnect()
                             }
                         }
 
@@ -73,7 +74,13 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
             val addSensorButton = Button("Add Sensor").apply {
                 setOnAction {
-                    TodoAlert(parentStage)
+                    val fileSensor = FileSensor("/home/zoid/media/clone/active/openant/heartrate.log")
+                    App.instance!!.wrangler.sensors.add(fileSensor)
+
+                    val heartRateChart = Graph("Heart Rate", arrayOf("Time", "BPM"), fileSensor.measurements[0]).apply {
+                        windowSize = 25
+                    }
+                    App.instance!!.wrangler.charts.add(heartRateChart)
                 }
             }
             val sensorListSidebar = VBox(sensorList, addSensorButton)
