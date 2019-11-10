@@ -19,7 +19,7 @@ import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 class ChartTab(parentStage: Stage): Tab("Charts") {
     init {
         content = HBox().apply {
-            val chartDetail = VBox().apply {
+            val chartDetail = VBox(10.0).apply {
                 HBox.setHgrow(this, Priority.SOMETIMES)
             }
 
@@ -85,7 +85,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                     AddChartPopup(parentStage)
                 }
             }
-            val chartListSidebar = VBox(chartList, addChartButton)
+            val chartListSidebar = VBox(10.0, chartList, addChartButton)
             chartListSidebar.children.add(chartDetail)
 
             val separator = Separator().apply {

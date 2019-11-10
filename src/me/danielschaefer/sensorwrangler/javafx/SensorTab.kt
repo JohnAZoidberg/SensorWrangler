@@ -19,7 +19,7 @@ import me.danielschaefer.sensorwrangler.sensors.*
 class SensorTab(parentStage: Stage): Tab("Sensors") {
     init {
         content = HBox().apply {
-            val sensorDetail = VBox().apply {
+            val sensorDetail = VBox(10.0).apply {
                 HBox.setHgrow(this, Priority.SOMETIMES)
             }
 
@@ -120,7 +120,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                     App.instance!!.wrangler.charts.add(heartRateChart)
                 }
             }
-            val sensorListSidebar = VBox(sensorList, addSensorButton)
+            val sensorListSidebar = VBox(10.0, sensorList, addSensorButton)
             sensorListSidebar.children.add(sensorDetail)
 
             val separator = Separator().apply {
