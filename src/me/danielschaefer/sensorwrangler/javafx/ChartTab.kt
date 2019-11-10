@@ -62,9 +62,13 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                             when (chart) {
                                 is Graph -> {
                                     items.addAll(
+                                        TableRow("X-axis label", chart.axisNames[0]),
+                                        TableRow("Y-axis label", chart.axisNames[1]),
+                                        TableRow("Y-axis measurement description", chart.yAxis?.description),
                                         TableRow("Y-axis lower bound", chart.lowerBound.toString()),
                                         TableRow("Y-axis upper bound", chart.upperBound.toString()),
-                                        TableRow("Y-axis tick spacing", chart.tickSpacing.toString())
+                                        TableRow("Y-axis tick spacing", chart.tickSpacing.toString()),
+                                        TableRow("Window size", chart.windowSize.toString())
                                     )
                                 }
                             }
