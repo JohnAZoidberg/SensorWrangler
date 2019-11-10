@@ -6,12 +6,10 @@ import javafx.scene.control.Hyperlink
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
-import javafx.stage.Modality
 import javafx.stage.Stage
 
 class AboutPopup(val parentStage: Stage): Stage() {
     init {
-        initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
         // TODO: Rewrite this with something better than bunching Text objects together

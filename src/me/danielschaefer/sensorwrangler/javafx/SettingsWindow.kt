@@ -7,7 +7,6 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.stage.Modality
 import javafx.stage.Stage
 
 
@@ -18,8 +17,6 @@ class SettingsWindow(val parentStage: Stage) : Stage() {
     val formulaTab: Tab
 
     init {
-        // TODO: Do we want to restrict the user like this?
-        initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
         val mainContent = VBox().apply {

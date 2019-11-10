@@ -16,7 +16,6 @@ import me.danielschaefer.sensorwrangler.javafx.App
 
 class AddChartPopup(val parentStage: Stage): Stage() {
     init {
-        initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
         val formGrid = GridPane().apply {

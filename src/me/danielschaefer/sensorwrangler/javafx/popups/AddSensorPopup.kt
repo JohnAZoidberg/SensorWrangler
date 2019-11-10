@@ -17,7 +17,6 @@ import me.danielschaefer.sensorwrangler.sensors.*
 
 class AddSensorPopup(val parentStage: Stage): Stage() {
     init {
-        initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
         scene = Scene(constructContent())

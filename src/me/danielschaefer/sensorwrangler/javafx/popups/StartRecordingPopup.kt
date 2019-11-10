@@ -7,7 +7,6 @@ import javafx.scene.control.Button
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.DirectoryChooser
-import javafx.stage.Modality
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.javafx.App
 import java.io.File
@@ -15,7 +14,6 @@ import java.nio.file.Paths
 
 class StartRecordingPopup(val parentStage: Stage): Stage() {
     init {
-        initModality(Modality.APPLICATION_MODAL)
         initOwner(parentStage)
 
         // Default to current working directory
