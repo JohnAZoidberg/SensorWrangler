@@ -15,7 +15,7 @@ class RandomSensor(val updateInterval: Long = 250) : Sensor() {
 
     override val title: String = "RandomSensor" + Random.nextInt(0, 100)
 
-    override val measurements: List<Measurement> = listOf(Measurement(Measurement.Unit.METER).apply{
+    override val measurements: List<Measurement> = listOf(Measurement(this, Measurement.Unit.METER).apply{
         description = "Random measurement " + Random.nextInt(0, 100)
         startDate = LocalTime.now()
     })

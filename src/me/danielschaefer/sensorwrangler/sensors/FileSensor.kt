@@ -48,7 +48,7 @@ class FileSensor(val filePath: String): Sensor() {
     }
 
     init {
-        measurements = listOf(Measurement(Measurement.Unit.METER).apply{
+        measurements = listOf(Measurement(this, Measurement.Unit.METER).apply{
             description = "HeartRate"
         })
     }

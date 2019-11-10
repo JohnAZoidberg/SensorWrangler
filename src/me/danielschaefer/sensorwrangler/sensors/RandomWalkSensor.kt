@@ -15,11 +15,11 @@ class RandomWalkSensor(val updateInterval: Long = 250) : Sensor() {
     var maxValue = 25
     var maxStep = 5
 
-    override val measurements: List<Measurement> = listOf(Measurement(Measurement.Unit.METER).apply{
+    override val measurements: List<Measurement> = listOf(Measurement(this, Measurement.Unit.METER).apply{
         description = "Random walk " + Random.nextInt(0, 100)
         startDate = LocalTime.now()
         values.add(0.0)
-    }, Measurement(Measurement.Unit.METER).apply{
+    }, Measurement(this, Measurement.Unit.METER).apply{
         description = "Random walk " + Random.nextInt(0, 100)
         startDate = LocalTime.now()
         values.add(0.0)

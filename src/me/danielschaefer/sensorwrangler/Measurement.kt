@@ -2,11 +2,11 @@ package me.danielschaefer.sensorwrangler
 
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.time.LocalTime
 
-class Measurement(unit: Unit) {
+class Measurement(val sensor: Sensor, val unit: Unit) {
     var description: String? = null
-    val unit: Unit = unit
     var startDate: LocalTime? = null
     /**
      * How much time lies in between each measured value
