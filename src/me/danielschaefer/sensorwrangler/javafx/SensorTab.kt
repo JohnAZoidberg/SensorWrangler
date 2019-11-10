@@ -83,10 +83,17 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             })
                         }
 
-                        // TODO: Handle the default case better
-                        val connectButton = Button("Connect").apply {
-                            setOnAction {
-                                sensor.connect()
+                        val connectButton = Button().apply {
+                            if (sensor.isConnected) {
+                                text = "Disonnect"
+                                setOnAction {
+                                    sensor.disconnect()
+                                }
+                            } else {
+                                text = "Connect"
+                                setOnAction {
+                                    sensor.connect()
+                                }
                             }
                         }
                         sensor.addConnectionChangeListener(object : ConnectionChangeListener {
