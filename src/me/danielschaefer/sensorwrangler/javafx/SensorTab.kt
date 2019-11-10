@@ -2,7 +2,7 @@ package me.danielschaefer.sensorwrangler.javafx
 
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
+import javafx.collections.ListChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.control.*
@@ -24,13 +24,11 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
             }
 
             val sensorList = ListView<Text>().apply {
-                val sensors: ObservableList<Text> = FXCollections.observableList(mutableListOf())
-
-                for (sensor in App.instance!!.wrangler.sensors) {
-                    sensors.add(Text(sensor.title))
-                }
-
-                items = sensors
+                items = FXCollections.observableList(mutableListOf())
+                items.setAll(App.instance!!.wrangler.sensors.map { Text(it.title) })
+                App.instance!!.wrangler.sensors.addListener(ListChangeListener {
+                    items.setAll(it.list.map { Text(it.title) })
+                })
 
                 // TODO: Cache these for better performance
                 selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->

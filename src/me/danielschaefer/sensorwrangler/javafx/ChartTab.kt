@@ -2,7 +2,7 @@ package me.danielschaefer.sensorwrangler.javafx
 
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
-import javafx.collections.ObservableList
+import javafx.collections.ListChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.control.*
@@ -24,13 +24,11 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
             }
 
             val chartList = ListView<Text>().apply {
-                val charts: ObservableList<Text> = FXCollections.observableList(mutableListOf())
-
-                for (chart in App.instance!!.wrangler.charts) {
-                    charts.add(Text(chart.title))
-                }
-
-                items = charts
+                items = FXCollections.observableList(mutableListOf())
+                items.setAll(App.instance!!.wrangler.charts.map { Text(it.title) })
+                App.instance!!.wrangler.charts.addListener(ListChangeListener {
+                    items.setAll(it.list.map { Text(it.title) })
+                })
 
                 // TODO: Cache these for better performance
                 selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->

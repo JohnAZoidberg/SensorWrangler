@@ -15,7 +15,7 @@ class SensorWrangler() {
     val isRecording: ReadOnlyBooleanProperty
         get() = recording.readOnlyProperty
 
-    val sensors: MutableList<Sensor> = mutableListOf()
+    val sensors: ObservableList<Sensor> = FXCollections.observableList(mutableListOf())
     val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf())
 
     private var recordingWriter: FileWriter? = null
