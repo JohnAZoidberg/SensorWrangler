@@ -1,6 +1,7 @@
 package me.danielschaefer.sensorwrangler.javafx.popups
 
 import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.layout.VBox
@@ -52,11 +53,12 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
             }
         }
 
-        val vBox = VBox(targetDirPathLabel, chooseFileButton, startRecordingButton).apply {
+        val vBox = VBox(10.0, targetDirPathLabel, chooseFileButton, startRecordingButton).apply {
             padding = Insets(25.0)
+            alignment = Pos.CENTER;
         }
         scene = Scene(vBox)
-        title = "Add LineChart"
+        title = "Start recording"
 
         sizeToScene()
         show()
