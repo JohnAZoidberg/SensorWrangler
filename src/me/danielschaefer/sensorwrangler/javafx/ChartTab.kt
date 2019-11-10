@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
+import me.danielschaefer.sensorwrangler.gui.Graph
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 class ChartTab(parentStage: Stage): Tab("Charts") {
@@ -56,6 +57,16 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                                 TableRow("Title", chart.title),
                                 TableRow("Currently shown?", StringUtil.yesNo(chart.shown))
                             )
+
+                            when (chart) {
+                                is Graph -> {
+                                    items.addAll(
+                                        TableRow("Y-axis lower bound", chart.lowerBound.toString()),
+                                        TableRow("Y-axis upper bound", chart.upperBound.toString()),
+                                        TableRow("Y-axis tick spacing", chart.tickSpacing.toString())
+                                    )
+                                }
+                            }
                         }
 
                         val removeChartButton = Button("Remove Chart").apply {

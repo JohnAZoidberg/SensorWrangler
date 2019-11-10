@@ -126,9 +126,9 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 val yAxis = NumberAxis().apply {
                     label = "Value"
                     isAutoRanging = false
-                    lowerBound = 50.0
-                    upperBound = 125.0
-                    tickUnit = 1.0
+                    lowerBound = chart.lowerBound
+                    upperBound = chart.upperBound
+                    tickUnit = chart.tickSpacing
                     animated = false
                 }
                 return LineChart(xAxis, yAxis).apply {

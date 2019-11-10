@@ -95,6 +95,9 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
                     val heartRateChart = Graph("Heart Rate", arrayOf("Time", "BPM"), fileSensor.measurements[0]).apply {
                         windowSize = 25
+                        lowerBound = 70.0
+                        upperBound = 100.0
+                        tickSpacing = 5.0
                     }
                     App.instance!!.wrangler.charts.add(heartRateChart)
                 }
