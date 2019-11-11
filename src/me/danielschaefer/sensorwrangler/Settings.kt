@@ -9,5 +9,6 @@ open class Settings {
     val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
     val version = "0.0.1"
 
+    var defaultFileSensorPath = "/home/zoid/media/clone/active/openant/"
     var recordingDirectory: String? = null
 }
