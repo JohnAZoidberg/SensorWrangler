@@ -13,23 +13,31 @@ class FileSensor(val filePath: String): Sensor() {
     override val title: String = "FileSensor" + Random.nextInt(0, 100)
     override val measurements: List<Measurement>
 
-    private val reader = BufferedReader(FileReader(filePath))
+    private var reader: BufferedReader? = null
     private var thread: Thread? = null
 
     override fun disconnect(reason: String?) {
         connected = false
-        reader.close()
+        reader?.close()
 
         super.disconnect(reason)
     }
 
     override fun connect() {
+        reader = BufferedReader(FileReader(filePath))
         measurements[0].startDate = LocalTime.now()
+        connected = true
         thread = Thread {
             while (connected) {
                 // TODO: Add exception handling for when the file is closed
                 try {
-                    val newValue = reader.readLine()
+                    if (reader == null) {
+                        disconnect()
+                        continue
+                    }
+
+                    val newValue = reader?.readLine() ?: continue
+
                     Platform.runLater {
                         measurements[0].values.add(newValue.toDouble())
                     }
