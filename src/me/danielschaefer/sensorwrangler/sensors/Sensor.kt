@@ -2,7 +2,12 @@ package me.danielschaefer.sensorwrangler.sensors
 
 import me.danielschaefer.sensorwrangler.Measurement
 
-abstract class Sensor() {
+/**
+ * Abstract Sensor
+ *
+ * Subclasses must have a default (no-args) constructor!
+ */
+abstract class Sensor {
     abstract val title: String
     abstract val measurements: List<Measurement>
     protected val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()

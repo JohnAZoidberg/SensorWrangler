@@ -4,16 +4,27 @@ import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
+import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
+import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.App
-import me.danielschaefer.sensorwrangler.sensors.*
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeAdapter
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
+import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.File
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.isSubtypeOf
 
 
 class AddSensorPopup(val parentStage: Stage): Stage() {
@@ -31,66 +42,93 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
        val addSensorButton = Button("Add sensor")
        val sensorConfiguration = VBox(10.0)
        val connectionConfiguration = VBox(10.0)
-       val sensorTypeSelection = ComboBox<Text>().apply {
-           // FIXME: The names seem to be disappearing when selecting something else
-           val sensorTypes = listOf(Text("RandomWalkSensor"), Text("RandomSensor"), Text("FileSensor"))
-           items.setAll(sensorTypes)
-           valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
-               if (newValue == null)
-                   return@ChangeListener
 
-               when (newValue.text) {
-                   "RandomWalkSensor" -> {
-                       val updateIntervalField = TextField("250")
-                       sensorConfiguration.children.setAll(Text("RandomWalkSensor options"), updateIntervalField)
-                       sizeToScene()
-                       addSensorButton.setOnAction {
-                           val newSensor = RandomWalkSensor(updateIntervalField.text.toLong())
-                           newSensor.addConnectionChangeListener(createConnectionChangeListener())
-                           App.instance!!.wrangler.sensors.add(newSensor)
-                           close()
-                       }
-                   }
-                   "RandomSensor" -> {
-                       val updateIntervalField = TextField("250")
-                       sensorConfiguration.children.setAll(Text("RandomSensor options"), updateIntervalField)
-                       sizeToScene()
-                       addSensorButton.setOnAction {
-                           val newSensor = RandomSensor(updateIntervalField.text.toLong())
-                           newSensor.addConnectionChangeListener(createConnectionChangeListener())
-                           App.instance!!.wrangler.sensors.add(newSensor)
-                           close()
-                       }
-                   }
-                   "FileSensor" -> {
-                       val fileLabel = Label("")
-                       val fileChooser = FileChooser()
-                       App.instance!!.settings.defaultFileSensorPath?.let {
-                           fileChooser.initialDirectory = File(it)
-                       }
-                       val fileChooserButton = Button("Choose File").apply {
-                           setOnAction {
-                               fileChooser.showOpenDialog(this@AddSensorPopup)?.absolutePath?.let {
-                                   fileLabel.text = it
+       val sensorTypeSelection = ComboBox<Text>().apply {
+           for (supportedSensor in App.instance!!.settings.supportedSensors) {
+               // FIXME: The names seem to be disappearing when selecting something else
+               items.add(Text(supportedSensor.simpleName))
+
+               valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                   if (!newValue.text.equals(supportedSensor.simpleName))
+                       return@ChangeListener
+
+                   sensorConfiguration.children.clear()
+                   connectionConfiguration.children.clear()
+
+                   val mutableProperties = supportedSensor.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
+                   val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
+                   for (property in mutableProperties) {
+                       for (annotation in property.annotations) {
+                           val input: Node = when {
+                               property.returnType.isSubtypeOf(String::class.createType()) -> {
+                                   TextField().apply {
+                                       propertyMap[property] = { text }
+                                   }
+                               }
+                               property.returnType.isSubtypeOf(Long::class.createType()) -> {
+                                   TextField().apply {
+                                       propertyMap[property] = { text.toLong() }
+                                   }
+                               }
+                               property.returnType.isSubtypeOf(Double::class.createType()) -> {
+                                   TextField().apply {
+                                       propertyMap[property] = { text.toDouble() }
+                                   }
+                               }
+                               property.returnType.isSubtypeOf(Integer::class.createType()) -> {
+                                   TextField().apply {
+                                       propertyMap[property] = { text.toInt() }
+                                   }
+                               }
+                               property.returnType.isSubtypeOf(Boolean::class.createType()) -> {
+                                   CheckBox().apply {
+                                       propertyMap[property] = { isSelected }
+                                   }
+                               }
+                               property.returnType.isSubtypeOf(File::class.createType()) -> {
+                                   HBox(10.0).apply {
+                                       val fileLabel = Label()
+                                       val fileButton = Button("Choose file").apply {
+                                           setOnAction {
+                                               val fileChooser = FileChooser()
+                                               App.instance!!.settings.defaultFileSensorPath?.let {
+                                                   fileChooser.initialDirectory = File(it)
+                                               }
+                                               fileChooser.showOpenDialog(this@AddSensorPopup)?.absolutePath?.let {
+                                                   fileLabel.text = it
+                                               }
+                                           }
+                                           propertyMap[property] = { File(fileLabel.text) }
+                                       }
+                                       children.addAll(fileLabel, fileButton)
+                                   }
+                               }
+                               else -> TODO("Don't know how to handle this type")
+                           }
+                           when (annotation) {
+                               is SensorProperty -> {
+                                   val label = Label(annotation.title)
+                                   sensorConfiguration.children.add(HBox(10.0, label, input))
+                               }
+                               is ConnectionProperty -> {
+                                   val label = Label(annotation.title)
+                                   connectionConfiguration.children.add(HBox(10.0, label, input))
                                }
                            }
                        }
-
-                       sensorConfiguration.children.setAll(Text("FileSensor options"))
-                       connectionConfiguration.children.setAll(fileLabel, fileChooserButton)
-                       sizeToScene()
-                       addSensorButton.setOnAction {
-                           FileSensor(fileLabel.text).apply {
-                               addConnectionChangeListener(createConnectionChangeListener())
-                               App.instance!!.wrangler.sensors.add(this)
-                           }
-                           print("Added new file sensor at ${fileLabel.text}")
-                           close()
-                       }
                    }
-               }
-               println("Changed sensor selection from ${oldValue?.text} to ${newValue.text}")
-           })
+                   sizeToScene()
+                   addSensorButton.setOnAction {
+                       val newSensor = supportedSensor.createInstance()
+                       for ((property, y) in propertyMap) {
+                           var newVal = y()
+                           property.setter.call(newSensor, y())
+                       }
+                       App.instance!!.wrangler.sensors.add(newSensor)
+                       close()
+                   }
+               })
+           }
        }
        val sensorBox = VBox().apply {
            spacing = 10.0

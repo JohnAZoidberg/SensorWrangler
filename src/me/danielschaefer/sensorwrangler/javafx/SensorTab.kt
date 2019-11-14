@@ -62,7 +62,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             // Information about a specific type of sensor
                             when (sensor) {
                                 is FileSensor -> {
-                                    items.add(TableRow("File path", sensor.filePath))
+                                    items.add(TableRow("File path", sensor.filePath.absolutePath))
                                 }
                                 is RandomSensor -> {
                                     items.add(TableRow("Update interval [ms]", sensor.updateInterval.toString()))

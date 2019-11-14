@@ -2,19 +2,27 @@ package me.danielschaefer.sensorwrangler.sensors
 
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
+import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import org.apache.commons.io.input.Tailer
 import org.apache.commons.io.input.TailerListenerAdapter
 import java.io.File
 import java.time.LocalTime
 import kotlin.random.Random
 
-class FileSensor(val filePath: String): Sensor() {
+class FileSensor: Sensor() {
     override val title: String = "FileSensor" + Random.nextInt(0, 100)
     override val measurements: List<Measurement> = listOf(Measurement(this, Measurement.Unit.METER).apply{
         description = "HeartRate"
     })
 
     private var tailer: Tailer? = null
+
+    @ConnectionProperty(title = "File path")
+    lateinit var filePath: File
+
+    @SensorProperty(title = "Tail?")
+    var tail: Boolean = false
 
     override fun disconnect(reason: String?) {
         connected = false
@@ -43,7 +51,7 @@ class FileSensor(val filePath: String): Sensor() {
                 }
             }
         }
-        tailer = Tailer.create(File(filePath), tailerListener, 1000)
+        tailer = Tailer.create(filePath, tailerListener, 1000)
         measurements[0].startDate = LocalTime.now()
         connected = true
 

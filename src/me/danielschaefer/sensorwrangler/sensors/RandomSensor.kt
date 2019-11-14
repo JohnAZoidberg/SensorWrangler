@@ -2,6 +2,7 @@ package me.danielschaefer.sensorwrangler.sensors
 
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import java.time.LocalTime
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -9,9 +10,10 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-class RandomSensor(val updateInterval: Long = 250) : Sensor() {
-    var minValue = -10;
-    var maxValue = 10;
+class RandomSensor : Sensor() {
+    @SensorProperty(title = "Update Interval") var updateInterval: Long = 250
+    @SensorProperty(title = "Minimum value") var minValue = -10;
+    @SensorProperty(title = "Maximum value") var maxValue = 10;
 
     override val title: String = "RandomSensor" + Random.nextInt(0, 100)
 

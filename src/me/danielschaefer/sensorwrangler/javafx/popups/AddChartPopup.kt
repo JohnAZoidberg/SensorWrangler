@@ -24,8 +24,7 @@ class AddChartPopup(val parentStage: Stage): Stage() {
             vgap = 10.0
 
             val typeDropdown = ComboBox<String>().apply{
-                items.add("Graph")
-                items.add("ScatterChart")
+                items.addAll(App.instance!!.settings.supportedCharts.map { it.simpleName })
             }
 
             val chartNameField = TextField()
@@ -97,7 +96,7 @@ class AddChartPopup(val parentStage: Stage): Stage() {
 
                     val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
                     when (typeDropdown.value) {
-                        "LineChart" -> LineGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
+                        "LineGraph" -> LineGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
                             windowSize = windowSizeField.text.toInt()
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
@@ -119,7 +118,7 @@ class AddChartPopup(val parentStage: Stage): Stage() {
         }
 
         scene = Scene(formGrid)
-        title = "Add LineChart"
+        title = "Add Chart"
 
         sizeToScene()
         show()

@@ -33,7 +33,8 @@ class App: Application() {
     }
 
     private fun runMainWindow(primaryStage: Stage) {
-        val dummyPowerSensor = RandomSensor(1000).apply {
+        val dummyPowerSensor = RandomSensor().apply {
+            updateInterval = 1000
             minValue = 0
             maxValue = 10
         }
