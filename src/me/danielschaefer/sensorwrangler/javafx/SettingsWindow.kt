@@ -15,6 +15,7 @@ class SettingsWindow(val parentStage: Stage) : Stage() {
     val sensorTab: Tab
     val chartTab: Tab
     val formulaTab: Tab
+    val preferencesTab: Tab
 
     init {
         initOwner(parentStage)
@@ -26,8 +27,9 @@ class SettingsWindow(val parentStage: Stage) : Stage() {
                 formulaTab = Tab("Formulas", HBox().apply {
                     children.addAll(Label("Configure formulas (virtual sensors created by applying measurements to a formula)"))
                 })
+                preferencesTab = PreferencesTab(this@SettingsWindow)
 
-                tabs.addAll(sensorTab, chartTab, formulaTab)
+                tabs.addAll(sensorTab, chartTab, formulaTab, preferencesTab)
 
                 // TODO: Do using CSS .tab-pane > .tab-content-area > * { -fx-padding: 25; }
                 val insets = Insets(25.0)

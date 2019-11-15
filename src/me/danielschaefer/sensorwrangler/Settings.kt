@@ -9,6 +9,10 @@ open class Settings {
     val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
     val version = "0.0.1"
 
-    var defaultFileSensorPath = "/home/zoid/media/clone/active/openant/"
+    // TODO: Think about how to have preferences of sensors of plugins
+    @Preference("Default path of file sensor", picker=Picker.FileOpen)
+    var defaultFileSensorPath: String = "/home/zoid/media/clone/active/openant/"
+
+    @Preference("Default recording directory", picker=Picker.Directory)
     var recordingDirectory: String? = null
 }
