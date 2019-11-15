@@ -2,62 +2,52 @@ package me.danielschaefer.sensorwrangler.sensors
 
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
-import java.io.BufferedReader
-import java.io.FileReader
-import java.io.IOException
-import java.lang.Thread.sleep
+import org.apache.commons.io.input.Tailer
+import org.apache.commons.io.input.TailerListenerAdapter
+import java.io.File
 import java.time.LocalTime
 import kotlin.random.Random
 
 class FileSensor(val filePath: String): Sensor() {
     override val title: String = "FileSensor" + Random.nextInt(0, 100)
-    override val measurements: List<Measurement>
+    override val measurements: List<Measurement> = listOf(Measurement(this, Measurement.Unit.METER).apply{
+        description = "HeartRate"
+    })
 
-    private var reader: BufferedReader? = null
-    private var thread: Thread? = null
+    private var tailer: Tailer? = null
 
     override fun disconnect(reason: String?) {
         connected = false
-        reader?.close()
+        tailer?.stop()
 
         super.disconnect(reason)
     }
 
     override fun connect() {
-        reader = BufferedReader(FileReader(filePath))
-        measurements[0].startDate = LocalTime.now()
-        connected = true
-        thread = Thread {
-            while (connected) {
-                // TODO: Add exception handling for when the file is closed
-                try {
-                    if (reader == null) {
-                        disconnect()
-                        continue
-                    }
+        // NOTE: Maybe Apache Commons for this is overkill, look at
+        // https://crunchify.com/log-file-tailer-tail-f-implementation-in-java-best-way-to-tail-any-file-programmatically/
+        val tailerListener = object: TailerListenerAdapter() {
+            override fun handle(ex: Exception?) {
+                disconnect()
+                super.handle(ex)
+            }
 
-                    val newValue = reader?.readLine() ?: continue
+            override fun handle(line: String?) {
+                println("Read $line from $filePath")
 
-                    Platform.runLater {
-                        measurements[0].values.add(newValue.toDouble())
-                    }
+                if (line == null)
+                    return
 
-                    println(newValue)
-                    sleep(1000)
-                } catch (e: IOException ) {
-                    disconnect("IOException: ${e.message}")
+                Platform.runLater {
+                    measurements[0].values.add(line.toDouble())
                 }
             }
-        }.apply {
-            start()
         }
+        tailer = Tailer.create(File(filePath), tailerListener, 1000)
+        measurements[0].startDate = LocalTime.now()
+        connected = true
 
         super.connect()
     }
 
-    init {
-        measurements = listOf(Measurement(this, Measurement.Unit.METER).apply{
-            description = "HeartRate"
-        })
-    }
 }
