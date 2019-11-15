@@ -9,9 +9,9 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.TextField
 import javafx.scene.layout.GridPane
 import javafx.scene.text.Text
-import javafx.stage.Modality
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.gui.LineGraph
+import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.javafx.App
 
 class AddChartPopup(val parentStage: Stage): Stage() {
@@ -24,8 +24,8 @@ class AddChartPopup(val parentStage: Stage): Stage() {
             vgap = 10.0
 
             val typeDropdown = ComboBox<String>().apply{
-                items.add("LineChart")
-                items.add("TODO: Scatterplot")
+                items.add("Graph")
+                items.add("ScatterChart")
             }
 
             val chartNameField = TextField()
@@ -96,13 +96,22 @@ class AddChartPopup(val parentStage: Stage): Stage() {
                         return@EventHandler
 
                     val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
-                    val heartRateChart = Graph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
-                        windowSize = windowSizeField.text.toInt()
-                        lowerBound = lowerBoundField.text.toDouble()
-                        upperBound = upperBoundField.text.toDouble()
-                        tickSpacing = tickSpacingField.text.toDouble()
+                    when (typeDropdown.value) {
+                        "LineChart" -> LineGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
+                            windowSize = windowSizeField.text.toInt()
+                            lowerBound = lowerBoundField.text.toDouble()
+                            upperBound = upperBoundField.text.toDouble()
+                            tickSpacing = tickSpacingField.text.toDouble()
+                            App.instance!!.wrangler.charts.add(this)
+                        }
+                        "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
+                            windowSize = windowSizeField.text.toInt()
+                            lowerBound = lowerBoundField.text.toDouble()
+                            upperBound = upperBoundField.text.toDouble()
+                            tickSpacing = tickSpacingField.text.toDouble()
+                            App.instance!!.wrangler.charts.add(this)
+                        }
                     }
-                    App.instance!!.wrangler.charts.add(heartRateChart)
                     close()
                 }
             }

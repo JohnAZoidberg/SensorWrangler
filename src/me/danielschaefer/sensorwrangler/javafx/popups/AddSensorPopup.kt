@@ -80,9 +80,11 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
                        connectionConfiguration.children.setAll(fileLabel, fileChooserButton)
                        sizeToScene()
                        addSensorButton.setOnAction {
-                           val newSensor = FileSensor(fileLabel.text)
-                           newSensor.addConnectionChangeListener(createConnectionChangeListener())
-                           App.instance!!.wrangler.sensors.add(newSensor)
+                           FileSensor(fileLabel.text).apply {
+                               addConnectionChangeListener(createConnectionChangeListener())
+                               App.instance!!.wrangler.sensors.add(this)
+                           }
+                           print("Added new file sensor at ${fileLabel.text}")
                            close()
                        }
                    }

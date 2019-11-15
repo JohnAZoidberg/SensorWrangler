@@ -6,7 +6,7 @@ import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.gui.Chart
-import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.FileWriter
@@ -76,7 +76,7 @@ class SensorWrangler() {
     fun removeSensor(sensor: Sensor) {
         for (measurement in sensor.measurements) {
             for (chart in charts) {
-                if (chart is Graph && chart.yAxis == measurement)
+                if (chart is LineGraph && chart.yAxis == measurement)
                     charts.remove(chart)
             }
         }

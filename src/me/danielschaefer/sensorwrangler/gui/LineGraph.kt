@@ -5,13 +5,13 @@ import javafx.scene.chart.XYChart
 import me.danielschaefer.sensorwrangler.Measurement
 
 
-class Graph(title: String, val axisNames: Array<String>, val yAxis: Measurement? = null) : Chart(title) {
-    var mappedList: ObservableList<XYChart.Data<String, Number>>? = null
+class LineGraph(title: String, axisNames: Array<String>, yAxis: Measurement? = null) : AxisGraph(title, axisNames, yAxis) {
+    override var mappedList: ObservableList<XYChart.Data<String, Number>>? = null
 
-    var windowSize: Int = 25
-    var lowerBound: Double = -10.0
-    var upperBound: Double = 10.0
-    var tickSpacing: Double = 1.0
+    override var windowSize: Int = 25
+    override var lowerBound: Double = -10.0
+    override var upperBound: Double = 10.0
+    override var tickSpacing: Double = 1.0
 
     init {
         if (yAxis != null) {

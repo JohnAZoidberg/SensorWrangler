@@ -7,18 +7,17 @@ import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.scene.Node
 import javafx.scene.Scene
-import javafx.scene.chart.CategoryAxis
-import javafx.scene.chart.LineChart
-import javafx.scene.chart.NumberAxis
-import javafx.scene.chart.XYChart
+import javafx.scene.chart.*
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
 import javafx.scene.layout.*
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
+import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.gui.Chart
-import me.danielschaefer.sensorwrangler.gui.Graph
+import me.danielschaefer.sensorwrangler.gui.LineGraph
+import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
@@ -122,7 +121,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun createFxChart(chart: Chart): Node? {
         when (chart) {
-            is Graph -> {
+            is AxisGraph -> {
                 val xAxis = CategoryAxis().apply {
                     label = chart.axisNames[0]
                     animated = false
@@ -136,7 +135,15 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     tickUnit = chart.tickSpacing
                     animated = false
                 }
-                return LineChart(xAxis, yAxis).apply {
+                val fxChart = when (chart) {
+                    is LineGraph -> LineChart(xAxis, yAxis)
+                    is ScatterGraph -> ScatterChart(xAxis, yAxis)
+                    else -> {
+                        println("Cannot display this kind of chart")
+                        null
+                    }
+                }
+                return fxChart?.apply {
                     title = chart.title
                     animated = false
                     val series = XYChart.Series<String, Number>().apply {
@@ -147,7 +154,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         // TODO: Remove this really bad hack
                         if (chart.mappedList == null) {
                             chart.mappedList = MappedList(chart.yAxis.values) {
-                                 XYChart.Data("${it.index}", it.value as Number)
+                                XYChart.Data("${it.index}", it.value as Number)
                             }
                         }
 
