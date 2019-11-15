@@ -11,7 +11,7 @@ open class Settings {
 
     // TODO: Think about how to have preferences of sensors of plugins
     @Preference("Default path of file sensor", picker=Picker.FileOpen)
-    var defaultFileSensorPath: String = "/home/zoid/media/clone/active/openant/"
+    var defaultFileSensorPath: String? = null
 
     @Preference("Default recording directory", picker=Picker.Directory)
     var recordingDirectory: String? = null
