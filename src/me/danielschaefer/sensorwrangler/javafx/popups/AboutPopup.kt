@@ -7,8 +7,14 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 import javafx.stage.Stage
+import me.danielschaefer.sensorwrangler.javafx.App
+import kotlin.reflect.KClass
 
 class AboutPopup(val parentStage: Stage): Stage() {
+    private fun foldClassNames(classes: Collection<KClass<*>>): String {
+        return classes.fold("", { acc, cls -> "$acc\n  - ${cls.simpleName}" })
+    }
+
     init {
         initOwner(parentStage)
 
@@ -16,9 +22,9 @@ class AboutPopup(val parentStage: Stage): Stage() {
         // TODO: Add information about available sensors, virtual sensors and charts
         val titleText =
             Text("SensorWrangler ${me.danielschaefer.sensorwrangler.javafx.App.instance!!.settings.version}")
-        val sensorText = Text("Built-in sensor drivers:")
-        val virtualSensorText = Text("Available formulas types:")
-        val chartText = Text("Available chart types:")
+        val sensorText = Text("Built-in sensor drivers:" + foldClassNames(App.instance!!.settings.supportedSensors))
+        val virtualSensorText = Text("Available formulas types:" + foldClassNames(App.instance!!.settings.supportedFormulas))
+        val chartText = Text("Available chart types:" + foldClassNames(App.instance!!.settings.supportedCharts))
 
         val freeSoftware = Hyperlink("Free Software").apply {
             setOnAction {
