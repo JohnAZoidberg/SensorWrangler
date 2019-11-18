@@ -43,13 +43,13 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
        val sensorConfiguration = VBox(10.0)
        val connectionConfiguration = VBox(10.0)
 
-       val sensorTypeSelection = ComboBox<Text>().apply {
+       val sensorTypeSelection = ComboBox<String>().apply {
            for (supportedSensor in App.instance.settings.supportedSensors) {
                // FIXME: The names seem to be disappearing when selecting something else
-               items.add(Text(supportedSensor.simpleName))
+               items.add(supportedSensor.simpleName)
 
                valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
-                   if (!newValue.text.equals(supportedSensor.simpleName))
+                   if (!newValue.equals(supportedSensor.simpleName))
                        return@ChangeListener
 
                    sensorConfiguration.children.clear()
