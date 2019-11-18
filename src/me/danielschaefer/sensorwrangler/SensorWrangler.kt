@@ -75,10 +75,7 @@ class SensorWrangler() {
      */
     fun removeSensor(sensor: Sensor) {
         for (measurement in sensor.measurements) {
-            for (chart in charts) {
-                if (chart is LineGraph && chart.yAxis == measurement)
-                    charts.remove(chart)
-            }
+            charts.removeIf { chart -> chart is LineGraph && chart.yAxis == measurement }
         }
         sensors.remove(sensor)
     }

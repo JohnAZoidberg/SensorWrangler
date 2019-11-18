@@ -17,13 +17,15 @@ import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 class ChartTab(parentStage: Stage): Tab("Charts") {
+    val chartList: ListView<Text>
+
     init {
         content = HBox().apply {
             val chartDetail = VBox(10.0).apply {
                 HBox.setHgrow(this, Priority.SOMETIMES)
             }
 
-            val chartList = ListView<Text>().apply {
+            chartList = ListView<Text>().apply {
                 items = FXCollections.observableList(mutableListOf())
                 items.setAll(App.instance.wrangler.charts.map { Text(it.title) })
                 App.instance.wrangler.charts.addListener(ListChangeListener {
@@ -78,6 +80,11 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                         val removeChartButton = Button("Remove Chart").apply {
                             setOnAction {
                                 App.instance.wrangler.charts.remove(chart)
+                                if (App.instance.wrangler.charts.size > 0) {
+                                    selectionModel.select(items.last())
+                                } else {
+                                    chartDetail.children.clear()
+                                }
                             }
                         }
 
@@ -88,7 +95,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
 
             val addChartButton = Button("Add Chart").apply {
                 setOnAction {
-                    AddChartPopup(parentStage)
+                    AddChartPopup(parentStage, this@ChartTab)
                 }
             }
             val chartListSidebar = VBox(10.0, chartList, addChartButton)

@@ -16,6 +16,7 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.javafx.SensorTab
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeAdapter
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import me.danielschaefer.sensorwrangler.sensors.Sensor
@@ -27,7 +28,7 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubtypeOf
 
 
-class AddSensorPopup(val parentStage: Stage): Stage() {
+class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): Stage() {
     init {
         initOwner(parentStage)
 
@@ -120,11 +121,12 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
                    sizeToScene()
                    addSensorButton.setOnAction {
                        val newSensor = supportedSensor.createInstance()
-                       for ((property, y) in propertyMap) {
-                           var newVal = y()
-                           property.setter.call(newSensor, y())
+                       for ((property, getValue) in propertyMap) {
+                           property.setter.call(newSensor, getValue())
                        }
                        App.instance.wrangler.sensors.add(newSensor)
+                       sensorTab?.sensorList?.selectionModel?.select(sensorTab.sensorList.items.last())
+
                        close()
                    }
                })

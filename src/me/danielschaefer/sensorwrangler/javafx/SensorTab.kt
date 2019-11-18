@@ -17,13 +17,15 @@ import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.sensors.*
 
 class SensorTab(parentStage: Stage): Tab("Sensors") {
+    val sensorList: ListView<Text>
+
     init {
         content = HBox().apply {
             val sensorDetail = VBox(10.0).apply {
                 HBox.setHgrow(this, Priority.SOMETIMES)
             }
 
-            val sensorList = ListView<Text>().apply {
+            sensorList = ListView<Text>().apply {
                 items = FXCollections.observableList(mutableListOf())
                 items.setAll(App.instance.wrangler.sensors.map { Text(it.title) })
                 App.instance.wrangler.sensors.addListener(ListChangeListener {
@@ -116,11 +118,17 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
                         val removeSensorButton = Button("Remove Sensor").apply {
                             setOnAction {
-                                if (sensor.isConnected)
+                                if (sensor.isConnected) {
                                     Alert(parentStage, "Sensor is connected",
                                         "Please disconnect the sensor before removing it.")
-                                else
+                                } else {
                                     App.instance.wrangler.removeSensor(sensor)
+                                    if (App.instance.wrangler.sensors.size > 0) {
+                                        selectionModel.select(items.last())
+                                    } else {
+                                         sensorDetail.children.clear()
+                                    }
+                                }
                             }
                         }
 
@@ -132,7 +140,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
             val addSensorButton = Button("Add Sensor").apply {
                 setOnAction {
-                    AddSensorPopup(parentStage)
+                    AddSensorPopup(parentStage, this@SensorTab)
                 }
             }
             val sensorListSidebar = VBox(10.0, sensorList, addSensorButton)

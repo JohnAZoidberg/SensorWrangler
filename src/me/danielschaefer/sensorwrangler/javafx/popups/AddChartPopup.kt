@@ -13,8 +13,9 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.javafx.ChartTab
 
-class AddChartPopup(val parentStage: Stage): Stage() {
+class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage() {
     init {
         initOwner(parentStage)
 
@@ -95,22 +96,24 @@ class AddChartPopup(val parentStage: Stage): Stage() {
                         return@EventHandler
 
                     val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
-                    when (typeDropdown.value) {
+                    val newChart = when (typeDropdown.value) {
                         "LineGraph" -> LineGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
                             windowSize = windowSizeField.text.toInt()
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
                             tickSpacing = tickSpacingField.text.toDouble()
-                            App.instance.wrangler.charts.add(this)
                         }
                         "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
                             windowSize = windowSizeField.text.toInt()
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
                             tickSpacing = tickSpacingField.text.toDouble()
-                            App.instance.wrangler.charts.add(this)
                         }
+                        else -> TODO("This chart is not recognized.")
                     }
+
+                    App.instance.wrangler.charts.add(newChart)
+                    chartTab?.chartList?.selectionModel?.select(chartTab.chartList.items.last())
                     close()
                 }
             }
