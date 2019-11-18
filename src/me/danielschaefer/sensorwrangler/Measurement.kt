@@ -6,6 +6,7 @@ import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.time.LocalTime
 
 class Measurement(val sensor: Sensor, val unit: Unit) {
+    // TODO: Add description to constructor and think about what to do with Unit
     var description: String? = null
     var startDate: LocalTime? = null
     /**

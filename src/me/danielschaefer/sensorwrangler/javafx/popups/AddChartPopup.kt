@@ -10,6 +10,7 @@ import javafx.scene.control.TextField
 import javafx.scene.layout.GridPane
 import javafx.scene.text.Text
 import javafx.stage.Stage
+import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.javafx.App
@@ -36,9 +37,8 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             val upperBoundField = TextField("10.0")
             val tickSpacingField = TextField("1")
 
-
-            val yAxisMeasurement = ComboBox<String>()
-            val yAxisSensor = ComboBox<String>().apply{
+            val yAxisMeasurements = listOf(ComboBox<String>(), ComboBox<String>())
+            val yAxisSensors = listOf(ComboBox<String>().apply{
                 items.setAll(App.instance.wrangler.sensors.map { it.title })
                 valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                     if (newValue == null)
@@ -48,10 +48,21 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                     if (sensor == null)
                         return@ChangeListener
 
-                    yAxisMeasurement.items.setAll(sensor.measurements.map { it.description })
+                    yAxisMeasurements[0].items.setAll(sensor.measurements.map { it.description })
                 })
-            }
+            }, ComboBox<String>().apply{
+                items.setAll(App.instance.wrangler.sensors.map { it.title })
+                valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                    if (newValue == null)
+                        return@ChangeListener
 
+                    val sensor = App.instance.wrangler.findSensorByTitle(newValue)
+                    if (sensor == null)
+                        return@ChangeListener
+
+                    yAxisMeasurements[1].items.setAll(sensor.measurements.map { it.description })
+                })
+            })
 
             add(Text("Chart Type"), 0, 0)
             add(typeDropdown, 1, 0)
@@ -59,51 +70,57 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(Text("Chart Name"), 0, 1)
             add(chartNameField, 1, 1)
 
+            add(Text("Window Size"), 0, 2)
+            add(windowSizeField, 1, 2)
+
+            add(Text("Lower Bound"), 0, 3)
+            add(lowerBoundField, 1, 3)
+
+            add(Text("Upper Bound"), 0, 4)
+            add(upperBoundField, 1, 4)
+
+            add(Text("Tick spacing"), 0, 5)
+            add(tickSpacingField, 1, 5)
+
             // add(Empty)
-            add(Text("Label"), 1, 2)
-            add(Text("Measurement"), 2, 2)
+            add(Text("Label"), 1, 6)
+            add(Text("Measurement"), 2, 6)
 
-            add(Text("X-Axis"), 0, 3)
-            add(xAxisNameField, 1, 3)
-            add(Text("Time"), 2, 3)
+            add(Text("X-Axis"), 0, 7)
+            add(xAxisNameField, 1, 7)
+            add(Text("Time"), 2, 7)
 
-            add(Text("Y-Axis"), 0, 4)
-            add(yAxisNameField, 1, 4)
-            add(yAxisSensor, 2, 4)
-            add(yAxisMeasurement, 3, 4)
+            add(Text("Y-Axis"), 0, 8)
+            add(yAxisNameField, 1, 8)
 
-            add(Text("Window Size"), 0, 5)
-            add(windowSizeField, 1, 5)
-
-            add(Text("Lower Bound"), 0, 6)
-            add(lowerBoundField, 1, 6)
-
-            add(Text("Upper Bound"), 0, 7)
-            add(upperBoundField, 1, 7)
-
-            add(Text("Tick spacing"), 0, 8)
-            add(tickSpacingField, 1, 8)
-
-            // TODO: Chart type specifics
-            // Which Measurement on which axis
-            // Axis labels
+            for (i in 0..1) {
+                add(Text("Y-Axis $i"), 0, 9+i)
+                add(yAxisSensors[i], 2, 9+i)
+                add(yAxisMeasurements[i], 3, 9+i)
+            }
 
             val addButton = Button("Add").apply {
                 onAction = EventHandler {
-                    val selectedSensor = App.instance.wrangler.findSensorByTitle(yAxisSensor.value)
-                    val selectedMeasurement = selectedSensor?.measurements?.filter { it.description == yAxisMeasurement.value }
-                    if (selectedMeasurement == null)
+                    val selectedMeasurements: MutableList<Measurement> = mutableListOf()
+                    for (i in 0..1) {
+                        val selectedSensor = App.instance.wrangler.findSensorByTitle(yAxisSensors[i].value)
+                        selectedSensor?.measurements?.filter { it.description == yAxisMeasurements[i].value }?.let {
+                            selectedMeasurements.add(it[0])
+                        }
+                    }
+
+                    if (selectedMeasurements.isEmpty())
                         return@EventHandler
 
                     val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
                     val newChart = when (typeDropdown.value) {
-                        "LineGraph" -> LineGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
+                        "LineGraph" -> LineGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
                             windowSize = windowSizeField.text.toInt()
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
                             tickSpacing = tickSpacingField.text.toDouble()
                         }
-                        "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
+                        "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
                             windowSize = windowSizeField.text.toInt()
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
@@ -117,7 +134,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                     close()
                 }
             }
-            add(addButton, 0, 9)
+            add(addButton, 0, 11)
         }
 
         scene = Scene(formGrid)

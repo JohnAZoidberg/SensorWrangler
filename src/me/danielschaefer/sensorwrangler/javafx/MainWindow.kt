@@ -127,7 +127,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     animated = false
                 }
 
-                val yAxis = NumberAxis().apply {
+                val fxYAxis = NumberAxis().apply {
                     label = chart.axisNames[1]
                     isAutoRanging = false
                     lowerBound = chart.lowerBound
@@ -136,8 +136,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     animated = false
                 }
                 val fxChart = when (chart) {
-                    is LineGraph -> LineChart(xAxis, yAxis)
-                    is ScatterGraph -> ScatterChart(xAxis, yAxis)
+                    is LineGraph -> LineChart(xAxis, fxYAxis)
+                    is ScatterGraph -> ScatterChart(xAxis, fxYAxis)
                     else -> {
                         println("Cannot display this kind of chart")
                         null
@@ -146,34 +146,30 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 return fxChart?.apply {
                     title = chart.title
                     animated = false
-                    val series = XYChart.Series<String, Number>().apply {
-                        name = chart.yAxis?.description ?: "Data"
-                    }
-                    if (chart.yAxis != null) {
+                    for (yAxis in chart.yAxes) {
+                        val series = XYChart.Series<String, Number>().apply {
+                            name = yAxis.description ?: "Data"
+                        }
+
                         // Need to attach it to chart, otherwise it gets garbage collected
                         // TODO: Remove this really bad hack
-                        if (chart.mappedList == null) {
-                            chart.mappedList = MappedList(chart.yAxis.values) {
-                                XYChart.Data("${it.index}", it.value as Number)
-                            }
+                        val mappedList = MappedList(yAxis.values) {
+                            XYChart.Data("${it.index}", it.value as Number)
                         }
+                        chart.mappedLists.add(mappedList)
 
                         val emptyList = mutableListOf<XYChart.Data<String, Number>>()
                         series.data = FXCollections.observableList(emptyList)
 
                         // TODO: Do this more efficiently without reassigning the entire list
-                        chart.mappedList!!.addListener(ListChangeListener {
+                        mappedList.addListener(ListChangeListener {
                             val first =
-                                if (chart.mappedList!!.size > chart.windowSize) chart.mappedList!!.size - chart.windowSize else 0;
-                            series.data.setAll(chart.mappedList!!.subList(first, chart.mappedList!!.size))
+                                if (mappedList.size > chart.windowSize) mappedList.size - chart.windowSize else 0;
+                            series.data.setAll(mappedList.subList(first, mappedList.size))
                         })
                         //series.data = mappedList
-                    } else {
-                        val emptyList = mutableListOf<XYChart.Data<String, Number>>()
-                        series.data = FXCollections.observableList(emptyList)
-                        series.data.addAll(listOf(1, 2, 3, 4, 5).map({ XYChart.Data<String, Number>("foo$it", it) }))
+                        data.add(series)
                     }
-                    data.add(series)
                 }
             }
             else -> println("Cannot display this kind of chart")
