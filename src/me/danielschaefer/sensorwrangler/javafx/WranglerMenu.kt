@@ -36,7 +36,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             })
             items.add(MenuItem("Stop Recording").apply {
                 onAction = EventHandler {
-                    App.instance!!.wrangler.stopRecording()
+                    App.instance.wrangler.stopRecording()
                 }
             })
         }
@@ -87,14 +87,9 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
 }
 
 fun getMeasurements(): MutableList<String?> {
-    if (App.instance == null)
-        return mutableListOf()
-
-    val foo = mutableListOf<String?>()
-    for (sensor in App.instance!!.wrangler.sensors) {
-        for (measurement in sensor.measurements) {
-            foo.add("${sensor.title}: ${measurement.description}")
+    return App.instance.wrangler.sensors.flatMap { sensor ->
+        sensor.measurements.map { measurement ->
+            "${sensor.title}: ${measurement.description}"
         }
-    }
-    return foo
+    }.toMutableList()
 }

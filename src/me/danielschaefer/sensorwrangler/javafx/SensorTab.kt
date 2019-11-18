@@ -25,8 +25,8 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
             val sensorList = ListView<Text>().apply {
                 items = FXCollections.observableList(mutableListOf())
-                items.setAll(App.instance!!.wrangler.sensors.map { Text(it.title) })
-                App.instance!!.wrangler.sensors.addListener(ListChangeListener {
+                items.setAll(App.instance.wrangler.sensors.map { Text(it.title) })
+                App.instance.wrangler.sensors.addListener(ListChangeListener {
                     items.setAll(it.list.map { Text(it.title) })
                 })
 
@@ -36,7 +36,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                         return@ChangeListener
 
                     // TODO: Pass Sensor object to avoid searching and possible failure
-                    val sensor = App.instance!!.wrangler.findSensorByTitle(newValue.text)
+                    val sensor = App.instance.wrangler.findSensorByTitle(newValue.text)
                     sensor?.let {
                         val sensorDetailTable = TableView<TableRow>().apply {
                             // Have columns expand to fill all available space
@@ -120,7 +120,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                                     Alert(parentStage, "Sensor is connected",
                                         "Please disconnect the sensor before removing it.")
                                 else
-                                    App.instance!!.wrangler.removeSensor(sensor)
+                                    App.instance.wrangler.removeSensor(sensor)
                             }
                         }
 

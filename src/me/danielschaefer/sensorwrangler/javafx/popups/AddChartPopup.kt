@@ -24,7 +24,7 @@ class AddChartPopup(val parentStage: Stage): Stage() {
             vgap = 10.0
 
             val typeDropdown = ComboBox<String>().apply{
-                items.addAll(App.instance!!.settings.supportedCharts.map { it.simpleName })
+                items.addAll(App.instance.settings.supportedCharts.map { it.simpleName })
             }
 
             val chartNameField = TextField()
@@ -38,12 +38,12 @@ class AddChartPopup(val parentStage: Stage): Stage() {
 
             val yAxisMeasurement = ComboBox<String>()
             val yAxisSensor = ComboBox<String>().apply{
-                items.setAll(App.instance!!.wrangler.sensors.map { it.title })
+                items.setAll(App.instance.wrangler.sensors.map { it.title })
                 valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                     if (newValue == null)
                         return@ChangeListener
 
-                    val sensor = App.instance!!.wrangler.findSensorByTitle(newValue)
+                    val sensor = App.instance.wrangler.findSensorByTitle(newValue)
                     if (sensor == null)
                         return@ChangeListener
 
@@ -89,7 +89,7 @@ class AddChartPopup(val parentStage: Stage): Stage() {
 
             val addButton = Button("Add").apply {
                 onAction = EventHandler {
-                    val selectedSensor = App.instance!!.wrangler.findSensorByTitle(yAxisSensor.value)
+                    val selectedSensor = App.instance.wrangler.findSensorByTitle(yAxisSensor.value)
                     val selectedMeasurement = selectedSensor?.measurements?.filter { it.description == yAxisMeasurement.value }
                     if (selectedMeasurement == null)
                         return@EventHandler
@@ -101,14 +101,14 @@ class AddChartPopup(val parentStage: Stage): Stage() {
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
                             tickSpacing = tickSpacingField.text.toDouble()
-                            App.instance!!.wrangler.charts.add(this)
+                            App.instance.wrangler.charts.add(this)
                         }
                         "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurement[0]).apply {
                             windowSize = windowSizeField.text.toInt()
                             lowerBound = lowerBoundField.text.toDouble()
                             upperBound = upperBoundField.text.toDouble()
                             tickSpacing = tickSpacingField.text.toDouble()
-                            App.instance!!.wrangler.charts.add(this)
+                            App.instance.wrangler.charts.add(this)
                         }
                     }
                     close()

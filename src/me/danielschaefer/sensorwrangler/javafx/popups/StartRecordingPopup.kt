@@ -17,18 +17,18 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
         initOwner(parentStage)
 
         // Default to current working directory
-        App.instance!!.settings.recordingDirectory = Paths.get("").toAbsolutePath().toString()
+        App.instance.settings.recordingDirectory = Paths.get("").toAbsolutePath().toString()
 
-        val targetDirPathLabel = Text(App.instance!!.settings.recordingDirectory ?: "No file selected")
+        val targetDirPathLabel = Text(App.instance.settings.recordingDirectory ?: "No file selected")
         val chooseFileButton = Button("Choose log directory").apply {
             setOnAction {
                 DirectoryChooser().apply {
                     title = "Choose log directory"
-                    App.instance!!.settings.recordingDirectory?.let { initialDirectory = File(it) }
+                    App.instance.settings.recordingDirectory?.let { initialDirectory = File(it) }
 
                     showDialog(parentStage)?.let {
                         targetDirPathLabel.text = it.absolutePath
-                        App.instance!!.settings.recordingDirectory = it.absolutePath
+                        App.instance.settings.recordingDirectory = it.absolutePath
                         sizeToScene()
                     }
                 }
@@ -36,7 +36,7 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
         }
         val startRecordingButton = Button("Start recording").apply {
             setOnAction {
-                if (App.instance!!.settings.recordingDirectory == null) {
+                if (App.instance.settings.recordingDirectory == null) {
                     Alert(
                         parentStage,
                         "Must select file",
@@ -44,8 +44,8 @@ class StartRecordingPopup(val parentStage: Stage): Stage() {
                     ).show()
                     return@setOnAction
                 }
-                App.instance!!.settings.recordingDirectory?.let {
-                    App.instance!!.wrangler.startRecording()
+                App.instance.settings.recordingDirectory?.let {
+                    App.instance.wrangler.startRecording()
                     close()
                 }
             }

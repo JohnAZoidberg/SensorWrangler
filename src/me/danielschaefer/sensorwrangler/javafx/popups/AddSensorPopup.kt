@@ -44,7 +44,7 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
        val connectionConfiguration = VBox(10.0)
 
        val sensorTypeSelection = ComboBox<Text>().apply {
-           for (supportedSensor in App.instance!!.settings.supportedSensors) {
+           for (supportedSensor in App.instance.settings.supportedSensors) {
                // FIXME: The names seem to be disappearing when selecting something else
                items.add(Text(supportedSensor.simpleName))
 
@@ -91,7 +91,7 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
                                        val fileButton = Button("Choose file").apply {
                                            setOnAction {
                                                val fileChooser = FileChooser()
-                                               App.instance!!.settings.defaultFileSensorPath?.let {
+                                               App.instance.settings.defaultFileSensorPath?.let {
                                                    fileChooser.initialDirectory = File(it)
                                                }
                                                fileChooser.showOpenDialog(this@AddSensorPopup)?.absolutePath?.let {
@@ -124,7 +124,7 @@ class AddSensorPopup(val parentStage: Stage): Stage() {
                            var newVal = y()
                            property.setter.call(newSensor, y())
                        }
-                       App.instance!!.wrangler.sensors.add(newSensor)
+                       App.instance.wrangler.sensors.add(newSensor)
                        close()
                    }
                })

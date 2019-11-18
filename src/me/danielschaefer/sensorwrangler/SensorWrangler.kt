@@ -25,7 +25,7 @@ class SensorWrangler() {
 
     fun startRecording() {
         recording.value  = true
-        recordingWriter = FileWriter("${App.instance!!.settings.recordingDirectory}/wrangler.log", true)
+        recordingWriter = FileWriter("${App.instance.settings.recordingDirectory}/wrangler.log", true)
 
         // CSV header
         recordingWriter?.write("Sensor,Measurement,Value\n")

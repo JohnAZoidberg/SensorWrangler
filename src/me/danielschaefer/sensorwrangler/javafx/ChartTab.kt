@@ -25,8 +25,8 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
 
             val chartList = ListView<Text>().apply {
                 items = FXCollections.observableList(mutableListOf())
-                items.setAll(App.instance!!.wrangler.charts.map { Text(it.title) })
-                App.instance!!.wrangler.charts.addListener(ListChangeListener {
+                items.setAll(App.instance.wrangler.charts.map { Text(it.title) })
+                App.instance.wrangler.charts.addListener(ListChangeListener {
                     items.setAll(it.list.map { Text(it.title) })
                 })
 
@@ -36,7 +36,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                         return@ChangeListener
 
                     // TODO: Pass Chart object to avoid searching and possible failure
-                    val chart = App.instance!!.wrangler.findChartByTitle(newValue.text)
+                    val chart = App.instance.wrangler.findChartByTitle(newValue.text)
                     chart?.let {
                         val chartDetailTable = TableView<TableRow>().apply {
                             // Have columns expand to fill all available space
@@ -77,7 +77,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
 
                         val removeChartButton = Button("Remove Chart").apply {
                             setOnAction {
-                                App.instance!!.wrangler.charts.remove(chart)
+                                App.instance.wrangler.charts.remove(chart)
                             }
                         }
 

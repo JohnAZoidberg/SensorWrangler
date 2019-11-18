@@ -40,10 +40,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         val chartBox = VBox()
                         val fxChart = LineChart<String, Number>(CategoryAxis(), NumberAxis())
                         val chartDropdown = ComboBox<String>().apply {
-                            App.instance!!.wrangler.charts.addListener(ListChangeListener {
+                            App.instance.wrangler.charts.addListener(ListChangeListener {
                                 items.setAll(it.list.map { it.title })
                             })
-                            items.addAll(App.instance!!.wrangler.charts.map { it.title })
+                            items.addAll(App.instance.wrangler.charts.map { it.title })
                             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                                 // No need to do anything if we don't switch to a chart
                                 // TODO: Maybe remove the current chart. Except it's not possible to manually select null
@@ -51,12 +51,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                     return@ChangeListener
 
                                 oldValue?.let {
-                                    App.instance!!.wrangler.findChartByTitle(oldValue)?.let {
+                                    App.instance.wrangler.findChartByTitle(oldValue)?.let {
                                         it.shown = false
                                     }
                                 }
 
-                                App.instance!!.wrangler.findChartByTitle(newValue)?.let {
+                                App.instance.wrangler.findChartByTitle(newValue)?.let {
                                     it.shown = true
                                     //val newChart = LineChart<Number, Number>(NumberAxis().apply{ label = newValue}, NumberAxis())
                                     chartBox.children[0] = createFxChart(it)
@@ -93,16 +93,16 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                 val buttonProjected = Button("Start Recording").apply {
                     onAction = EventHandler {
-                        if (App.instance!!.wrangler.isRecording.value) {
-                            App.instance!!.wrangler.stopRecording()
+                        if (App.instance.wrangler.isRecording.value) {
+                            App.instance.wrangler.stopRecording()
                         } else {
-                            if (App.instance!!.settings.recordingDirectory == null)
+                            if (App.instance.settings.recordingDirectory == null)
                                StartRecordingPopup(primaryStage)
                             else
-                                App.instance!!.wrangler.startRecording()
+                                App.instance.wrangler.startRecording()
                         }
                     }
-                    App.instance!!.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
+                    App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
                         text = if (new) "Stop Recording" else "Start Recording"
                     })
                 }

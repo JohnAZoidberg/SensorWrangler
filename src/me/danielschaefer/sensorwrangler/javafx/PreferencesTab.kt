@@ -31,12 +31,12 @@ class PreferencesTab(parentStage: Stage) : Tab("Preferences"){
                 when (property.returnType) {
                     typeOf<String>(), typeOf<String?>()-> {
                         val label = Label(annotation.description)
-                        val field = TextField(property.getter.call(App.instance!!.settings) as String?).apply {
+                        val field = TextField(property.getter.call(App.instance.settings) as String?).apply {
                             this.textProperty().addListener { observable, oldValue, newValue ->
                                 if (text == null)
                                     return@addListener
 
-                                property.setter.call(App.instance!!.settings, newValue)
+                                property.setter.call(App.instance.settings, newValue)
                             }
                         }
                         contentBox.add(label, 0, row)
@@ -49,7 +49,7 @@ class PreferencesTab(parentStage: Stage) : Tab("Preferences"){
                                         Picker.Directory -> {
                                             DirectoryChooser().apply {
                                                 title = "Choose path"
-                                                App.instance!!.settings.recordingDirectory?.let { initialDirectory = File(it) }
+                                                App.instance.settings.recordingDirectory?.let { initialDirectory = File(it) }
 
                                                 showDialog(parentStage)?.let {
                                                     field.text = it.absolutePath
@@ -59,7 +59,7 @@ class PreferencesTab(parentStage: Stage) : Tab("Preferences"){
                                         Picker.FileOpen -> {
                                             FileChooser().apply {
                                                 title = "Choose path"
-                                                App.instance!!.settings.recordingDirectory?.let { initialDirectory = File(it) }
+                                                App.instance.settings.recordingDirectory?.let { initialDirectory = File(it) }
 
                                                 showOpenDialog(parentStage)?.let {
                                                     field.text = it.absolutePath
