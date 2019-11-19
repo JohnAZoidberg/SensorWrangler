@@ -14,6 +14,7 @@ import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
 import me.danielschaefer.sensorwrangler.gui.AxisGraph
+import me.danielschaefer.sensorwrangler.gui.BarGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 class ChartTab(parentStage: Stage): Tab("Charts") {
@@ -58,10 +59,25 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
 
                             items.setAll(
                                 TableRow("Title", chart.title),
+                                TableRow("Type", chart::class.simpleName),
                                 TableRow("Currently shown?", StringUtil.yesNo(chart.shown))
                             )
 
                             when (chart) {
+                                is BarGraph -> {
+                                    items.addAll(
+                                        TableRow("X-axis label", chart.axisNames[0]),
+                                        TableRow("Y-axis label", chart.axisNames[1]),
+                                        TableRow("Y-axis lower bound", chart.lowerBound.toString()),
+                                        TableRow("Y-axis upper bound", chart.upperBound.toString())
+                                    )
+                                    chart.yAxes.forEachIndexed { i, yAxis ->
+                                        items.addAll(
+                                            TableRow("Y-axis $i sensor", yAxis.sensor.title),
+                                            TableRow("Y-axis $i measurement", yAxis.description)
+                                        )
+                                    }
+                                }
                                 is AxisGraph -> {
                                     items.addAll(
                                         TableRow("X-axis label", chart.axisNames[0]),

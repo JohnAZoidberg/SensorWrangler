@@ -14,10 +14,8 @@ import javafx.scene.control.Slider
 import javafx.scene.layout.*
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
-import me.danielschaefer.sensorwrangler.gui.AxisGraph
+import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.gui.Chart
-import me.danielschaefer.sensorwrangler.gui.LineGraph
-import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
@@ -121,6 +119,37 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun createFxChart(chart: Chart): Node? {
         when (chart) {
+            is BarGraph -> {
+                val xAxis = CategoryAxis().apply {
+                    label = chart.axisNames[0]
+                    animated = false
+                }
+                val fxYAxis = NumberAxis().apply {
+                    label = chart.axisNames[0]
+                    animated = false
+                    isAutoRanging = false
+                    lowerBound = chart.lowerBound
+                    upperBound = chart.upperBound
+                }
+                return BarChart(xAxis, fxYAxis).apply {
+                    val series = XYChart.Series<String, Number>().apply {
+                        name = chart.title
+                        val emptyList = mutableListOf<XYChart.Data<String, Number>>()
+                        data = FXCollections.observableList(emptyList)
+                    }
+                    for ((i, yAxis) in chart.yAxes.withIndex()) {
+                        val foo: XYChart.Data<String?, Number> = XYChart.Data(yAxis.description, 0.0 as Number)
+                        series.data.add(foo)
+                        yAxis.values.addListener(ListChangeListener {
+                            it.next()
+                            val newVal = it.addedSubList.last() as Number
+                            println("Displaying $newVal")
+                            foo.yValue = it.addedSubList.last() as Number
+                        })
+                    }
+                    data.add(series)
+                }
+            }
             is AxisGraph -> {
                 val xAxis = CategoryAxis().apply {
                     label = chart.axisNames[0]
@@ -167,7 +196,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                 if (mappedList.size > chart.windowSize) mappedList.size - chart.windowSize else 0;
                             series.data.setAll(mappedList.subList(first, mappedList.size))
                         })
-                        //series.data = mappedList
+
                         data.add(series)
                     }
                 }

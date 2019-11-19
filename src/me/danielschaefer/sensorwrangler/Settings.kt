@@ -1,5 +1,6 @@
 package me.danielschaefer.sensorwrangler
 
+import me.danielschaefer.sensorwrangler.gui.BarGraph
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
@@ -27,7 +28,8 @@ open class Settings {
 
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
         LineGraph::class,
-        ScatterGraph::class
+        ScatterGraph::class,
+        BarGraph::class
     )
 
     // TODO: Think about how to have preferences of sensors of plugins
