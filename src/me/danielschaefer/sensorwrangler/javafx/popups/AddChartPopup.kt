@@ -3,11 +3,13 @@ package me.danielschaefer.sensorwrangler.javafx.popups
 import javafx.beans.value.ChangeListener
 import javafx.event.EventHandler
 import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.TextField
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Measurement
@@ -17,52 +19,53 @@ import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.ChartTab
 
 class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage() {
+    private val yAxisMeasurements: MutableList<ComboBox<String>> = mutableListOf()
+    private val yAxisSensors: MutableList<ComboBox<String>> = mutableListOf()
+    private val formGrid: GridPane
+
+    private fun addYAxis() {
+        val newAxisIndex = yAxisSensors.size
+
+        yAxisMeasurements.add(ComboBox<String>())
+        yAxisSensors.add(ComboBox<String>().apply{
+            items.setAll(App.instance.wrangler.sensors.map { it.title })
+            valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                if (newValue == null)
+                    return@ChangeListener
+
+                val sensor = App.instance.wrangler.findSensorByTitle(newValue)
+                if (sensor == null)
+                    return@ChangeListener
+
+                yAxisMeasurements[newAxisIndex].items.setAll(sensor.measurements.map { it.description })
+            })
+        })
+
+        formGrid.add(Text("Y-Axis ${newAxisIndex + 1}"), 0, newAxisIndex + 10)
+        formGrid.add(yAxisSensors[newAxisIndex], 2, newAxisIndex + 10)
+        formGrid.add(yAxisMeasurements[newAxisIndex], 3, newAxisIndex + 10)
+        sizeToScene()
+    }
+
     init {
         initOwner(parentStage)
 
-        val formGrid = GridPane().apply {
+        val typeDropdown = ComboBox<String>().apply{
+            items.addAll(App.instance.settings.supportedCharts.map { it.simpleName })
+        }
+
+        val chartNameField = TextField()
+        val xAxisNameField = TextField()
+        val yAxisNameField = TextField()
+        val windowSizeField = TextField("25")
+        val lowerBoundField = TextField("-10.0")
+        val upperBoundField = TextField("10.0")
+        val tickSpacingField = TextField("1")
+
+        formGrid = GridPane().apply {
             padding = Insets(25.0)
             hgap = 10.0
             vgap = 10.0
-
-            val typeDropdown = ComboBox<String>().apply{
-                items.addAll(App.instance.settings.supportedCharts.map { it.simpleName })
-            }
-
-            val chartNameField = TextField()
-            val xAxisNameField = TextField()
-            val yAxisNameField = TextField()
-            val windowSizeField = TextField("25")
-            val lowerBoundField = TextField("-10.0")
-            val upperBoundField = TextField("10.0")
-            val tickSpacingField = TextField("1")
-
-            val yAxisMeasurements = listOf(ComboBox<String>(), ComboBox<String>())
-            val yAxisSensors = listOf(ComboBox<String>().apply{
-                items.setAll(App.instance.wrangler.sensors.map { it.title })
-                valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
-                    if (newValue == null)
-                        return@ChangeListener
-
-                    val sensor = App.instance.wrangler.findSensorByTitle(newValue)
-                    if (sensor == null)
-                        return@ChangeListener
-
-                    yAxisMeasurements[0].items.setAll(sensor.measurements.map { it.description })
-                })
-            }, ComboBox<String>().apply{
-                items.setAll(App.instance.wrangler.sensors.map { it.title })
-                valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
-                    if (newValue == null)
-                        return@ChangeListener
-
-                    val sensor = App.instance.wrangler.findSensorByTitle(newValue)
-                    if (sensor == null)
-                        return@ChangeListener
-
-                    yAxisMeasurements[1].items.setAll(sensor.measurements.map { it.description })
-                })
-            })
 
             add(Text("Chart Type"), 0, 0)
             add(typeDropdown, 1, 0)
@@ -93,51 +96,55 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(Text("Y-Axis"), 0, 8)
             add(yAxisNameField, 1, 8)
 
-            for (i in 0..1) {
-                add(Text("Y-Axis $i"), 0, 9+i)
-                add(yAxisSensors[i], 2, 9+i)
-                add(yAxisMeasurements[i], 3, 9+i)
-            }
-
-            val addButton = Button("Add").apply {
-                onAction = EventHandler {
-                    val selectedMeasurements: MutableList<Measurement> = mutableListOf()
-                    for (i in 0..1) {
-                        val selectedSensor = App.instance.wrangler.findSensorByTitle(yAxisSensors[i].value)
-                        selectedSensor?.measurements?.filter { it.description == yAxisMeasurements[i].value }?.let {
-                            selectedMeasurements.add(it[0])
-                        }
-                    }
-
-                    if (selectedMeasurements.isEmpty())
-                        return@EventHandler
-
-                    val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
-                    val newChart = when (typeDropdown.value) {
-                        "LineGraph" -> LineGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
-                            windowSize = windowSizeField.text.toInt()
-                            lowerBound = lowerBoundField.text.toDouble()
-                            upperBound = upperBoundField.text.toDouble()
-                            tickSpacing = tickSpacingField.text.toDouble()
-                        }
-                        "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
-                            windowSize = windowSizeField.text.toInt()
-                            lowerBound = lowerBoundField.text.toDouble()
-                            upperBound = upperBoundField.text.toDouble()
-                            tickSpacing = tickSpacingField.text.toDouble()
-                        }
-                        else -> TODO("This chart is not recognized.")
-                    }
-
-                    App.instance.wrangler.charts.add(newChart)
-                    chartTab?.chartList?.selectionModel?.select(chartTab.chartList.items.last())
-                    close()
+            val addMeasurementButton = Button("Add y-axis measurement").apply {
+                setOnAction {
+                    addYAxis()
                 }
             }
-            add(addButton, 0, 11)
+            add(addMeasurementButton, 2, 9)
         }
 
-        scene = Scene(formGrid)
+        val addButton = Button("Add chart").apply {
+            onAction = EventHandler {
+                val selectedMeasurements: MutableList<Measurement> = mutableListOf()
+                for (i in 0 until yAxisSensors.size) {
+                    val selectedSensor = App.instance.wrangler.findSensorByTitle(yAxisSensors[i].value)
+                    selectedSensor?.measurements?.filter { it.description == yAxisMeasurements[i].value }?.let {
+                        selectedMeasurements.add(it[0])
+                    }
+                }
+
+                if (selectedMeasurements.isEmpty())
+                    return@EventHandler
+
+                val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
+                val newChart = when (typeDropdown.value) {
+                    "LineGraph" -> LineGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
+                        windowSize = windowSizeField.text.toInt()
+                        lowerBound = lowerBoundField.text.toDouble()
+                        upperBound = upperBoundField.text.toDouble()
+                        tickSpacing = tickSpacingField.text.toDouble()
+                    }
+                    "ScatterChart" -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
+                        windowSize = windowSizeField.text.toInt()
+                        lowerBound = lowerBoundField.text.toDouble()
+                        upperBound = upperBoundField.text.toDouble()
+                        tickSpacing = tickSpacingField.text.toDouble()
+                    }
+                    else -> TODO("This chart is not recognized.")
+                }
+
+                App.instance.wrangler.charts.add(newChart)
+                chartTab?.chartList?.selectionModel?.select(chartTab.chartList.items.last())
+                close()
+            }
+        }
+
+        val contentBox = VBox(10.0, formGrid, addButton).apply {
+            padding = Insets(25.0)
+            alignment = Pos.CENTER;
+        }
+        scene = Scene(contentBox)
         title = "Add Chart"
 
         sizeToScene()
