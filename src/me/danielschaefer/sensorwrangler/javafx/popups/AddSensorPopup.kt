@@ -8,6 +8,7 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
@@ -41,8 +42,19 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
 
    private fun constructContent(): Parent {
        val addSensorButton = Button("Add sensor")
-       val sensorConfiguration = VBox(10.0)
-       val connectionConfiguration = VBox(10.0)
+
+       // TOOD: Maybe we can have both in a single table, so the columns are all one size
+       val sensorConfiguration = GridPane().apply {
+           padding = Insets(25.0)
+           hgap = 10.0
+           vgap = 10.0
+       }
+
+       val connectionConfiguration = GridPane().apply {
+           padding = Insets(25.0)
+           hgap = 10.0
+           vgap = 10.0
+       }
 
        val sensorTypeSelection = ComboBox<String>().apply {
            for (supportedSensor in App.instance.settings.supportedSensors) {
@@ -54,7 +66,9 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                        return@ChangeListener
 
                    sensorConfiguration.children.clear()
+                   var sensorRow = 0
                    connectionConfiguration.children.clear()
+                   var connectionRow = 0
 
                    val mutableProperties = supportedSensor.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
                    val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
@@ -109,11 +123,15 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                            when (annotation) {
                                is SensorProperty -> {
                                    val label = Label(annotation.title)
-                                   sensorConfiguration.children.add(HBox(10.0, label, input))
+                                   sensorConfiguration.add(label, 0, sensorRow)
+                                   sensorConfiguration.add(input, 1, sensorRow)
+                                   sensorRow++
                                }
                                is ConnectionProperty -> {
                                    val label = Label(annotation.title)
-                                   connectionConfiguration.children.add(HBox(10.0, label, input))
+                                   connectionConfiguration.add(label, 0, connectionRow)
+                                   connectionConfiguration.add(input, 1, connectionRow)
+                                   connectionRow++
                                }
                            }
                        }
@@ -136,7 +154,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
            spacing = 10.0
            padding = Insets(10.0)
 
-           children.addAll(Text("Sensor options"), sensorTypeSelection, sensorConfiguration)
+           children.addAll(Text("Sensor options"), sensorConfiguration)
        }
        val connectionBox = VBox().apply {
            spacing = 10.0
@@ -148,7 +166,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
            orientation = Orientation.HORIZONTAL
            padding = Insets(10.0)
        }}
-       return VBox(sensorBox, separator(), connectionBox, separator(), addSensorButton).apply {
+       return VBox(sensorTypeSelection, separator(), sensorBox, separator(), connectionBox, separator(), addSensorButton).apply {
            padding = Insets(25.0)
        }
    }
