@@ -49,7 +49,7 @@ class PreferencesTab(parentStage: Stage) : Tab("Preferences"){
                                         Picker.Directory -> {
                                             DirectoryChooser().apply {
                                                 title = "Choose path"
-                                                App.instance.settings.recordingDirectory?.let { initialDirectory = File(it) }
+                                                (property.getter.call(App.instance.settings) as String?)?.let { initialDirectory = File(it) }
 
                                                 showDialog(parentStage)?.let {
                                                     field.text = it.absolutePath
@@ -59,7 +59,7 @@ class PreferencesTab(parentStage: Stage) : Tab("Preferences"){
                                         Picker.FileOpen -> {
                                             FileChooser().apply {
                                                 title = "Choose path"
-                                                App.instance.settings.recordingDirectory?.let { initialDirectory = File(it) }
+                                                (property.getter.call(App.instance.settings) as String?)?.let { initialDirectory = File(it) }
 
                                                 showOpenDialog(parentStage)?.let {
                                                     field.text = it.absolutePath
