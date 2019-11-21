@@ -18,7 +18,7 @@ class Measurement(val sensor: Sensor, val indexInSensor: Int, val unit: Unit) {
     @JsonProperty("indexInSensor")
     val _indexInSensor = indexInSensor
     @JsonProperty("sensorUuid")
-    val sensorUuid = sensor.uuid
+    var sensorUuid = sensor.uuid
 
     // TODO: Add description to constructor and think about what to do with Unit
     var description: String? = null
@@ -41,6 +41,9 @@ class MeasurementDeserializer @JvmOverloads constructor(vc: Class<*>? = null) : 
         val indexInSensor = myMap?.get("indexInSensor") as Int
         val sensorUuid = myMap?.get("sensorUuid") as String
         val sensor = App.instance.wrangler.sensors.find { it.uuid == sensorUuid } as Sensor
+
+        // TODO: Why do I have to do it here and not in the Sensor class?
+        sensor.measurements.forEach { it.sensorUuid = sensorUuid}
         return sensor.measurements[indexInSensor]
     }
 }
