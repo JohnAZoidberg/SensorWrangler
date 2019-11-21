@@ -1,5 +1,6 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
@@ -10,14 +11,22 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-class RandomSensor : Sensor() {
-    @SensorProperty(title = "Update Interval") var updateInterval: Long = 250
-    @SensorProperty(title = "Minimum value") var minValue = -10;
-    @SensorProperty(title = "Maximum value") var maxValue = 10;
-
+class RandomSensor: Sensor() {
     override val title: String = "RandomSensor" + Random.nextInt(0, 100)
 
-    override val measurements: List<Measurement> = listOf(Measurement(this, Measurement.Unit.METER).apply{
+    @JsonProperty("updateInterval")
+    @SensorProperty(title = "Update Interval")
+    var updateInterval: Long = 250
+
+    @JsonProperty("minValue")
+    @SensorProperty(title = "Minimum value")
+    var minValue = -10;
+
+    @JsonProperty("maxValue")
+    @SensorProperty(title = "Maximum value")
+    var maxValue = 10;
+
+    override val measurements: List<Measurement> = listOf(Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "Random measurement " + Random.nextInt(0, 100)
         startDate = LocalTime.now()
     })

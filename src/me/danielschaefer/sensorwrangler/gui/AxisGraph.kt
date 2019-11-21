@@ -4,7 +4,10 @@ import javafx.collections.ObservableList
 import javafx.scene.chart.XYChart
 import me.danielschaefer.sensorwrangler.Measurement
 
-abstract class AxisGraph(title: String, val axisNames: Array<String>, val yAxes: List<Measurement>): Chart(title) {
+abstract class AxisGraph: Chart() {
+    abstract var axisNames: Array<String>
+    abstract var yAxes: List<Measurement>
+
     abstract var windowSize: Int
     abstract var lowerBound: Double
     abstract var upperBound: Double

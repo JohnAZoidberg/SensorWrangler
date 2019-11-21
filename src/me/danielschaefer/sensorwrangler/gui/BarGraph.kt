@@ -1,8 +1,20 @@
 package me.danielschaefer.sensorwrangler.gui
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.danielschaefer.sensorwrangler.Measurement
 
-class BarGraph(title: String, val axisNames: Array<String>, val yAxes: List<Measurement>): Chart(title) {
+class BarGraph: Chart() {
+    @JsonProperty("title")
+    override lateinit var title: String
+
+    @JsonProperty("axisNames")
+    lateinit var axisNames: Array<String>
+
+    @JsonProperty("yAxes")
+    lateinit var yAxes: List<Measurement>
+
+    @JsonProperty("lowerBound")
     var lowerBound: Double = -10.0
+    @JsonProperty("upperBound")
     var upperBound: Double = 10.0
 }

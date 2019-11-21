@@ -140,19 +140,31 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
 
                 val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
                 val newChart = when (typeDropdown.value) {
-                    LineGraph::class.simpleName -> LineGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
+                    LineGraph::class.simpleName -> LineGraph().apply {
+                        title = chartNameField.text
+                        this.axisNames = axisNames
+                        yAxes = selectedMeasurements
+
                         windowSize = windowSizeField.text.toInt()
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                         tickSpacing = tickSpacingField.text.toDouble()
                     }
-                    ScatterGraph::class.simpleName -> ScatterGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
+                    ScatterGraph::class.simpleName -> ScatterGraph().apply {
+                        title = chartNameField.text
+                        this.axisNames = axisNames
+                        yAxes = selectedMeasurements
+
                         windowSize = windowSizeField.text.toInt()
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                         tickSpacing = tickSpacingField.text.toDouble()
                     }
-                    BarGraph::class.simpleName -> BarGraph(chartNameField.text, axisNames, selectedMeasurements).apply {
+                    BarGraph::class.simpleName -> BarGraph().apply {
+                        title = chartNameField.text
+                        this.axisNames = axisNames
+                        yAxes = selectedMeasurements
+
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                     }

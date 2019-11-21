@@ -1,5 +1,6 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
@@ -12,15 +13,18 @@ import kotlin.random.Random
 
 class FileSensor: Sensor() {
     override val title: String = "FileSensor" + Random.nextInt(0, 100)
-    override val measurements: List<Measurement> = listOf(Measurement(this, Measurement.Unit.METER).apply{
+
+    override val measurements: List<Measurement> = listOf(Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "HeartRate"
     })
 
     private var tailer: Tailer? = null
 
+    @JsonProperty("filePath")
     @ConnectionProperty(title = "File path")
     lateinit var filePath: File
 
+    @JsonProperty("tail")
     @SensorProperty(title = "Tail?")
     var tail: Boolean = false
 

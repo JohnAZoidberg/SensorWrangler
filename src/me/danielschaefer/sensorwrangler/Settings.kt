@@ -38,4 +38,7 @@ open class Settings {
 
     @Preference("Default recording directory", picker=Picker.Directory)
     var recordingDirectory: String? = null
+
+    @Preference("Default export file", picker=Picker.FileSave)
+    val defaultExportPath: String? = null
 }

@@ -1,7 +1,7 @@
 package me.danielschaefer.sensorwrangler
 
 enum class Picker {
-    FileOpen, Directory, None
+    FileOpen, FileSave, Directory, None
 }
 
 @Retention(AnnotationRetention.RUNTIME)

@@ -66,6 +66,16 @@ class PreferencesTab(parentStage: Stage) : Tab("Preferences"){
                                                 }
                                             }
                                         }
+                                        Picker.FileSave -> {
+                                            FileChooser().apply {
+                                                title = "Choose path"
+                                                (property.getter.call(App.instance.settings) as String?)?.let { initialDirectory = File(it) }
+
+                                                showSaveDialog(parentStage)?.let {
+                                                    field.text = it.absolutePath
+                                                }
+                                            }
+                                        }
                                         else -> {}
                                     }
                                 }

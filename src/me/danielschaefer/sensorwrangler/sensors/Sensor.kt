@@ -1,6 +1,9 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import me.danielschaefer.sensorwrangler.Measurement
+import java.util.*
+
 
 /**
  * Abstract Sensor
@@ -8,9 +11,12 @@ import me.danielschaefer.sensorwrangler.Measurement
  * Subclasses must have a default (no-args) constructor!
  */
 abstract class Sensor {
+    @JsonProperty("uuid")
+    val uuid: String = UUID.randomUUID().toString()
+
     abstract val title: String
     abstract val measurements: List<Measurement>
-    protected val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()
+    private val connectionListeners: MutableList<ConnectionChangeListener> = mutableListOf()
     protected var connected = false
     val isConnected: Boolean
       get() = connected

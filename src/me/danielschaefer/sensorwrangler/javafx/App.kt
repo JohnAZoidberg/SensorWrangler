@@ -5,9 +5,6 @@ import javafx.application.Platform
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.Settings
-import me.danielschaefer.sensorwrangler.gui.LineGraph
-import me.danielschaefer.sensorwrangler.sensors.RandomSensor
-import me.danielschaefer.sensorwrangler.sensors.RandomWalkSensor
 import kotlin.system.exitProcess
 
 class App: Application() {
@@ -33,43 +30,6 @@ class App: Application() {
     }
 
     private fun runMainWindow(primaryStage: Stage) {
-        val dummyPowerSensor = RandomSensor().apply {
-            updateInterval = 1000
-            minValue = 0
-            maxValue = 10
-        }
-        wrangler.sensors.add(dummyPowerSensor)
-
-        val dummyGyro = RandomSensor().apply {
-            minValue = -5
-            maxValue = 10
-        }
-        wrangler.sensors.add(dummyGyro)
-
-        val dummyWalker = RandomWalkSensor()
-        wrangler.sensors.add(dummyWalker)
-
-        wrangler.charts.add(LineGraph("Foobar", arrayOf("Time", "Power"), listOf(dummyPowerSensor.measurements[0])).apply {
-            windowSize = 15
-            lowerBound = 0.0
-            upperBound = 11.0
-        })
-        wrangler.charts.add(LineGraph("BarFoo2", arrayOf("Time", "Force"), listOf(dummyWalker.measurements[0])).apply {
-            windowSize = 20
-            lowerBound = -30.0
-            upperBound = 30.0
-            tickSpacing = 5.0
-        })
-        wrangler.charts.add(LineGraph("BarFoo3", arrayOf("Time", "Acceleration"), listOf(dummyGyro.measurements[0])).apply {
-            windowSize = 40
-        })
-        wrangler.charts.add(LineGraph("BarFoo4", arrayOf("Time", "Acceleration"), listOf(dummyGyro.measurements[0])).apply {
-            windowSize = 40
-            lowerBound = -10.0
-            upperBound = 15.0
-            tickSpacing = 5.0
-        })
-
         MainWindow(primaryStage, wrangler)
     }
 

@@ -58,6 +58,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
                             items.clear()
                             items.add(TableRow("Title", sensor.title))
+                            items.add(TableRow("Type", sensor::class.simpleName))
 
                             // TODO: Figure out how to generate from the class definition
                             //       Can/should it be done without reflection?
