@@ -40,5 +40,5 @@ open class Settings {
     var recordingDirectory: String? = null
 
     @Preference("Default export file", picker=Picker.FileSave)
-    val defaultExportPath: String? = null
+    val defaultExportPath: String = "wrangler.settings"
 }
