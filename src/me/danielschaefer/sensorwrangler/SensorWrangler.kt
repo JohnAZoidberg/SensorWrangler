@@ -14,17 +14,18 @@ import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Sensor
+import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.FileWriter
 import java.util.*
 
 
-class SensorWrangler() {
+class SensorWrangler {
     val isRecording: ReadOnlyBooleanProperty
         get() = recording.readOnlyProperty
 
-    val sensors: ObservableList<Sensor> = FXCollections.observableList(mutableListOf())
+    val sensors: ObservableList<VirtualSensor> = FXCollections.observableList(mutableListOf())
     val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf())
 
     private var recordingWriter: FileWriter? = null
@@ -48,7 +49,6 @@ class SensorWrangler() {
         val module = SimpleModule()
         module.addDeserializer(Measurement::class.java, MeasurementDeserializer())
         registerModule(module)
-
     }
 
     fun startRecording() {
@@ -90,12 +90,16 @@ class SensorWrangler() {
 
     // TODO: Do we want charts to be a map indexed by the title?
     fun findChartByTitle(title: String): Chart? {
-        return charts.filter { it.title == title }[0]
+        return charts.find { it.title == title }
     }
 
     // TODO: Do we want sensors to be a map indexed by the title?
+    fun findVirtualSensorByTitle(title: String): VirtualSensor? {
+        return sensors.find { it.title == title }
+    }
+
     fun findSensorByTitle(title: String): Sensor? {
-        return sensors.filter { it.title == title }[0]
+        return sensors.find { it.title == title && it is Sensor} as Sensor?
     }
 
     /**

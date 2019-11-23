@@ -193,6 +193,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                         // TODO: Do this more efficiently without reassigning the entire list
                         mappedList.addListener(ListChangeListener {
+                            // TODO: Don't I have to do an it.next() here?
                             val first =
                                 if (mappedList.size > chart.windowSize) mappedList.size - chart.windowSize else 0;
                             series.data.setAll(mappedList.subList(first, mappedList.size))

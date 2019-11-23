@@ -27,14 +27,13 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
     private fun addYAxis() {
         val newAxisIndex = yAxisSensors.size
 
-        yAxisMeasurements.add(ComboBox<String>())
-        yAxisSensors.add(ComboBox<String>().apply{
+        yAxisSensors.add(ComboBox<String>().apply {
             items.setAll(App.instance.wrangler.sensors.map { it.title })
             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                 if (newValue == null)
                     return@ChangeListener
 
-                val sensor = App.instance.wrangler.findSensorByTitle(newValue)
+                val sensor = App.instance.wrangler.findVirtualSensorByTitle(newValue)
                 if (sensor == null)
                     return@ChangeListener
 
@@ -42,6 +41,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                 sizeToScene()
             })
         })
+        yAxisMeasurements.add(ComboBox<String>())
 
         formGrid.add(Label("Y-Axis ${newAxisIndex + 1}"), 0, newAxisIndex + 10)
         formGrid.add(yAxisSensors[newAxisIndex], 2, newAxisIndex + 10)
@@ -129,7 +129,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             onAction = EventHandler {
                 val selectedMeasurements: MutableList<Measurement> = mutableListOf()
                 for (i in 0 until yAxisSensors.size) {
-                    val selectedSensor = App.instance.wrangler.findSensorByTitle(yAxisSensors[i].value)
+                    val selectedSensor = App.instance.wrangler.findVirtualSensorByTitle(yAxisSensors[i].value)
                     selectedSensor?.measurements?.filter { it.description == yAxisMeasurements[i].value }?.let {
                         selectedMeasurements.add(it[0])
                     }

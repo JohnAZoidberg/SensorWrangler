@@ -86,6 +86,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             })
                         }
 
+                        // TODO: Handle disconnection for VirtualSensor or maybe gray the button out
                         val connectButton = Button().apply {
                             if (sensor.isConnected) {
                                 text = "Disonnect"

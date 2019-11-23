@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 class RandomWalkSensor : Sensor() {
-    override val title: String = "RandomWalkSensor " + Random.nextInt(0, 100)
+    override val title: String = "RandomWalkSensor ${Random.nextInt(0, 100)}"
 
     @JsonProperty("updateInterval")
     @SensorProperty(title = "Update Interval")

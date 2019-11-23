@@ -12,7 +12,7 @@ import java.time.LocalTime
 import kotlin.random.Random
 
 class FileSensor: Sensor() {
-    override val title: String = "FileSensor" + Random.nextInt(0, 100)
+    override val title: String = "FileSensor ${Random.nextInt(0, 100)}"
 
     override val measurements: List<Measurement> = listOf(Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "HeartRate"

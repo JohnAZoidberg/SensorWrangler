@@ -7,10 +7,7 @@ import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.popups.AboutPopup
-import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
-import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
-import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.*
 import java.io.File
 
 
@@ -92,6 +89,14 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             })
         }
 
+        val averageMenu = Menu("Averages").apply {
+            items.add(MenuItem("Add").apply {
+                onAction = EventHandler {
+                    AddAveragePopup(primaryStage)
+                }
+            })
+        }
+
         val helpMenu = Menu("Help").apply {
             val aboutItem = MenuItem("About").apply {
                 onAction = EventHandler {
@@ -105,6 +110,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         menus.add(recordingMenu)
         menus.add(sensorMenu)
         menus.add(chartMenu)
+        menus.add(averageMenu)
         menus.add(helpMenu)
     }
 }
