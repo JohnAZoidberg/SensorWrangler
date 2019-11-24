@@ -1,17 +1,30 @@
 package me.danielschaefer.sensorwrangler.gui
 
-import javafx.collections.ObservableList
-import javafx.scene.chart.XYChart
 import me.danielschaefer.sensorwrangler.Measurement
 
 abstract class AxisGraph: Chart() {
     abstract var axisNames: Array<String>
     abstract var yAxes: List<Measurement>
 
+    /**
+     * How many millisencds of data the graph can show at once.
+     *
+     * After that, old data slides out of the window and cannot be seen.
+     */
     abstract var windowSize: Int
-    abstract var lowerBound: Double
-    abstract var upperBound: Double
-    abstract var tickSpacing: Double
 
-    abstract var mappedLists: MutableList<ObservableList<XYChart.Data<String, Number>>>
+    /**
+     * The lowest value to display on the x-axis
+     */
+    abstract var lowerBound: Double
+
+    /**
+     * The highest value to display on the x-axis
+     */
+    abstract var upperBound: Double
+
+    /**
+     * How far the ticks marks on the chart are apart from each other
+     */
+    abstract var tickSpacing: Double
 }

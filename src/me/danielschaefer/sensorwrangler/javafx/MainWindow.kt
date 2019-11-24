@@ -1,5 +1,6 @@
 package me.danielschaefer.sensorwrangler.javafx
 
+import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
@@ -13,10 +14,18 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
 import javafx.scene.layout.*
 import javafx.stage.Stage
+import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
     private val jfxSettings = JavaFxSettings()
@@ -138,23 +147,40 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         val emptyList = mutableListOf<XYChart.Data<String, Number>>()
                         data = FXCollections.observableList(emptyList)
                     }
-                    for ((i, yAxis) in chart.yAxes.withIndex()) {
-                        val foo: XYChart.Data<String?, Number> = XYChart.Data(yAxis.description, 0.0 as Number)
-                        series.data.add(foo)
-                        yAxis.values.addListener(ListChangeListener {
+
+                    for (yAxis in chart.yAxes) {
+                        // Start at 0, we need a starting value to later change the yValue of that
+                        val data = XYChart.Data(yAxis.description, 0.0 as Number)
+                        series.data.add(data)
+
+                        yAxis.dataPoints.addListener(ListChangeListener {
                             it.next()
-                            val newVal = it.addedSubList.last() as Number
-                            println("Displaying $newVal")
-                            foo.yValue = it.addedSubList.last() as Number
+                            data.yValue = it.addedSubList.last().value
                         })
                     }
+
                     data.add(series)
                 }
             }
             is AxisGraph -> {
-                val xAxis = CategoryAxis().apply {
+                val xAxis = NumberAxis().apply {
                     label = chart.axisNames[0]
+                    isAutoRanging = false
+                    tickUnit = 5_000.0  // Tick mark every 5 seconds
                     animated = false
+
+                    tickLabelFormatter = object : StringConverter<Number>() {
+                        override fun toString(unixTime: Number): String? {
+                            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+                            return Instant.ofEpochMilli(unixTime.toLong())
+                                .atZone(ZoneId.of("GMT+1"))  // TODO: Think about how to deal with TZs
+                                .format(formatter)
+                        }
+
+                        override fun fromString(string: String?): Number {
+                            return 0
+                        }
+                    }
                 }
 
                 val fxYAxis = NumberAxis().apply {
@@ -173,33 +199,33 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         null
                     }
                 }
+
                 return fxChart?.apply {
                     title = chart.title
                     animated = false
                     for (yAxis in chart.yAxes) {
-                        val series = XYChart.Series<String, Number>().apply {
+                        XYChart.Series<Number, Number>().apply {
                             name = yAxis.description ?: "Data"
+
+                            // TODO: Maybe we can have it as a list of measurements and there is something like a cellFactory for charts?
+                            data = MappedList(yAxis.dataPoints) {
+                                val datum: XYChart.Data<Number, Number> = XYChart.Data(it.value.timestamp, it.value.value)
+                                datum
+                            }
+
+                            fxChart.data.add(this)
                         }
 
-                        // Need to attach it to chart, otherwise it gets garbage collected
-                        // TODO: Remove this really bad hack
-                        val mappedList = MappedList(yAxis.values) {
-                            XYChart.Data("${it.index}", it.value as Number)
+                        // Show data from now until chart.windowSize ago
+                        // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
+                        Executors.newSingleThreadScheduledExecutor().apply {
+                            scheduleAtFixedRate({
+                                Platform.runLater {
+                                    xAxis.upperBound = Date().time.toDouble()
+                                    xAxis.lowerBound = xAxis.upperBound - chart.windowSize
+                                }
+                            }, 0, 40, TimeUnit.MILLISECONDS)  // 40ms = 25FPS
                         }
-                        chart.mappedLists.add(mappedList)
-
-                        val emptyList = mutableListOf<XYChart.Data<String, Number>>()
-                        series.data = FXCollections.observableList(emptyList)
-
-                        // TODO: Do this more efficiently without reassigning the entire list
-                        mappedList.addListener(ListChangeListener {
-                            // TODO: Don't I have to do an it.next() here?
-                            val first =
-                                if (mappedList.size > chart.windowSize) mappedList.size - chart.windowSize else 0;
-                            series.data.setAll(mappedList.subList(first, mappedList.size))
-                        })
-
-                        data.add(series)
                     }
                 }
             }

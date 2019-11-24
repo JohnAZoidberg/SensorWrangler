@@ -1,13 +1,9 @@
 package me.danielschaefer.sensorwrangler.gui
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import javafx.collections.ObservableList
-import javafx.scene.chart.XYChart
 import me.danielschaefer.sensorwrangler.Measurement
 
 class ScatterGraph : AxisGraph() {
-        override var mappedLists: MutableList<ObservableList<XYChart.Data<String, Number>>> = mutableListOf()
-
         @JsonProperty("title")
         override lateinit var title: String
 

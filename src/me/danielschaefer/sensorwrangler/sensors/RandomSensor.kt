@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
-import java.time.LocalTime
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadLocalRandom
@@ -26,10 +25,10 @@ class RandomSensor: Sensor() {
     @SensorProperty(title = "Maximum value")
     var maxValue = 10;
 
-    override val measurements: List<Measurement> = listOf(Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "Random measurement " + Random.nextInt(0, 100)
-        startDate = LocalTime.now()
-    })
+    }
+    override val measurements: List<Measurement> = listOf(measurement)
 
     private var updater: ScheduledExecutorService? = null
 
@@ -40,7 +39,7 @@ class RandomSensor: Sensor() {
                 Platform.runLater {
                     connected = true
                     val random = ThreadLocalRandom.current().nextInt(minValue, maxValue + 1)
-                    measurements[0].values.add(random.toDouble())
+                    measurement.addDataPoint(random.toDouble())
                 }
             }, 0, updateInterval, TimeUnit.MILLISECONDS)
         }

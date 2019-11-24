@@ -8,15 +8,15 @@ import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import org.apache.commons.io.input.Tailer
 import org.apache.commons.io.input.TailerListenerAdapter
 import java.io.File
-import java.time.LocalTime
 import kotlin.random.Random
 
 class FileSensor: Sensor() {
     override val title: String = "FileSensor ${Random.nextInt(0, 100)}"
 
-    override val measurements: List<Measurement> = listOf(Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "HeartRate"
-    })
+    }
+    override val measurements: List<Measurement> = listOf(measurement)
 
     private var tailer: Tailer? = null
 
@@ -51,12 +51,11 @@ class FileSensor: Sensor() {
                     return
 
                 Platform.runLater {
-                    measurements[0].values.add(line.toDouble())
+                    measurement.addDataPoint(line.toDouble())
                 }
             }
         }
         tailer = Tailer.create(filePath, tailerListener, 1000)
-        measurements[0].startDate = LocalTime.now()
         connected = true
 
         super.connect()

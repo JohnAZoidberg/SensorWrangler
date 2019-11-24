@@ -18,6 +18,9 @@ import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.io.BufferedReader
 import java.io.FileReader
 import java.io.FileWriter
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -29,7 +32,7 @@ class SensorWrangler {
     val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf())
 
     private var recordingWriter: FileWriter? = null
-    private var recordingListeners: MutableList<ListChangeListener<Double>> = mutableListOf()
+    private var recordingListeners: MutableList<ListChangeListener<DataPoint>> = mutableListOf()
     private var recording: ReadOnlyBooleanWrapper = ReadOnlyBooleanWrapper(false)
 
     private val objectMapper = ObjectMapper().apply {
@@ -56,24 +59,28 @@ class SensorWrangler {
         recordingWriter = FileWriter("${App.instance.settings.recordingDirectory}/wrangler.log", true)
 
         // CSV header
-        recordingWriter?.write("Sensor,Measurement,Value\n")
+        recordingWriter?.write("Timestamp,Sensor,Measurement,Value\n")
 
         // Values
         for (sensor in sensors) {
             for (measurement in sensor.measurements) {
-                val recordingListener = ListChangeListener<Double> {
+                val recordingListener = ListChangeListener<DataPoint> {
                     // If the listener called when we're not recording, something is wrong
                     assert(recording.value)
 
                     it.next()
-                    // Assumption is that it's an append only operation
+                    // We assume that the measurements list is only ever appended
                     for (newValue in it.addedSubList) {
-                        recordingWriter?.write("${sensor.title},${measurement.description},$newValue\n")
+                        val formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+                        val newDateTime = Instant.ofEpochMilli(newValue.timestamp)
+                            .atZone(ZoneId.of("GMT+1"))  // TODO: Think about how to deal with TZs
+                            .format(formatter)
+                        recordingWriter?.write("${sensor.title},${measurement.description},$newDateTime,${newValue.value}\n")
                     }
                     recordingWriter?.flush()
                 }
                 recordingListeners.add(recordingListener)
-                measurement.values.addListener(recordingListener)
+                measurement.dataPoints.addListener(recordingListener)
             }
         }
     }
@@ -83,7 +90,7 @@ class SensorWrangler {
         for (sensor in sensors)
             for (measurement in sensor.measurements)
                 for (listener in recordingListeners)
-                    measurement.values.removeListener(listener)
+                    measurement.dataPoints.removeListener(listener)
 
         recordingWriter?.close()
     }

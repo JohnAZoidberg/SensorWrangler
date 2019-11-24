@@ -85,7 +85,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                                         TableRow("Y-axis lower bound", chart.lowerBound.toString()),
                                         TableRow("Y-axis upper bound", chart.upperBound.toString()),
                                         TableRow("Y-axis tick spacing", chart.tickSpacing.toString()),
-                                        TableRow("Window size", chart.windowSize.toString())
+                                        TableRow("Window size [s]", (chart.windowSize / 1_000).toString())
                                     )
                                     chart.yAxes.forEachIndexed { i, yAxis ->
                                         items.addAll(

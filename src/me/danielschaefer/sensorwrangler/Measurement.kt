@@ -9,9 +9,10 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
-import java.time.LocalTime
 import java.util.*
 
+// TODO: Maybe use Instant instead of Long
+data class DataPoint(val timestamp: Long, val value: Double)
 
 @JsonRootName(value = "Measurement")
 class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: Unit) {
@@ -21,13 +22,27 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
     var sensorUuid = sensor.uuid
 
     // TODO: Add description to constructor and think about what to do with Unit
+    // TODO: Deserialize description
     var description: String? = null
-    var startDate: LocalTime? = null
-    /**
-     * How much time lies in between each measured value
-     */
-    var period: Long = 1
-    val values: ObservableList<Double> = FXCollections.observableList(mutableListOf())
+    var startDate: Long? = null
+
+    // TODO: Create something like the ReadonlyBooleanproperty a ImmutableObversableList
+    val dataPoints: ObservableList<DataPoint> = FXCollections.observableList(mutableListOf())
+
+    private fun addDataPoint(point: DataPoint) {
+        if (startDate == null)
+            startDate = point.timestamp
+
+        dataPoints.add(point)
+    }
+
+    private fun addDataPoint(datetime: Long, value: Double) {
+        addDataPoint(DataPoint(datetime, value))
+    }
+
+    fun addDataPoint(value: Double) {
+        addDataPoint(Date().time, value)
+    }
 
     // TODO: Actually use it
     enum class Unit {

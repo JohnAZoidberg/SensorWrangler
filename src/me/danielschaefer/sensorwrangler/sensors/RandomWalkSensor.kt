@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
-import java.time.LocalTime
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadLocalRandom
@@ -32,12 +31,8 @@ class RandomWalkSensor : Sensor() {
 
     override val measurements: List<Measurement> = listOf(Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "Random walk " + Random.nextInt(0, 100)
-        startDate = LocalTime.now()
-        values.add(0.0)
     }, Measurement(this, 1, Measurement.Unit.METER).apply{
         description = "Random walk " + Random.nextInt(0, 100)
-        startDate = LocalTime.now()
-        values.add(0.0)
     })
 
     private var updaters: MutableList<ScheduledExecutorService> = mutableListOf()
@@ -56,13 +51,18 @@ class RandomWalkSensor : Sensor() {
             updaters.add(updater)
             updater.scheduleAtFixedRate({
                 Platform.runLater {
-                    val currentPos = measurement.values.last()
+                    val currentPos = if (measurement.dataPoints.isEmpty())
+                        ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
+                    else
+                        measurement.dataPoints.last().value
+
                     var newPos: Double
                     do {
-                        val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1)
-                        newPos = currentPos + random.toDouble()
+                        val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
+                        newPos = currentPos + random
                     } while (newPos < minValue || newPos > maxValue)
-                    measurement.values.add(newPos)
+
+                    measurement.addDataPoint(newPos)
                 }
             }, 0, updateInterval, TimeUnit.MILLISECONDS)
         }

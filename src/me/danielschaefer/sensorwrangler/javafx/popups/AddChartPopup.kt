@@ -55,13 +55,13 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
         val chartNameField = TextField()
         val xAxisNameField = TextField()
         val yAxisNameField = TextField()
-        val lowerBoundField = TextField("-10.0")
-        val upperBoundField = TextField("10.0")
+        val lowerBoundField = TextField("-25.0")
+        val upperBoundField = TextField("25.0")
 
         val tickSpacingLabel = Label("Tick spacing")
-        val tickSpacingField = TextField("1")
-        val windowSizeLabel = Label("Window Size")
-        val windowSizeField = TextField("25")
+        val tickSpacingField = TextField("5")
+        val windowSizeLabel = Label("Window Size [s]")
+        val windowSizeField = TextField("10")
 
         val typeDropdown = ComboBox<String>().apply{
             items.addAll(App.instance.settings.supportedCharts.map { it.simpleName })
@@ -145,7 +145,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         this.axisNames = axisNames
                         yAxes = selectedMeasurements
 
-                        windowSize = windowSizeField.text.toInt()
+                        windowSize = windowSizeField.text.toInt() * 1_000
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                         tickSpacing = tickSpacingField.text.toDouble()
@@ -155,7 +155,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         this.axisNames = axisNames
                         yAxes = selectedMeasurements
 
-                        windowSize = windowSizeField.text.toInt()
+                        windowSize = windowSizeField.text.toInt() * 1_000
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                         tickSpacing = tickSpacingField.text.toDouble()
