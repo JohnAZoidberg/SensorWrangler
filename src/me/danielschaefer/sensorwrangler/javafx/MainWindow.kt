@@ -31,7 +31,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     private val jfxSettings = JavaFxSettings()
 
     init {
-        wrangler.import(App.instance.settings.defaultExportPath)
+        wrangler.import(App.instance.settings.configPath)
         primaryStage.apply {
             title = "SensorWrangler"
 

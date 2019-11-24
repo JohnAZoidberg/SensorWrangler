@@ -33,12 +33,16 @@ open class Settings {
     )
 
     // TODO: Think about how to have preferences of sensors of plugins
-    @Preference("Default path of file sensor", picker=Picker.FileOpen)
+    @Preference("Default path of file sensor",
+        explanation = "Which file the FileSensor tries to read from, by default.",
+        picker = Picker.FileOpen)
     var defaultFileSensorPath: String? = null
 
-    @Preference("Default recording directory", picker=Picker.Directory)
+    @Preference("Default recording directory",
+        explanation = "Which directory, recordings are saved into, by default.",
+        picker=Picker.Directory)
     var recordingDirectory: String? = null
 
-    @Preference("Default export file", picker=Picker.FileSave)
-    val defaultExportPath: String = "wrangler.settings"
+    // TODO: Make overridable by cmdline param or environment variable
+    val configPath: String = "wrangler.settings"
 }
