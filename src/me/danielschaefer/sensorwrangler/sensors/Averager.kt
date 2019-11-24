@@ -1,14 +1,16 @@
 package me.danielschaefer.sensorwrangler.sensors
 
-import javafx.collections.ListChangeListener
-import me.danielschaefer.sensorwrangler.DataPoint
+import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 class Averager(sourceMeasurements: List<Measurement>) : VirtualSensor() {
     private val measurement: Measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
-        description = "Averaged measurement of " + sourceMeasurements.fold( "") {
-                acc, m -> "$acc, ${m.description}"
+        description = "Averaged measurement of " + sourceMeasurements.joinToString(separator = ", ") {
+                it.description ?: ""
         }
     }
     override val measurements: List<Measurement> = listOf(measurement)
@@ -16,18 +18,34 @@ class Averager(sourceMeasurements: List<Measurement>) : VirtualSensor() {
     override var connected: Boolean = true
     override val title: String = "Averager ${Random.nextInt(0, 100)}"
 
+    /**
+     * How much time lies between each new average and
+     * over which interval to average the individual measurements
+     *
+     * Unit: Milliseconds
+     * TODO: Maybe there is a type for seconds and milliseconds
+     */
+    private val period: Long = 1_000
+
     init {
-        sourceMeasurements[0].dataPoints.addListener(ListChangeListener {
-            it.next()
+        Executors.newSingleThreadScheduledExecutor().apply {
+            scheduleAtFixedRate({
+                Platform.runLater {
+                    val connectedMeasurements = sourceMeasurements.filter { it.sensor.isConnected }
+                    val summedNewVals = connectedMeasurements.fold(0.0) {
+                        acc, m ->
+                            // Average data points of this measurement during the last $period milliseconds
+                            val dataPoints = m.dataPoints.filter {
+                                it.timestamp > Date().time.toDouble() - period.toDouble()
+                            }
+                            acc + dataPoints.sumByDouble { it.value } / dataPoints.size
+                    }
 
-            val newValSum: Double = sourceMeasurements.subList(1, sourceMeasurements.size).fold(it.addedSubList.first().value) {
-                // FIXME: Why do I have to force it as a double?
-                acc, m -> acc + m.dataPoints.last().value
-            }
-
-            val averagedNewVal: Double = newValSum / sourceMeasurements.size
-            measurement.dataPoints.add(DataPoint(it.addedSubList.first().timestamp, averagedNewVal))
-        })
+                    if (connectedMeasurements.isNotEmpty())
+                        measurement.addDataPoint(summedNewVals / connectedMeasurements.size)
+                }
+            }, 0, period, TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+        }
 
         connected = true
     }

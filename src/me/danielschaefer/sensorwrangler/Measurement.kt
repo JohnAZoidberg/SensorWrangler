@@ -23,6 +23,7 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
 
     // TODO: Add description to constructor and think about what to do with Unit
     // TODO: Deserialize description
+    // TODO: Why/when would it be null?
     var description: String? = null
     var startDate: Long? = null
 
