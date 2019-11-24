@@ -145,7 +145,7 @@ class SensorWrangler {
 
             when (prefix) {
                 "Sensor" -> {
-                    val newSensor: Sensor = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.sensors.$className")) as Sensor
+                    val newSensor = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.sensors.$className")) as VirtualSensor
                     sensors.add(newSensor)
                 }
                 "Chart" -> {

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.sensors.Averager
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.util.*
 
@@ -58,8 +59,13 @@ class MeasurementDeserializer @JvmOverloads constructor(vc: Class<*>? = null) : 
         val sensorUuid = myMap?.get("sensorUuid") as String
         val sensor = App.instance.wrangler.sensors.find { it.uuid == sensorUuid } as VirtualSensor
 
+        if (sensor is Averager) {
+            // This assumes that the sensors have been deserialized before this measurement
+            sensor.connect()
+        }
+
         // TODO: Why do I have to do it here and not in the Sensor class?
-        sensor.measurements.forEach { it.sensorUuid = sensorUuid}
+        sensor.measurements.forEach { it.sensorUuid = sensorUuid }
         return sensor.measurements[indexInSensor]
     }
 }

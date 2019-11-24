@@ -79,7 +79,10 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
 
 
 
-                App.instance.wrangler.sensors.add(Averager(selectedMeasurements))
+                App.instance.wrangler.sensors.add(Averager().apply {
+                    sourceMeasurements = selectedMeasurements
+                    connect()
+                })
                 close()
             }
         }

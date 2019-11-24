@@ -1,21 +1,22 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import java.util.*
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-class Averager(sourceMeasurements: List<Measurement>) : VirtualSensor() {
-    private val measurement: Measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
-        description = "Averaged measurement of " + sourceMeasurements.joinToString(separator = ", ") {
-                it.description ?: ""
-        }
-    }
-    override val measurements: List<Measurement> = listOf(measurement)
+class Averager: VirtualSensor() {
+    @JsonProperty("sourceMeasurements")
+    var sourceMeasurements: List<Measurement> = listOf()
 
+    private var measurement: Measurement? = null
+    override var measurements: MutableList<Measurement> = mutableListOf()
     override var connected: Boolean = true
+
     override val title: String = "Averager ${Random.nextInt(0, 100)}"
 
     /**
@@ -27,8 +28,19 @@ class Averager(sourceMeasurements: List<Measurement>) : VirtualSensor() {
      */
     private val period: Long = 1_000
 
-    init {
-        Executors.newSingleThreadScheduledExecutor().apply {
+    private var updater: ScheduledExecutorService? = null
+
+    fun connect() {
+        measurement = Measurement(this, 0, Measurement.Unit.METER).apply {
+            description = "Averaged measurement of " + sourceMeasurements.joinToString(separator = ", ") {
+                it.description ?: ""
+            }
+
+            measurements.clear()
+            measurements.add(this)
+        }
+
+        updater = Executors.newSingleThreadScheduledExecutor().apply {
             scheduleAtFixedRate({
                 Platform.runLater {
                     val connectedMeasurements = sourceMeasurements.filter { it.sensor.isConnected }
@@ -42,11 +54,9 @@ class Averager(sourceMeasurements: List<Measurement>) : VirtualSensor() {
                     }
 
                     if (connectedMeasurements.isNotEmpty())
-                        measurement.addDataPoint(summedNewVals / connectedMeasurements.size)
+                        measurement?.addDataPoint(summedNewVals / connectedMeasurements.size)
                 }
             }, 0, period, TimeUnit.MILLISECONDS)  // 40ms = 25FPS
         }
-
-        connected = true
     }
 }
