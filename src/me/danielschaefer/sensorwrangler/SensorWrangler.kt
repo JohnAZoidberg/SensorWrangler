@@ -111,8 +111,11 @@ class SensorWrangler {
 
     /**
      * Remove a sensor and charts associated with its measurements
+     *
+     * TODO: For charts with multiple measurements, don't remove the entire chart,
+     * only the measurements of this sensor.
      */
-    fun removeSensor(sensor: Sensor) {
+    fun removeSensor(sensor: VirtualSensor) {
         for (measurement in sensor.measurements) {
             charts.removeIf { chart -> chart is LineGraph && chart.yAxes.contains(measurement) }
         }

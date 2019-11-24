@@ -14,7 +14,7 @@ class RandomSensor: Sensor() {
     override val title: String = "RandomSensor" + Random.nextInt(0, 100)
 
     @JsonProperty("updateInterval")
-    @SensorProperty(title = "Update Interval")
+    @SensorProperty(title = "Update Interval [ms]")
     var updateInterval: Long = 250
 
     @JsonProperty("minValue")

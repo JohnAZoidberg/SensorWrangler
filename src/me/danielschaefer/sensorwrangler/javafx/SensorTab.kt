@@ -38,8 +38,7 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                         return@ChangeListener
 
                     // TODO: Pass Sensor object to avoid searching and possible failure
-                    val sensor = App.instance.wrangler.findSensorByTitle(newValue.text)
-                    sensor?.let {
+                    App.instance.wrangler.findVirtualSensorByTitle(newValue.text)?.let {sensor ->
                         val sensorDetailTable = TableView<TableRow>().apply {
                             // Have columns expand to fill all available space
                             columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
@@ -78,6 +77,12 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                                     items.add(TableRow("Maximum value", sensor.maxValue.toString()))
                                     items.add(TableRow("Maximum step distance", sensor.maxStep.toString()))
                                 }
+                                is Averager -> {
+                                    items.add(TableRow("Source measurements", ""))
+                                    for (m in sensor.sourceMeasurements)
+                                        items.add(TableRow("", m.description))
+
+                                }
                             }
 
                             items.add(TableRow("Measurements", sensor.measurements.size.toString()))
@@ -87,36 +92,43 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                         }
 
                         // TODO: Handle disconnection for VirtualSensor or maybe gray the button out
-                        val connectButton = Button().apply {
-                            if (sensor.isConnected) {
-                                text = "Disonnect"
-                                setOnAction {
-                                    sensor.disconnect()
-                                }
-                            } else {
-                                text = "Connect"
-                                setOnAction {
-                                    sensor.connect()
-                                }
-                            }
+
+                        var connectButton = Button("Disconnect").apply {
+                            isDisable = true
                         }
-                        sensor.addConnectionChangeListener(object : ConnectionChangeListener {
-                            override fun onConnect() {
-                                connectButton.text = "Disconnect"
-                                connectButton.setOnAction {
-                                    // TODO: Add popup for connection dialog
-                                    sensor.disconnect()
+
+                        if (sensor is Sensor) {
+                            connectButton = Button().apply {
+                                if (sensor.isConnected) {
+                                    text = "Disonnect"
+                                    setOnAction {
+                                        sensor.disconnect()
+                                    }
+                                } else {
+                                    text = "Connect"
+                                    setOnAction {
+                                        sensor.connect()
+                                    }
                                 }
                             }
-
-                            override fun onDisconnect(sensor: Sensor, reason: String?) {
-                                connectButton.text = "Connect"
-                                connectButton.setOnAction {
-                                    sensor.connect()
+                            sensor.addConnectionChangeListener(object : ConnectionChangeListener {
+                                override fun onConnect() {
+                                    connectButton.text = "Disconnect"
+                                    connectButton.setOnAction {
+                                        // TODO: Add popup for connection dialog
+                                        sensor.disconnect()
+                                    }
                                 }
-                            }
 
-                        })
+                                override fun onDisconnect(sensor: Sensor, reason: String?) {
+                                    connectButton.text = "Connect"
+                                    connectButton.setOnAction {
+                                        sensor.connect()
+                                    }
+                                }
+
+                            })
+                        }
 
                         val removeSensorButton = Button("Remove Sensor").apply {
                             setOnAction {
