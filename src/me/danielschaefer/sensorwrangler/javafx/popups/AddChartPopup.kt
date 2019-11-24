@@ -125,6 +125,9 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(addMeasurementButton, 2, 9)
         }
 
+        // Already display one measurement input field
+        addYAxis()
+
         val addButton = Button("Add chart").apply {
             onAction = EventHandler {
                 val selectedMeasurements: MutableList<Measurement> = mutableListOf()
