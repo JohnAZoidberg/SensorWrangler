@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox
 import javafx.scene.control.Label
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
+import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.javafx.App
@@ -87,7 +88,8 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
             }
         }
 
-        val contentBox = VBox(10.0, formGrid, addButton).apply {
+        val explanationLabel = Text("Average each of the inputs over the last second.\n" + "Measurements of disconnected sensors are ignored.")
+        val contentBox = VBox(10.0, explanationLabel, formGrid, addButton).apply {
             padding = Insets(25.0)
             alignment = Pos.CENTER;
         }
