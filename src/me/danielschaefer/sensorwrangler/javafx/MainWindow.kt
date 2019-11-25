@@ -210,17 +210,20 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     title = chart.title
                     animated = false
                     for (yAxis in chart.yAxes) {
-                        XYChart.Series<Number, Number>().apply {
+                        val series = XYChart.Series<Number, Number>().apply {
                             name = yAxis.description ?: "Data"
-
-                            // TODO: Maybe we can have it as a list of measurements and there is something like a cellFactory for charts?
-                            data = MappedList(yAxis.dataPoints) {
-                                val datum: XYChart.Data<Number, Number> = XYChart.Data(it.value.timestamp, it.value.value)
-                                datum
-                            }
-
-                            fxChart.data.add(this)
                         }
+
+
+                        series.data = FXCollections.observableList(mutableListOf<XYChart.Data<Number, Number>>())
+                        // TODO: Maybe we can define some sort of mapping to get rid of the additional listener,
+                        //       like the cellFactory, but for charts
+                        yAxis.dataPoints.addListener(ListChangeListener {
+                            it.next()
+                            series.data.addAll(it.addedSubList.map { dp -> XYChart.Data(dp.timestamp as Number , dp.value as Number) })
+                        })
+
+                        fxChart.data.add(series)
 
                         // Show data from now until chart.windowSize ago
                         // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
