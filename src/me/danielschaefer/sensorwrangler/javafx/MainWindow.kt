@@ -137,6 +137,9 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 val xAxis = CategoryAxis().apply {
                     label = chart.axisNames[0]
                     animated = false
+                    // Long labels are automatically rotated to 90°.
+                    // Setting it to 0° doesn't change that behaviour *shrug*
+                    tickLabelRotation = 360.0
                 }
                 val fxYAxis = NumberAxis().apply {
                     label = chart.axisNames[0]

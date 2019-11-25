@@ -32,7 +32,7 @@ class Averager: VirtualSensor() {
 
     fun connect() {
         measurement = Measurement(this, 0, Measurement.Unit.METER).apply {
-            description = "Averaged measurement of " + sourceMeasurements.joinToString(separator = ", ") {
+            description = "Average of\n" + sourceMeasurements.joinToString(separator = ",\n") {
                 it.description ?: ""
             }
 
