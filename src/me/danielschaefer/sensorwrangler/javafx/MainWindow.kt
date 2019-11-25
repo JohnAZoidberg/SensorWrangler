@@ -18,6 +18,7 @@ import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.gui.Chart
+import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 import java.time.Instant
 import java.time.ZoneId
@@ -31,8 +32,11 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     private val jfxSettings = JavaFxSettings()
 
     init {
-        wrangler.import(App.instance.settings.configPath)
         primaryStage.apply {
+            if (!App.instance.wrangler.import(App.instance.settings.configPath))
+                Alert(primaryStage, "Import failed",
+                    "Failed to import configuration because '${App.instance.settings.configPath}' was not found.")
+
             title = "SensorWrangler"
 
             val allChartsBox = GridPane().apply {

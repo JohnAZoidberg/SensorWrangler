@@ -21,7 +21,9 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
                         initialDirectory = File(it)
                     }
                     showOpenDialog(primaryStage)?.absolutePath?.let {
-                        App.instance.wrangler.import(it)
+                        if (!App.instance.wrangler.import(it))
+                            Alert(primaryStage, "Import failed",
+                                "Failed to import configuration because '$it' was not found.")
                     }
                 }
             }})

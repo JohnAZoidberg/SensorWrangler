@@ -16,6 +16,7 @@ import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.io.BufferedReader
+import java.io.FileNotFoundException
 import java.io.FileReader
 import java.io.FileWriter
 import java.time.Instant
@@ -138,24 +139,29 @@ class SensorWrangler {
         writer.flush()
     }
 
-    fun import(path: String) {
-        val reader = BufferedReader(FileReader(path))
-        while(reader.ready()) {
-            val (prefix, jsonObject) = reader.readLine().split("@")
+    fun import(path: String): Boolean {
+        try {
+            val reader = BufferedReader(FileReader(path))
+            while(reader.ready()) {
+                val (prefix, jsonObject) = reader.readLine().split("@")
 
-            val myMap: HashMap<*, *> = ObjectMapper().readValue(jsonObject, HashMap::class.java)
-            val className = myMap.keys.first() as String
+                val myMap: HashMap<*, *> = ObjectMapper().readValue(jsonObject, HashMap::class.java)
+                val className = myMap.keys.first() as String
 
-            when (prefix) {
-                "Sensor" -> {
-                    val newSensor = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.sensors.$className")) as VirtualSensor
-                    sensors.add(newSensor)
-                }
-                "Chart" -> {
-                    val newChart: Chart = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.gui.$className")) as Chart
-                    charts.add(newChart)
+                when (prefix) {
+                    "Sensor" -> {
+                        val newSensor = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.sensors.$className")) as VirtualSensor
+                        sensors.add(newSensor)
+                    }
+                    "Chart" -> {
+                        val newChart: Chart = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.gui.$className")) as Chart
+                        charts.add(newChart)
+                    }
                 }
             }
+            return true
+        } catch (e: FileNotFoundException) {
+            return false
         }
     }
 }
