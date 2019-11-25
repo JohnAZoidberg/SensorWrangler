@@ -70,7 +70,6 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                                 App.instance.wrangler.findChartByTitle(newValue)?.let {
                                     it.shown = true
-                                    //val newChart = LineChart<Number, Number>(NumberAxis().apply{ label = newValue}, NumberAxis())
                                     chartBox.children[0] = createFxChart(it)
                                 }
                                 println("Switched from chart $oldValue to $newValue")

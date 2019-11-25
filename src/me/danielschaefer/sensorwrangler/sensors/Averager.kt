@@ -31,6 +31,9 @@ class Averager: VirtualSensor() {
     private var updater: ScheduledExecutorService? = null
 
     fun connect() {
+        if (measurement != null)
+            return
+
         measurement = Measurement(this, 0, Measurement.Unit.METER).apply {
             description = "Average of\n" + sourceMeasurements.joinToString(separator = ",\n") {
                 it.description ?: ""
@@ -39,6 +42,9 @@ class Averager: VirtualSensor() {
             measurements.clear()
             measurements.add(this)
         }
+
+        if (updater != null)
+            return
 
         updater = Executors.newSingleThreadScheduledExecutor().apply {
             scheduleAtFixedRate({

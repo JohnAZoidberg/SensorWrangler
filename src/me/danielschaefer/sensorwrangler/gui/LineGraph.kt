@@ -9,10 +9,10 @@ class LineGraph: AxisGraph() {
     override lateinit var title: String
 
     @JsonProperty("axisNames")
-    lateinit override var axisNames: Array<String>
+    override lateinit var axisNames: Array<String>
 
     @JsonProperty("yAxes")
-    lateinit override var yAxes: List<Measurement>
+    override lateinit var yAxes: List<Measurement>
 
     @JsonProperty("windowSize")
     override var windowSize: Int = 25
