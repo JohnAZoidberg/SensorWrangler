@@ -22,4 +22,6 @@ class LineGraph: AxisGraph() {
     override var upperBound: Double = 10.0
     @JsonProperty("tickSpacing")
     override var tickSpacing: Double = 1.0
+    @JsonProperty("withDots")
+    var withDots: Boolean = false
 }

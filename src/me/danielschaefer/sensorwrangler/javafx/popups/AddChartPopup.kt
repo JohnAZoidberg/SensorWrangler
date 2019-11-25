@@ -5,10 +5,7 @@ import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.Button
-import javafx.scene.control.ComboBox
-import javafx.scene.control.Label
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
@@ -62,22 +59,36 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
         val tickSpacingField = TextField("5")
         val windowSizeLabel = Label("Window Size [s]")
         val windowSizeField = TextField("10")
+        val withDotsLabel = Label("With dots")
+        val withDotsField = CheckBox()
 
         val typeDropdown = ComboBox<String>().apply{
             items.addAll(App.instance.settings.supportedCharts.map { it.simpleName })
             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                 when (newValue) {
                     BarGraph::class.simpleName -> {
-                        tickSpacingField.visibleProperty().set(false)
-                        tickSpacingLabel.visibleProperty().set(false)
-                        windowSizeField.visibleProperty().set(false)
-                        windowSizeLabel.visibleProperty().set(false)
+                        withDotsLabel.isVisible = false
+                        withDotsField.isVisible = false
+                        tickSpacingField.isVisible = false
+                        tickSpacingLabel.isVisible = false
+                        windowSizeField.isVisible = false
+                        windowSizeLabel.isVisible = false
                     }
-                    LineGraph::class.simpleName, ScatterGraph::class.simpleName -> {
-                        tickSpacingField.visibleProperty().set(true)
-                        tickSpacingLabel.visibleProperty().set(true)
-                        windowSizeField.visibleProperty().set(true)
-                        windowSizeLabel.visibleProperty().set(true)
+                    LineGraph::class.simpleName -> {
+                        withDotsLabel.isVisible = true
+                        withDotsField.isVisible = true
+                        tickSpacingField.isVisible = true
+                        tickSpacingLabel.isVisible = true
+                        windowSizeField.isVisible = true
+                        windowSizeLabel.isVisible = true
+                    }
+                    ScatterGraph::class.simpleName -> {
+                        withDotsLabel.isVisible = false
+                        withDotsField.isVisible = false
+                        tickSpacingField.isVisible = true
+                        tickSpacingLabel.isVisible = true
+                        windowSizeField.isVisible = true
+                        windowSizeLabel.isVisible = true
                     }
                 }
             })
@@ -88,41 +99,46 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             hgap = 10.0
             vgap = 10.0
 
-            add(Label("Chart Type"), 0, 0)
-            add(typeDropdown, 1, 0)
+            var row = 0
 
-            add(Label("Chart Name"), 0, 1)
-            add(chartNameField, 1, 1)
+            add(Label("Chart Type"), 0, row)
+            add(typeDropdown, 1, row++)
 
-            add(windowSizeLabel, 0, 2)
-            add(windowSizeField, 1, 2)
+            add(Label("Chart Name"), 0, row)
+            add(chartNameField, 1, row++)
 
-            add(Label("Lower Bound"), 0, 3)
-            add(lowerBoundField, 1, 3)
+            add(windowSizeLabel, 0, row)
+            add(windowSizeField, 1, row++)
 
-            add(Label("Upper Bound"), 0, 4)
-            add(upperBoundField, 1, 4)
+            add(Label("Lower Bound"), 0, row)
+            add(lowerBoundField, 1, row++)
 
-            add(tickSpacingLabel, 0, 5)
-            add(tickSpacingField, 1, 5)
+            add(Label("Upper Bound"), 0, row)
+            add(upperBoundField, 1, row++)
+
+            add(tickSpacingLabel, 0, row)
+            add(tickSpacingField, 1, row++)
+
+            add(withDotsLabel, 0, row)
+            add(withDotsField, 1, row++)
 
             // add(Empty)
-            add(Label("Label"), 1, 6)
-            add(Label("Measurement"), 2, 6)
+            add(Label("Label"), 1, row)
+            add(Label("Measurement"), 2, row++)
 
-            add(Label("X-Axis"), 0, 7)
-            add(xAxisNameField, 1, 7)
-            add(Label("Time"), 2, 7)
+            add(Label("X-Axis"), 0, row)
+            add(xAxisNameField, 1, row)
+            add(Label("Time"), 2, row++)
 
-            add(Label("Y-Axis"), 0, 8)
-            add(yAxisNameField, 1, 8)
+            add(Label("Y-Axis"), 0, row)
+            add(yAxisNameField, 1, row++)
 
             val addMeasurementButton = Button("Add y-axis measurement").apply {
                 setOnAction {
                     addYAxis()
                 }
             }
-            add(addMeasurementButton, 2, 9)
+            add(addMeasurementButton, 2, row++)
         }
 
         // Already display one measurement input field
@@ -152,6 +168,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                         tickSpacing = tickSpacingField.text.toDouble()
+                        withDots = withDotsField.isSelected
                     }
                     ScatterGraph::class.simpleName -> ScatterGraph().apply {
                         title = chartNameField.text

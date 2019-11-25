@@ -198,7 +198,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     animated = false
                 }
                 val fxChart = when (chart) {
-                    is LineGraph -> LineChart(xAxis, fxYAxis)
+                    is LineGraph -> LineChart(xAxis, fxYAxis).apply { createSymbols = chart.withDots }
                     is ScatterGraph -> ScatterChart(xAxis, fxYAxis)
                     else -> {
                         println("Cannot display this kind of chart")

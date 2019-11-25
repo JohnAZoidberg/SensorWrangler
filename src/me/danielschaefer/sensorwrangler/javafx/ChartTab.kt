@@ -15,6 +15,7 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
 import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.gui.BarGraph
+import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 class ChartTab(parentStage: Stage): Tab("Charts") {
@@ -79,6 +80,10 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                                     }
                                 }
                                 is AxisGraph -> {
+                                    if (chart is LineGraph)
+                                        items.addAll(
+                                            TableRow("With dots", StringUtil.yesNo(chart.withDots))
+                                        )
                                     items.addAll(
                                         TableRow("X-axis label", chart.axisNames[0]),
                                         TableRow("Y-axis label", chart.axisNames[1]),
