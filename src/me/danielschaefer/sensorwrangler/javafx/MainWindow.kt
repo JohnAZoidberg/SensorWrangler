@@ -160,6 +160,20 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
             sizeToScene()
             show()
+
+            Executors.newSingleThreadScheduledExecutor().apply {
+                scheduleAtFixedRate({
+                    if (paused)
+                        return@scheduleAtFixedRate
+
+                    if (lastUpperBound == null)
+                        lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
+
+                    lastUpperBound?.let {
+                        lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
+                    }
+                }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+            }
         }
     }
 
@@ -267,11 +281,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                     if (paused)
                                         return@runLater
 
-                                    if (lastUpperBound == null)
-                                        lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
-
                                     lastUpperBound?.let {
-                                        lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
                                         xAxis.upperBound = it
                                         xAxis.lowerBound = xAxis.upperBound - chart.windowSize
                                     }
