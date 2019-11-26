@@ -15,6 +15,7 @@ import kotlin.reflect.KClass
  * General Settings for the entire program
  */
 open class Settings {
+    val chartUpdatePeriod: Double = 40.0
     val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
     val version = "0.0.1"
 

@@ -29,6 +29,9 @@ import java.util.concurrent.TimeUnit
 
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
+    private var paused: Boolean = false
+    private var live: Boolean = true
+    private var lastUpperBound: Double? = null
     private val jfxSettings = JavaFxSettings()
 
     init {
@@ -82,7 +85,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
 
             // TODO: Make this useful
-            val playBox = HBox().apply {
+            val playBox = HBox(10.0).apply {
                 padding = Insets(25.0)
 
                 val spacer = fun() = Region().apply {
@@ -90,17 +93,47 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 }
 
                 val slider = Slider().apply {
-                    min = 0.0;
-                    max = 100.0;
-                    value = 40.0;
+                    min = -60.0;
+                    max = 0.0;
+                    value = 0.0;
                     isShowTickLabels = true;
                     isShowTickMarks = true;
-                    majorTickUnit = 50.0;
-                    minorTickCount = 5;
-                    blockIncrement = 10.0;
+                    majorTickUnit = 10.0;
+                    minorTickCount = 1;
+                    blockIncrement = 1.0;
+                    HBox.setHgrow(this, Priority.ALWAYS)
+                    isDisable = true
+                    labelFormatter = object : StringConverter<Double>() {
+                        override fun toString(value: Double): String? {
+                            return if (value == 0.0) "now" else "$value s"
+                        }
+
+                        override fun fromString(string: String?): Double {
+                            return if (string == "now")
+                                0.0
+                            else
+                                string!!.removeSuffix(" s").toDouble()
+                        }
+                    }
                 }
 
-                val buttonCurrent = Button("Pause")
+                val buttonSkipToNow = Button("Skip to now").apply {
+                    isDisable = true
+                    onAction = EventHandler {
+                        lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
+                        live = true
+                        isDisable = true
+                    }
+                }
+
+                val buttonPause = Button("Pause").apply {
+                    onAction = EventHandler {
+                        paused = !paused
+                        live = !paused
+                        buttonSkipToNow.isDisable = !live
+                        text = if (paused) "Start" else "Pause"
+                    }
+                }
 
                 val buttonProjected = Button("Start Recording").apply {
                     onAction = EventHandler {
@@ -118,7 +151,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     })
                 }
 
-                children.addAll(spacer(), buttonProjected)
+                children.addAll(slider, buttonPause, buttonSkipToNow, buttonProjected)
             }
             val vBox = VBox(createMenuBar(primaryStage), allChartsBox, playBox)
 
@@ -184,6 +217,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         }
 
                         override fun fromString(string: String?): Number {
+                            // TODO: DateTimeParser to Number
                             return 0
                         }
                     }
@@ -230,10 +264,19 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         Executors.newSingleThreadScheduledExecutor().apply {
                             scheduleAtFixedRate({
                                 Platform.runLater {
-                                    xAxis.upperBound = Date().time.toDouble()
-                                    xAxis.lowerBound = xAxis.upperBound - chart.windowSize
+                                    if (paused)
+                                        return@runLater
+
+                                    if (lastUpperBound == null)
+                                        lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
+
+                                    lastUpperBound?.let {
+                                        lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
+                                        xAxis.upperBound = it
+                                        xAxis.lowerBound = xAxis.upperBound - chart.windowSize
+                                    }
                                 }
-                            }, 0, 40, TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
                         }
                     }
                 }
