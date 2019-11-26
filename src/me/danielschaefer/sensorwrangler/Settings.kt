@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 open class Settings {
     val chartUpdatePeriod: Double = 40.0
     val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
-    val version = "0.0.1"
+    val version = "0.1.0"
 
     val supportedSensors: MutableList<KClass<out Sensor>> = mutableListOf(
         RandomSensor::class,
