@@ -3,6 +3,7 @@ package me.danielschaefer.sensorwrangler.sensors
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.NamedThreadFactory
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -34,7 +35,7 @@ class RandomSensor: Sensor() {
 
     override fun connect() {
         // TODO: Tie the lifetime of this to the window
-        updater = Executors.newSingleThreadScheduledExecutor().apply {
+        updater = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
             scheduleAtFixedRate({
                 Platform.runLater {
                     connected = true

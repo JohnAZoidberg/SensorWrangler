@@ -3,6 +3,7 @@ package me.danielschaefer.sensorwrangler.sensors
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.NamedThreadFactory
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -46,7 +47,7 @@ class Averager: VirtualSensor() {
         if (updater != null)
             return
 
-        updater = Executors.newSingleThreadScheduledExecutor().apply {
+        updater = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
             scheduleAtFixedRate({
                 Platform.runLater {
                     val connectedMeasurements = sourceMeasurements.filter { it.sensor.isConnected }

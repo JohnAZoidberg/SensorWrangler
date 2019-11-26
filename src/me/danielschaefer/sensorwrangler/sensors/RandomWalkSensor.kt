@@ -3,6 +3,7 @@ package me.danielschaefer.sensorwrangler.sensors
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.NamedThreadFactory
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
@@ -47,24 +48,24 @@ class RandomWalkSensor : Sensor() {
     override fun connect() {
         for (measurement in measurements) {
             // TODO: Tie the lifetime of this to the window
-            val updater = Executors.newSingleThreadScheduledExecutor()
-            updaters.add(updater)
-            updater.scheduleAtFixedRate({
-                Platform.runLater {
-                    val currentPos = if (measurement.dataPoints.isEmpty())
-                        ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
-                    else
-                        measurement.dataPoints.last().value
+            updaters.add(Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
+                scheduleAtFixedRate({
+                    Platform.runLater {
+                        val currentPos = if (measurement.dataPoints.isEmpty())
+                            ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
+                        else
+                            measurement.dataPoints.last().value
 
-                    var newPos: Double
-                    do {
-                        val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
-                        newPos = currentPos + random
-                    } while (newPos < minValue || newPos > maxValue)
+                        var newPos: Double
+                        do {
+                            val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
+                            newPos = currentPos + random
+                        } while (newPos < minValue || newPos > maxValue)
 
-                    measurement.addDataPoint(newPos)
-                }
-            }, 0, updateInterval, TimeUnit.MILLISECONDS)
+                        measurement.addDataPoint(newPos)
+                    }
+                }, 0, updateInterval, TimeUnit.MILLISECONDS)
+            })
         }
 
         super.connect()

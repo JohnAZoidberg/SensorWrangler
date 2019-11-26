@@ -15,6 +15,7 @@ import javafx.scene.control.Slider
 import javafx.scene.layout.*
 import javafx.stage.Stage
 import javafx.util.StringConverter
+import me.danielschaefer.sensorwrangler.NamedThreadFactory
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.gui.Chart
@@ -161,7 +162,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             sizeToScene()
             show()
 
-            Executors.newSingleThreadScheduledExecutor().apply {
+            Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update lastUpperBound")).apply {
                 scheduleAtFixedRate({
                     if (paused)
                         return@scheduleAtFixedRate
@@ -170,6 +171,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
 
                     lastUpperBound?.let {
+                        // TODO: This might slowly fall behind the current time,
+                        //       if this thread isn't properly scheduled every 40ms
                         lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
                     }
                 }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
@@ -275,7 +278,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                         // Show data from now until chart.windowSize ago
                         // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
-                        Executors.newSingleThreadScheduledExecutor().apply {
+                        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
                             scheduleAtFixedRate({
                                 Platform.runLater {
                                     if (paused)
