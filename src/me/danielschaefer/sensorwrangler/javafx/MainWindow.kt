@@ -181,7 +181,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     }
 
     private fun createFxChart(chart: Chart): Node? {
-        when (chart) {
+        return when (chart) {
             is BarGraph -> {
                 val xAxis = CategoryAxis().apply {
                     label = chart.axisNames[0]
@@ -197,7 +197,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     lowerBound = chart.lowerBound
                     upperBound = chart.upperBound
                 }
-                return BarChart(xAxis, fxYAxis).apply {
+                BarChart(xAxis, fxYAxis).apply {
                     val series = XYChart.Series<String, Number>().apply {
                         name = chart.title
                         val emptyList = mutableListOf<XYChart.Data<String, Number>>()
@@ -257,7 +257,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     }
                 }
 
-                return fxChart?.apply {
+                fxChart?.apply {
                     title = chart.title
                     animated = false
                     for (yAxis in chart.yAxes) {
@@ -267,11 +267,14 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
 
                         series.data = FXCollections.observableList(mutableListOf<XYChart.Data<Number, Number>>())
+                        // Fill with past data
+                        series.data.addAll(yAxis.dataPoints.map { dp -> XYChart.Data(dp.timestamp as Number, dp.value as Number) })
+
                         // TODO: Maybe we can define some sort of mapping to get rid of the additional listener,
                         //       like the cellFactory, but for charts
                         yAxis.dataPoints.addListener(ListChangeListener {
                             it.next()
-                            series.data.addAll(it.addedSubList.map { dp -> XYChart.Data(dp.timestamp as Number , dp.value as Number) })
+                            series.data.addAll(it.addedSubList.map { dp -> XYChart.Data(dp.timestamp as Number, dp.value as Number) })
                         })
 
                         fxChart.data.add(series)
@@ -294,8 +297,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     }
                 }
             }
-            else -> println("Cannot display this kind of chart")
+            else -> {
+                println("Cannot display this kind of chart")
+                null
+            }
         }
-        return null
     }
 }
