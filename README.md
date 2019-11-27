@@ -1,5 +1,8 @@
 # SensorWrangler
 
+![Preview](https://danielschaefer.me/SensorWrangler/0.1.0.gif)
+
+## Features
 - Read data from fitness tracking sensors
 - Nice user interface to easily select and connect to devices
 - Log data to file or database
