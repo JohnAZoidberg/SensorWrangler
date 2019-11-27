@@ -1,5 +1,21 @@
 # SensorWrangler
 
+- Read data from fitness tracking sensors
+- Nice user interface to easily select and connect to devices
+- Log data to file or database
+  - CSV
+- API for third-party programs to read sensor data
+  - CSV (using live log)
+- Flexible visualization of sensor data
+  - Pause, continue and jump-to-now time travelling
+  - Charts
+    - Line chart
+    - Scatter chart
+    - Bar chart
+- Combine measurements of sensors
+  - Average of multiple measurements
+- Extensibility: Easily add new Sensors and Charts
+
 ## Building
 Currently there are no Maven or Gradle build files available. The project has to be imported using IntelliJ IDEA and built from there.
 
