@@ -60,10 +60,14 @@ class SocketSensor: Sensor() {
 
                         measurement.addDataPoint(value)
                     } catch (e: IOException) {
-                        disconnect("Socket had an IOException: ${e.message}")
+                        // If we're already disconnected, we don't care about the exception
+                        if (connected)
+                            disconnect("Socket had an IOException: ${e.message}")
+
+                        return@thread
                     }
                 }
-                disconnect("Socket was closed")
+                disconnect("Socket was closed/disconnected")
             }
 
             connected = true
