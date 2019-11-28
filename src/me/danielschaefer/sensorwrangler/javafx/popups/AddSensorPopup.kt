@@ -2,7 +2,6 @@ package me.danielschaefer.sensorwrangler.javafx.popups
 
 import javafx.beans.value.ChangeListener
 import javafx.geometry.Insets
-import javafx.geometry.Orientation
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
@@ -167,11 +166,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
            children.addAll(Text("Connection options"), connectionConfiguration)
        }
 
-       val separator = { Separator().apply {
-           orientation = Orientation.HORIZONTAL
-           padding = Insets(10.0)
-       }}
-       return VBox(sensorTypeSelection, separator(), sensorBox, separator(), connectionBox, separator(), addSensorButton).apply {
+       return VBox(10.0, sensorTypeSelection, sensorBox, connectionBox, addSensorButton).apply {
            padding = Insets(25.0)
        }
    }
