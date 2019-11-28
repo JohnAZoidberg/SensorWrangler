@@ -17,9 +17,6 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             // TODO: What should they even do?
             items.add(MenuItem("Open").apply { onAction = EventHandler {
                 FileChooser().apply {
-                    App.instance.settings.defaultFileSensorPath?.let {
-                        initialDirectory = File(it)
-                    }
                     showOpenDialog(primaryStage)?.absolutePath?.let {
                         if (!App.instance.wrangler.import(it))
                             Alert(primaryStage, "Import failed",
