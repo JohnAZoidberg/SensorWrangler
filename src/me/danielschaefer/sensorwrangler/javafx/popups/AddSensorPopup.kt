@@ -55,7 +55,6 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
 
        val sensorTypeSelection = ComboBox<String>().apply {
            for (supportedSensor in App.instance.settings.supportedSensors) {
-               // FIXME: The names seem to be disappearing when selecting something else
                items.add(supportedSensor.simpleName)
 
                valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
@@ -103,8 +102,10 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                                        val fileButton = Button("Choose file").apply {
                                            setOnAction {
                                                val fileChooser = FileChooser()
-                                               App.instance.settings.configPath?.let {
-                                                   fileChooser.initialDirectory = File(it)
+                                               App.instance.settings.defaultFileSensorPath?.let {
+                                                   val file = File(it)
+                                                   fileChooser.initialDirectory = file.parentFile
+                                                   fileChooser.initialFileName = file.name
                                                }
                                                fileChooser.showOpenDialog(this@AddSensorPopup)?.absolutePath?.let {
                                                    fileLabel.text = it
@@ -144,6 +145,8 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                        }
                        newSensor.addConnectionChangeListener(JavaFXUtil.createConnectionChangeListener(parentStage))
                        App.instance.wrangler.sensors.add(newSensor)
+
+                       // Select the new sensor if SensorTab is currently shown
                        sensorTab?.sensorList?.selectionModel?.select(sensorTab.sensorList.items.last())
 
                        close()
