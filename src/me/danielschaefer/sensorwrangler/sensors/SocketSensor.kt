@@ -31,42 +31,46 @@ class SocketSensor: Sensor() {
     override fun disconnect(reason: String?) {
         connected = false
         socket?.close()
+        socket = null
 
         super.disconnect(reason)
     }
 
     override fun connect() {
+        if (socket != null)
+            return
+
         try {
-            socket = Socket(hostname, port).apply {
-                val reader = inputStream.bufferedReader()
-                thread = thread(start = true) {
-                    while (socket?.isClosed == true) {
-                        try {
-                            val line = reader.readLine()
+            socket = Socket(hostname, port)
+            val reader = socket?.inputStream?.bufferedReader()
 
-                            val value = line?.toDoubleOrNull()
+            thread = thread(start = true) {
+                while (socket?.isClosed == false && socket?.isConnected == true) {
+                    try {
+                        val line = reader?.readLine()
 
-                            println("Read $line from $hostname:$port")
+                        val value = line?.toDoubleOrNull()
 
-                            if (value == null) {
-                                println("Invalid number was read in $title: '$line'")
-                                continue
-                            }
+                        println("Read $line from $hostname:$port")
 
-                            measurement.addDataPoint(value)
-                        } catch (e: IOException) {
-                            disconnect("Socket of $title had an IOException: ${e.message}")
+                        if (value == null) {
+                            println("Invalid number was read in $title: '$line'")
+                            continue
                         }
+
+                        measurement.addDataPoint(value)
+                    } catch (e: IOException) {
+                        disconnect("Socket had an IOException: ${e.message}")
                     }
-                    disconnect("Socket of $title was closed")
                 }
+                disconnect("Socket was closed")
             }
 
             connected = true
 
             super.connect()
         } catch (e: ConnectException) {
-            disconnect("Socket of $title failed to connect: ${e.message}")
+            disconnect("Socket failed to connect: ${e.message}")
         }
     }
 
