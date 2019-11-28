@@ -21,7 +21,7 @@ class FileSensor: Sensor() {
     private var tailer: Tailer? = null
 
     @JsonProperty("filePath")
-    @ConnectionProperty(title = "File path")
+    @ConnectionProperty(title = "File path", default="")
     lateinit var filePath: File
 
     @JsonProperty("tail")

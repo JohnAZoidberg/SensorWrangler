@@ -21,12 +21,12 @@ class SocketSensor: Sensor() {
     private var thread: Thread? = null
 
     @JsonProperty("hostname")
-    @ConnectionProperty(title = "Hostname")
-    lateinit var hostname: String
+    @ConnectionProperty(title = "Hostname", default="localhost")
+    var hostname: String = "localhost"
 
     @JsonProperty("port")
-    @ConnectionProperty(title = "Port")
-    var port: Int = 0
+    @ConnectionProperty(title = "Port", default="8080")
+    var port: Int = 8080
 
     override fun disconnect(reason: String?) {
         connected = false

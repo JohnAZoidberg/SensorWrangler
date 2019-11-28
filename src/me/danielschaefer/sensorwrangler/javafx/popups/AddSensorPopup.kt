@@ -126,6 +126,10 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                                }
                                is ConnectionProperty -> {
                                    val label = Label(annotation.title)
+
+                                   if (input is TextField)
+                                       input.text = annotation.default
+
                                    connectionConfiguration.add(label, 0, connectionRow)
                                    connectionConfiguration.add(input, 1, connectionRow)
                                    connectionRow++
