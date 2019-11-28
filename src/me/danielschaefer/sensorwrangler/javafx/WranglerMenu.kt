@@ -51,7 +51,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
         }
 
         val recordingMenu = Menu("Recording").apply {
-            items.add(MenuItem("Start Recording").apply {
+            items.add(MenuItem("Add Recorder").apply {
                 onAction = EventHandler {
                     StartRecordingPopup(primaryStage)
                 }

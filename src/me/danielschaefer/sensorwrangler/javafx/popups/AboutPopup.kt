@@ -25,6 +25,7 @@ class AboutPopup(val parentStage: Stage): Stage() {
         val sensorText = Text("Built-in sensor drivers:" + foldClassNames(App.instance.settings.supportedSensors))
         val virtualSensorText = Text("Available formulas types:" + foldClassNames(App.instance.settings.supportedFormulas))
         val chartText = Text("Available chart types:" + foldClassNames(App.instance.settings.supportedCharts))
+        val recorderText = Text("Available recorders:" + foldClassNames(App.instance.settings.supportedRecorders))
 
         val freeSoftware = Hyperlink("Free Software").apply {
             setOnAction {
@@ -74,6 +75,7 @@ class AboutPopup(val parentStage: Stage): Stage() {
             sensorText,
             virtualSensorText,
             chartText,
+            recorderText,
             licenseText,
             aboutText
         ).apply {

@@ -4,7 +4,10 @@ import me.danielschaefer.sensorwrangler.gui.BarGraph
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
+import me.danielschaefer.sensorwrangler.recording.CsvRecorder
+import me.danielschaefer.sensorwrangler.recording.Recorder
 import me.danielschaefer.sensorwrangler.sensors.*
+import java.nio.file.Paths
 import java.time.format.DateTimeFormatter
 import kotlin.reflect.KClass
 
@@ -25,6 +28,10 @@ open class Settings {
 
     val supportedFormulas: MutableList<KClass<Any>> = mutableListOf()
 
+    val supportedRecorders: MutableList<KClass<out Recorder>> = mutableListOf(
+        CsvRecorder::class
+    )
+
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
         LineGraph::class,
         ScatterGraph::class,
@@ -37,10 +44,12 @@ open class Settings {
         picker = Picker.FileOpen)
     var defaultFileSensorPath: String? = null
 
+    // Default: Current working directory
     @Preference("Default recording directory",
         explanation = "Which directory, recordings are saved into, by default.",
         picker=Picker.Directory)
-    var recordingDirectory: String? = null
+    var recordingDirectory: String = Paths.get("").toAbsolutePath().toString()
+
 
     // TODO: Make overridable by cmdline param or environment variable
     val configPath: String = "wrangler.settings"

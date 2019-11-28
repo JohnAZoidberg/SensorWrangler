@@ -12,7 +12,7 @@ import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
-import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.recording.Recorder
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.io.BufferedReader
@@ -32,7 +32,8 @@ class SensorWrangler {
     val sensors: ObservableList<VirtualSensor> = FXCollections.observableList(mutableListOf())
     val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf())
 
-    private var recordingWriter: FileWriter? = null
+    private val recorders: MutableList<Recorder> = mutableListOf()
+
     private var recordingListeners: MutableList<ListChangeListener<DataPoint>> = mutableListOf()
     private var recording: ReadOnlyBooleanWrapper = ReadOnlyBooleanWrapper(false)
 
@@ -55,30 +56,29 @@ class SensorWrangler {
         registerModule(module)
     }
 
-    fun startRecording() {
+    private fun startRecording() {
+        // If already recording, the listeners don't have to be set up again
+        if (recording.value)
+            return
+
         recording.value = true
-        recordingWriter = FileWriter("${App.instance.settings.recordingDirectory}/wrangler.log", true)
 
-        // CSV header
-        recordingWriter?.write("Timestamp,Sensor,Measurement,Value\n")
-
-        // Values
+        // TODO: Add new sensors
         for (sensor in sensors) {
             for (measurement in sensor.measurements) {
-                val recordingListener = ListChangeListener<DataPoint> {
+                val recordingListener = ListChangeListener<DataPoint> { listChange ->
                     // If the listener called when we're not recording, something is wrong
                     assert(recording.value)
 
-                    it.next()
+                    listChange.next()
                     // We assume that the measurements list is only ever appended
-                    for (newValue in it.addedSubList) {
+                    for (newValue in listChange.addedSubList) {
                         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
                         val newDateTime = Instant.ofEpochMilli(newValue.timestamp)
                             .atZone(ZoneId.of("GMT+1"))  // TODO: Think about how to deal with TZs
                             .format(formatter)
-                        recordingWriter?.write("${sensor.title},${measurement.description},$newDateTime,${newValue.value}\n")
+                        recorders.forEach { it.recordValue(newDateTime, measurement, newValue.value) }
                     }
-                    recordingWriter?.flush()
                 }
                 recordingListeners.add(recordingListener)
                 measurement.dataPoints.addListener(recordingListener)
@@ -93,7 +93,10 @@ class SensorWrangler {
                 for (listener in recordingListeners)
                     measurement.dataPoints.removeListener(listener)
 
-        recordingWriter?.close()
+        recordingListeners.clear()
+
+        recorders.forEach { it.close() }
+        recorders.clear()
     }
 
     // TODO: Do we want charts to be a map indexed by the title?
@@ -163,5 +166,10 @@ class SensorWrangler {
         } catch (e: FileNotFoundException) {
             return false
         }
+    }
+
+    fun addRecorder(recorder: Recorder) {
+        recorders.add(recorder)
+        startRecording()
     }
 }
