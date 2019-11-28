@@ -12,9 +12,15 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
+import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
+import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
-import me.danielschaefer.sensorwrangler.sensors.*
+import me.danielschaefer.sensorwrangler.sensors.Averager
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
+import me.danielschaefer.sensorwrangler.sensors.Sensor
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.declaredMemberProperties
 
 class SensorTab(parentStage: Stage): Tab("Sensors") {
     val sensorList: ListView<Text>
@@ -59,24 +65,24 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             items.add(TableRow("Title", sensor.title))
                             items.add(TableRow("Type", sensor::class.simpleName))
 
-                            // TODO: Figure out how to generate from the class definition
-                            //       Can/should it be done without reflection?
                             // Information about a specific type of sensor
+                            val mutableProperties = sensor::class.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
+                            val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
+                            for (property in mutableProperties) {
+                                for (annotation in property.annotations) {
+                                    when (annotation) {
+                                        is SensorProperty -> {
+                                            items.add(TableRow(annotation.title, property.getter.call(sensor).toString()))
+                                        }
+                                        is ConnectionProperty -> {
+                                            items.add(TableRow(annotation.title, property.getter.call(sensor).toString()))
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Information about virtual sensor - not currently modular, so no reflection here
                             when (sensor) {
-                                is FileSensor -> {
-                                    items.add(TableRow("File path", sensor.filePath.absolutePath))
-                                }
-                                is RandomSensor -> {
-                                    items.add(TableRow("Update interval [ms]", sensor.updateInterval.toString()))
-                                    items.add(TableRow("Minimum value", sensor.minValue.toString()))
-                                    items.add(TableRow("Maximum value", sensor.maxValue.toString()))
-                                }
-                                is RandomWalkSensor -> {
-                                    items.add(TableRow("Update interval [ms]", sensor.updateInterval.toString()))
-                                    items.add(TableRow("Minimum value", sensor.minValue.toString()))
-                                    items.add(TableRow("Maximum value", sensor.maxValue.toString()))
-                                    items.add(TableRow("Maximum step distance", sensor.maxStep.toString()))
-                                }
                                 is Averager -> {
                                     items.add(TableRow("Source measurements", ""))
                                     for (m in sensor.sourceMeasurements)
