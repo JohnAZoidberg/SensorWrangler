@@ -1,5 +1,6 @@
 package me.danielschaefer.sensorwrangler.javafx
 
+import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
@@ -119,17 +120,23 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                             }
                             sensor.addConnectionChangeListener(object : ConnectionChangeListener {
                                 override fun onConnect() {
-                                    connectButton.text = "Disconnect"
-                                    connectButton.setOnAction {
-                                        // TODO: Add popup for connection dialog
-                                        sensor.disconnect()
+                                    // Could be called from a non-UI thread
+                                    Platform.runLater {
+                                        connectButton.text = "Disconnect"
+                                        connectButton.setOnAction {
+                                            // TODO: Add popup for connection dialog
+                                            sensor.disconnect()
+                                        }
                                     }
                                 }
 
                                 override fun onDisconnect(sensor: Sensor, reason: String?) {
-                                    connectButton.text = "Connect"
-                                    connectButton.setOnAction {
-                                        sensor.connect()
+                                    // Could be called from a non-UI thread
+                                    Platform.runLater {
+                                        connectButton.text = "Connect"
+                                        connectButton.setOnAction {
+                                            sensor.connect()
+                                        }
                                     }
                                 }
 

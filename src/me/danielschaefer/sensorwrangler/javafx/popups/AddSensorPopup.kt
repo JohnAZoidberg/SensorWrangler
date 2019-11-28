@@ -1,6 +1,5 @@
 package me.danielschaefer.sensorwrangler.javafx.popups
 
-import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -17,10 +16,8 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
 import me.danielschaefer.sensorwrangler.javafx.SensorTab
-import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeAdapter
-import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
-import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createInstance
@@ -141,6 +138,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                        for ((property, getValue) in propertyMap) {
                            property.setter.call(newSensor, getValue())
                        }
+                       newSensor.addConnectionChangeListener(JavaFXUtil.createConnectionChangeListener(parentStage))
                        App.instance.wrangler.sensors.add(newSensor)
                        sensorTab?.sensorList?.selectionModel?.select(sensorTab.sensorList.items.last())
 
@@ -170,24 +168,4 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
            padding = Insets(25.0)
        }
    }
-
-    private fun createConnectionChangeListener(): ConnectionChangeListener {
-        return object: ConnectionChangeAdapter() {
-            override fun onDisconnect(sensor: Sensor, reason: String?) {
-                Platform.runLater {
-                    reason?.let {
-                        Alert(
-                            parentStage, "Sensor disconnected",
-                            "Sensor ${sensor.title} was disconnected because of:\n$reason"
-                        )
-                    }
-                    if (reason == null)
-                        Alert(
-                            parentStage, "Sensor disconnected",
-                            "Sensor ${sensor.title} was disconnected"
-                        )
-                }
-            }
-        }
-    }
 }
