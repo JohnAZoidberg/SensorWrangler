@@ -4,10 +4,7 @@ import me.danielschaefer.sensorwrangler.gui.BarGraph
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
-import me.danielschaefer.sensorwrangler.sensors.FileSensor
-import me.danielschaefer.sensorwrangler.sensors.RandomSensor
-import me.danielschaefer.sensorwrangler.sensors.RandomWalkSensor
-import me.danielschaefer.sensorwrangler.sensors.Sensor
+import me.danielschaefer.sensorwrangler.sensors.*
 import java.time.format.DateTimeFormatter
 import kotlin.reflect.KClass
 
@@ -22,7 +19,8 @@ open class Settings {
     val supportedSensors: MutableList<KClass<out Sensor>> = mutableListOf(
         RandomSensor::class,
         RandomWalkSensor::class,
-        FileSensor::class
+        FileSensor::class,
+        SocketSensor::class
     )
 
     val supportedFormulas: MutableList<KClass<Any>> = mutableListOf()

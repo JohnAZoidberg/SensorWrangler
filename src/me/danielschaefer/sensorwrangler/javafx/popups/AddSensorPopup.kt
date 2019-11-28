@@ -90,7 +90,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                                        propertyMap[property] = { text.toDouble() }
                                    }
                                }
-                               property.returnType.isSubtypeOf(Integer::class.createType()) -> {
+                               property.returnType.isSubtypeOf(Int::class.createType()) -> {
                                    TextField().apply {
                                        propertyMap[property] = { text.toInt() }
                                    }
@@ -136,7 +136,6 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                            }
                        }
                    }
-                   sizeToScene()
                    addSensorButton.setOnAction {
                        val newSensor = supportedSensor.createInstance()
                        for ((property, getValue) in propertyMap) {
@@ -147,6 +146,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
 
                        close()
                    }
+                   sizeToScene()
                })
            }
        }
