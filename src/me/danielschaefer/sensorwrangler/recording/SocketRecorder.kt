@@ -1,0 +1,42 @@
+package me.danielschaefer.sensorwrangler.recording
+
+import me.danielschaefer.sensorwrangler.Measurement
+import java.io.OutputStreamWriter
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.SocketException
+import kotlin.concurrent.thread
+
+class SocketRecorder(port: Int): Recorder {
+    private var socket: ServerSocket = ServerSocket(port)
+    private var conn: Socket? = null
+    private var ofStream: OutputStreamWriter? = null
+
+    init {
+        thread(start = true) {
+            if (conn == null)
+                conn = socket.accept()
+
+            if (ofStream == null)
+                ofStream = conn!!.outputStream!!.writer()
+        }
+    }
+
+    override fun recordValue(timestamp: String, measurement: Measurement, value: Double) {
+        // TODO: Check socket.isConnected and socket.isClosed
+        // Timestamp,Sensor,Measurement,Value\n
+        try {
+            ofStream?.write("${measurement.sensor.title},${measurement.description},$timestamp,${value}\n")
+            ofStream?.flush()
+        } catch (e: SocketException) {
+            println("SocketRecorder disconnected because of ${e.message}")
+            // TODO: Maybe it should remove itself from the list of recorders?
+            close()
+        }
+    }
+
+    override fun close() {
+        conn?.close()
+        socket.close()
+    }
+}

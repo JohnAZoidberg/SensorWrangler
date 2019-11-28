@@ -7,6 +7,7 @@ import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.recording.CsvRecorder
 import me.danielschaefer.sensorwrangler.recording.DatabaseRecorder
 import me.danielschaefer.sensorwrangler.recording.Recorder
+import me.danielschaefer.sensorwrangler.recording.SocketRecorder
 import me.danielschaefer.sensorwrangler.sensors.*
 import java.nio.file.Paths
 import java.time.format.DateTimeFormatter
@@ -31,7 +32,8 @@ open class Settings {
 
     val supportedRecorders: MutableList<KClass<out Recorder>> = mutableListOf(
         CsvRecorder::class,
-        DatabaseRecorder::class
+        DatabaseRecorder::class,
+        SocketRecorder::class
     )
 
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
