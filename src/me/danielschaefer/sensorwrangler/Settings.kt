@@ -5,6 +5,7 @@ import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.recording.CsvRecorder
+import me.danielschaefer.sensorwrangler.recording.DatabaseRecorder
 import me.danielschaefer.sensorwrangler.recording.Recorder
 import me.danielschaefer.sensorwrangler.sensors.*
 import java.nio.file.Paths
@@ -29,7 +30,8 @@ open class Settings {
     val supportedFormulas: MutableList<KClass<Any>> = mutableListOf()
 
     val supportedRecorders: MutableList<KClass<out Recorder>> = mutableListOf(
-        CsvRecorder::class
+        CsvRecorder::class,
+        DatabaseRecorder::class
     )
 
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
