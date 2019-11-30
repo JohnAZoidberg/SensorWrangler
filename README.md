@@ -38,7 +38,7 @@ Before building, the following dependencies have to be installed:
 - Logging (also run-time dependency of some other dependencies)
   - `org.slf4j:slf4j-api:1.7.11`
 
-The project targets JDK11 and Kotlin language version 1.3 with experimental features, so kotlinc has to be passed the flags `-Xuse-experimental=kotlin.ExperimentalStdlibApi`.
+The project targets JDK11 and Kotlin language version 1.3.
 
 ## Running the jar
 1. Get it from the [releases page](https://github.com/JohnAZoidberg/SensorWrangler/releases)

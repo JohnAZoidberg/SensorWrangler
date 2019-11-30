@@ -14,8 +14,8 @@ import me.danielschaefer.sensorwrangler.Preference
 import me.danielschaefer.sensorwrangler.Settings
 import java.io.File
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.typeOf
 
 
 class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
@@ -37,7 +37,7 @@ class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
 
     private fun addPreference(row: Int, property: KMutableProperty<*>, annotation: Preference): Boolean {
         when (property.returnType) {
-            typeOf<String>(), typeOf<String?>() -> {
+            String::class.createType(), String::class.createType(nullable = true) -> {
                 val label = Label(annotation.description)
                 label.tooltip = Tooltip(annotation.explanation)
                 val field = TextField(property.getter.call(App.instance.settings) as String?).apply {
