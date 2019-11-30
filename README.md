@@ -24,9 +24,19 @@ Currently there are no Maven or Gradle build files available. The project has to
 
 Before building, the following dependencies have to be installed:
 
-- [`com.fasterxml.jackson.core:jackson-databind:2.10.1`](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.10.1)
-- [`commons-io:commons-io:2.6`](https://mvnrepository.com/artifact/commons-io/commons-io/2.6)
-- [j-antplus](https://github.com/glever/j-antplus)
+- Saving the configuration
+  - [`com.fasterxml.jackson.core:jackson-databind:2.10.1`](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.10.1)
+- *Tail*ing a file
+  - [`commons-io:commons-io:2.6`](https://mvnrepository.com/artifact/commons-io/commons-io/2.6)
+- Recording to databases
+  - `exposed-core-0.18.1`
+  - `exposed-jdbc-0.18.1`
+  - `joda-time:joda-time:2.5` (runtime dependency of `exposed`)
+  - `org.postgresql:postgresql:42.2.5`
+- Connecting to ANT+ sensors
+  - [j-antplus](https://github.com/glever/j-antplus)
+- Logging (also run-time dependency of some other dependencies)
+  - `org.slf4j:slf4j-api:1.7.11`
 
 The project targets JDK11 and Kotlin language version 1.3 with experimental features, so kotlinc has to be passed the flags `-Xuse-experimental=kotlin.ExperimentalStdlibApi`.
 
