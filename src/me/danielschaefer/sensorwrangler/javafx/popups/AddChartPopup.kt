@@ -38,11 +38,12 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                 sizeToScene()
             })
         })
-        yAxisMeasurements.add(ComboBox<String>())
+        yAxisMeasurements.add(ComboBox())
 
-        formGrid.add(Label("Y-Axis ${newAxisIndex + 1}"), 0, newAxisIndex + 10)
-        formGrid.add(yAxisSensors[newAxisIndex], 2, newAxisIndex + 10)
-        formGrid.add(yAxisMeasurements[newAxisIndex], 3, newAxisIndex + 10)
+        val newRowIndex = formGrid.rowCount
+        formGrid.add(Label("Y-Axis ${newAxisIndex + 1}"), 0, newRowIndex)
+        formGrid.add(yAxisSensors[newAxisIndex], 2, newRowIndex)
+        formGrid.add(yAxisMeasurements[newAxisIndex], 3, newRowIndex)
         sizeToScene()
     }
 
