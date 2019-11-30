@@ -22,6 +22,7 @@ open class Settings {
     val version = "0.1.0"
 
     val supportedSensors: MutableList<KClass<out Sensor>> = mutableListOf(
+        AntPlusSensor::class,
         RandomSensor::class,
         RandomWalkSensor::class,
         FileSensor::class,

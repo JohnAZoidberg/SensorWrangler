@@ -26,6 +26,7 @@ Before building, the following dependencies have to be installed:
 
 - [`com.fasterxml.jackson.core:jackson-databind:2.10.1`](https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.10.1)
 - [`commons-io:commons-io:2.6`](https://mvnrepository.com/artifact/commons-io/commons-io/2.6)
+- [j-antplus](https://github.com/glever/j-antplus)
 
 The project targets JDK11 and Kotlin language version 1.3 with experimental features, so kotlinc has to be passed the flags `-Xuse-experimental=kotlin.ExperimentalStdlibApi`.
 
