@@ -101,7 +101,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                                        val fileButton = Button("Choose file").apply {
                                            setOnAction {
                                                val fileChooser = FileChooser()
-                                               App.instance.settings.defaultFileSensorPath?.let {
+                                               App.instance.settings.defaultFileSensorDirectory?.let {
                                                    val file = File(it)
                                                    fileChooser.initialDirectory = file.parentFile
                                                    fileChooser.initialFileName = file.name

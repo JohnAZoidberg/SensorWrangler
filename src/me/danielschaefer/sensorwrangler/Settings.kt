@@ -44,10 +44,10 @@ open class Settings {
     )
 
     // TODO: Think about how to have preferences of sensors of plugins
-    @Preference("Default path of file sensor",
-        explanation = "Which file the FileSensor tries to read from, by default.",
+    @Preference("Default directory of file sensor",
+        explanation = "Which directory the dialog to create a FileSensor opens, to choose a file from",
         picker = Picker.FileOpen)
-    var defaultFileSensorPath: String? = null
+    var defaultFileSensorDirectory: String? = null
 
     // Default: Current working directory
     @Preference("Default recording directory",

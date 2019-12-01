@@ -8,7 +8,6 @@ import javafx.scene.control.MenuItem
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.javafx.popups.*
-import java.io.File
 
 
 fun createMenuBar(primaryStage: Stage): MenuBar {
@@ -26,9 +25,6 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             }})
             items.add(MenuItem("Save").apply { onAction = EventHandler {
                 FileChooser().apply {
-                    App.instance.settings.defaultFileSensorPath?.let {
-                        initialDirectory = File(it)
-                    }
                     showSaveDialog(primaryStage)?.absolutePath?.let {
                         App.instance.wrangler.export(it)
                     }
