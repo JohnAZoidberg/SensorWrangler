@@ -7,6 +7,7 @@ import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.hrm.HRMChannel
 import be.glever.antplus.hrm.datapage.HrmDataPageRegistry
 import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent
+import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import kotlin.concurrent.thread
 import kotlin.random.Random
@@ -51,8 +52,13 @@ class AntPlusSensor : Sensor() {
             removeToggleBit(payLoad)
             val dataPage: AbstractAntPlusDataPage = registry.constructDataPage(payLoad)
 
-            if (dataPage is HrmDataPage4PreviousHeartBeatEvent)
-                measurement.addDataPoint(dataPage.computedHeartRateInBpm.toDouble())
+            if (dataPage is HrmDataPage4PreviousHeartBeatEvent) {
+                // TODO: Call runLater in UI code, not here
+                // UI can only be updated from UI threads
+                Platform.runLater {
+                    measurement.addDataPoint(dataPage.computedHeartRateInBpm.toDouble())
+                }
+            }
         }
     }
 
