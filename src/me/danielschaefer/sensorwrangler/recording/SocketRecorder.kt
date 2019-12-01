@@ -14,6 +14,7 @@ class SocketRecorder(port: Int): Recorder {
 
     init {
         thread(start = true) {
+            // TODO: Start listening again after a client disconnects
             if (conn == null)
                 conn = socket.accept()
 

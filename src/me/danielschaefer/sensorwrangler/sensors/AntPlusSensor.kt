@@ -32,6 +32,7 @@ class AntPlusSensor : Sensor() {
             if (antDevice == null) {
                 super.disconnect("No devices found")
             } else {
+                // TODO: Wrap in try-catch and disconnect
                 antDevice.use { device ->
                     device.initialize()
                     device.closeAllChannels() // Otherwise channels stay open on usb dongle even if program shuts down

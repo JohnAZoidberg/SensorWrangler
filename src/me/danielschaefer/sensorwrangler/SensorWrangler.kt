@@ -130,6 +130,8 @@ class SensorWrangler {
         sensors.remove(sensor)
     }
 
+    // FIXME: Throws ConcurrentModificationException
+    // TODO: Use pure JSON
     fun export(path: String) {
         val writer = FileWriter(path)
 
