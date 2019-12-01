@@ -54,9 +54,17 @@ The project targets JDK11 and Kotlin language version 1.3.
 
 ## Supported Devices and other Sensors
 
-### Using ANTUSB-m transceiver
+### Using ANT USB-m transceiver
 #### Garmin HRM 3-SS
 With the AntPlusSensor. It's configure to directly connect to the HRM (heart rate monitor).
+When running on Windows, please install the libusb driver using [Zadig](https://zadig.akeo.ie/):
+
+1. Plug ANT USB-m transeiver into USB port
+2. Open Zadig
+3. Option -> List all devices
+4. Select device: `ANT USB-m Stick`
+5. Select target driver: `libusb-win32 (v1.2.6.0)`
+6. Downgrade driver
 
 With [openant](https://github.com/Tigge/openant/blob/master/examples/heart_rate_monitor.py) modified, so it writes the data to a file.
 This file can be used by the FileSensor.
