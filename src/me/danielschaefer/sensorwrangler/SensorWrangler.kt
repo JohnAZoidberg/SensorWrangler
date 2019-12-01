@@ -12,6 +12,7 @@ import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
+import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.recording.Recorder
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
@@ -23,6 +24,9 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.javaType
 
 
 class SensorWrangler {
@@ -139,6 +143,15 @@ class SensorWrangler {
             writer.write("Chart@$chartString\n")
         }
 
+        for (property in Settings::class.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()) {
+            if (property.annotations.filterIsInstance<Preference>().isEmpty())
+                continue
+
+            val propString: String = objectMapper.writeValueAsString(property.getter.call(App.instance.settings))
+            val propName = property.name
+            writer.write("Preference.$propName@$propString\n")
+        }
+
         writer.flush()
     }
 
@@ -160,11 +173,29 @@ class SensorWrangler {
                         val newChart: Chart = objectMapper.readValue(jsonObject, Class.forName("me.danielschaefer.sensorwrangler.gui.$className")) as Chart
                         charts.add(newChart)
                     }
+                    else -> importOther(prefix, jsonObject)
                 }
             }
             return true
         } catch (e: FileNotFoundException) {
             return false
+        }
+    }
+
+    private fun importOther(prefix: String, jsonObject: String) {
+        val (prefixType, propName) = prefix.split(".")
+        when (prefixType) {
+            "Preference" -> {
+                // TODO: Catch wrong property name
+                //  E.g. if the user manually changed the settings file or it is from a different Wrangler version
+                val property = Settings::class.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>().first { it.name == propName }
+                val type = property.returnType.javaType
+
+                // Is always true, because Class<T> is a subtype of Type
+                // TODO: Find something to do away with the if-check (e.g. a safe cast of some sort)
+                if (type is Class<*>)
+                    property.setter.call(App.instance.settings, objectMapper.readValue(jsonObject, type))
+            }
         }
     }
 
