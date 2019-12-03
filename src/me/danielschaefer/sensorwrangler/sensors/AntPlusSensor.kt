@@ -1,25 +1,15 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import be.glever.ant.channel.AntChannel
 import be.glever.ant.message.AntMessage
-import be.glever.ant.message.data.BroadcastDataMessage
+import be.glever.ant.usb.AntUsbDevice
 import be.glever.ant.usb.AntUsbDeviceFactory
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
-import be.glever.antplus.hrm.HRMChannel
-import be.glever.antplus.hrm.datapage.HrmDataPageRegistry
-import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent
-import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
+import be.glever.antplus.FluxProvider
+import be.glever.antplus.common.datapage.registry.AbstractDataPageRegistry
 import kotlin.concurrent.thread
-import kotlin.random.Random
 
-class AntPlusSensor : Sensor() {
-    private val registry = HrmDataPageRegistry()
-
-    override val title: String = "AntPlusSensor" + Random.nextInt(0, 100)
-    private val measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
-        description = "HRM " + Random.nextInt(0, 100)
-    }
-    override val measurements: List<Measurement> = listOf(measurement)
+abstract class AntPlusSensor<T> : Sensor() where T : AntChannel, T : FluxProvider {
+    protected abstract val registry: AbstractDataPageRegistry
 
     override fun connect() {
         if (connected)
@@ -28,17 +18,17 @@ class AntPlusSensor : Sensor() {
         thread(start = true) {
             val availableDevices = AntUsbDeviceFactory.getAvailableAntDevices()
             val antDevice = availableDevices.first()
-            // TODO: Maybe filter by serialNumber { it.serialNumber contentEquals serialNumber.encodeToByteArray() }
 
             if (antDevice == null) {
                 super.disconnect("No devices found")
             } else {
                 // TODO: Wrap in try-catch and disconnect
                 antDevice.use { device ->
+                    // TODO: Support multiple ANT devices. Problem: Cannot initialize multiple times
                     device.initialize()
                     device.closeAllChannels() // Otherwise channels stay open on usb dongle even if program shuts down
-                    HRMChannel(device).events.doOnNext { handleMessage(it) }.subscribe()
-                    System.`in`.read()  // QUESTION: Why is this necessary?
+                    createChannel(device).events.doOnNext { handleMessage(it) }.subscribe()
+                    System.`in`.read()  // TODO: Use better method to sleep thread indefinitely
                 }
             }
         }
@@ -46,29 +36,12 @@ class AntPlusSensor : Sensor() {
         super.connect()
     }
 
-    private fun handleMessage(antMessage: AntMessage?) {
-        if (antMessage is BroadcastDataMessage) {
-            val payLoad = antMessage.payLoad
-            removeToggleBit(payLoad)
-            val dataPage: AbstractAntPlusDataPage = registry.constructDataPage(payLoad)
-
-            if (dataPage is HrmDataPage4PreviousHeartBeatEvent) {
-                // TODO: Call runLater in UI code, not here
-                // UI can only be updated from UI threads
-                Platform.runLater {
-                    measurement.addDataPoint(dataPage.computedHeartRateInBpm.toDouble())
-                }
-            }
-        }
-    }
-
     /**
-     * Non-legacy devices swap the first bit of the pageNumber every 4 messages.
-     * For the moment not taking the legacy HRM devices into account.
+     * Create an instance of the generic channel class
      *
-     * @param payload
+     * This is necessary because we cannot instantiate it in this class, since generic types are erased at run-time.
      */
-    private fun removeToggleBit(payload: ByteArray) {
-        payload[0] = (127 and payload[0].toInt()).toByte()
-    }
+    protected abstract fun createChannel(device: AntUsbDevice): T
+
+    protected abstract fun handleMessage(antMessage: AntMessage?)
 }
