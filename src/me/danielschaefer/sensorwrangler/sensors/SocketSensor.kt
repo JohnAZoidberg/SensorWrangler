@@ -28,15 +28,12 @@ class SocketSensor: Sensor() {
     @ConnectionProperty(title = "Port", default="8080")
     var port: Int = 8080
 
-    override fun disconnect(reason: String?) {
-        connected = false
+    override fun specificDisconnect(reason: String?) {
         socket?.close()
         socket = null
-
-        super.disconnect(reason)
     }
 
-    override fun connect() {
+    override fun specificConnect() {
         if (socket != null)
             return
 
@@ -44,6 +41,7 @@ class SocketSensor: Sensor() {
             socket = Socket(hostname, port)
             val reader = socket?.inputStream?.bufferedReader()
 
+            // TODO: Probably all sensors need to run on a thread, can we abstract this and start the thread by the parent class?
             thread = thread(start = true) {
                 while (socket?.isClosed == false && socket?.isConnected == true) {
                     try {
@@ -69,10 +67,6 @@ class SocketSensor: Sensor() {
                 }
                 disconnect("Socket was closed/disconnected")
             }
-
-            connected = true
-
-            super.connect()
         } catch (e: ConnectException) {
             disconnect("Socket failed to connect: ${e.message}")
         }

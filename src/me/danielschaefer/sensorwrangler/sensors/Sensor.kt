@@ -13,14 +13,13 @@ abstract class Sensor : VirtualSensor() {
     /**
      * Disconnect the sensor from its data source
      *
-     * Note: Make sure to call super.disconnect or inform listeners when overriding.
-     * TODO: How can we ensure that overriders of this class don't forget it?
-     *       Probably connected should be a watch-only property
-     *
      * @param reason the reason for disconnection
      */
-    open fun disconnect(reason: String? = null) {
+    fun disconnect(reason: String? = null) {
+        // Disconnecting always succeeds and we don't want to disconnect twice -> set it to false, first thing
         connected = false
+
+        specificDisconnect(reason)
         for (listener in connectionListeners)
             listener.onDisconnect(this, reason)
     }
@@ -28,9 +27,25 @@ abstract class Sensor : VirtualSensor() {
         connectionListeners.add(listener)
     }
 
-    open fun connect() {
+    fun connect() {
+        // Don't connect twice
+        if (connected)
+            return
+
+        specificConnect()
+        connected = true
         for (listener in connectionListeners)
             listener.onConnect()
-        connected = true
     }
+
+    /**
+     * Sensor specific connect
+     *
+     * TODO: Return whether connection was successful
+     */
+    abstract fun specificConnect()
+    /**
+     * Sensor specific disconnect
+     */
+    abstract fun specificDisconnect(reason: String?)
 }

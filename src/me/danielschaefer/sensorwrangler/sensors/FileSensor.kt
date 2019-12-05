@@ -28,14 +28,11 @@ class FileSensor: Sensor() {
     @SensorProperty(title = "Tail?")
     var tail: Boolean = false
 
-    override fun disconnect(reason: String?) {
-        connected = false
+    override fun specificDisconnect(reason: String?) {
         tailer?.stop()
-
-        super.disconnect(reason)
     }
 
-    override fun connect() {
+    override fun specificConnect() {
         // NOTE: Maybe Apache Commons for this is overkill, look at
         // https://crunchify.com/log-file-tailer-tail-f-implementation-in-java-best-way-to-tail-any-file-programmatically/
         val tailerListener = object: TailerListenerAdapter() {
@@ -56,9 +53,6 @@ class FileSensor: Sensor() {
             }
         }
         tailer = Tailer.create(filePath, tailerListener, 1000)
-        connected = true
-
-        super.connect()
     }
 
 }

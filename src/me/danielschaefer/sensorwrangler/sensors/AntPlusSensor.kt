@@ -21,10 +21,7 @@ class AntPlusSensor : Sensor() {
     }
     override val measurements: List<Measurement> = listOf(measurement)
 
-    override fun connect() {
-        if (connected)
-            return
-
+    override fun specificConnect() {
         thread(start = true) {
             val availableDevices = AntUsbDeviceFactory.getAvailableAntDevices()
             val antDevice = availableDevices.first()
@@ -32,19 +29,20 @@ class AntPlusSensor : Sensor() {
 
             if (antDevice == null) {
                 super.disconnect("No devices found")
-            } else {
-                // TODO: Wrap in try-catch and disconnect
-                antDevice.use { device ->
-                    device.initialize()
-                    device.closeAllChannels() // Otherwise channels stay open on usb dongle even if program shuts down
-                    HRMChannel(device).events.doOnNext { handleMessage(it) }.subscribe()
-                    System.`in`.read()  // QUESTION: Why is this necessary?
-                }
+                return@thread
+            }
+
+            // TODO: Wrap in try-catch and disconnect
+            antDevice.use { device ->
+                device.initialize()
+                device.closeAllChannels() // Otherwise channels stay open on usb dongle even if program shuts down
+                HRMChannel(device).events.doOnNext { handleMessage(it) }.subscribe()
+                System.`in`.read()  // TODO: Use a better method to block this thread forever
             }
         }
-
-        super.connect()
     }
+
+    override fun specificDisconnect(reason: String?) { }
 
     private fun handleMessage(antMessage: AntMessage?) {
         if (antMessage is BroadcastDataMessage) {

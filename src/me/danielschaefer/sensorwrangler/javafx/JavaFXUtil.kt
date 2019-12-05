@@ -14,17 +14,12 @@ object JavaFXUtil {
             override fun onDisconnect(sensor: Sensor, reason: String?) {
                 // Could be called from a non-UI thread
                 Platform.runLater {
-                    reason?.let {
-                        Alert(
-                            parentStage, "Sensor disconnected",
-                            "Sensor ${sensor.title} was disconnected because of:\n$reason"
-                        )
-                    }
-                    if (reason == null)
-                        Alert(
-                            parentStage, "Sensor disconnected",
-                            "Sensor ${sensor.title} was disconnected"
-                        )
+                    val alertText = if (reason == null)
+                        "Sensor ${sensor.title} was disconnected"
+                    else
+                        "Sensor ${sensor.title} was disconnected because of:\n$reason"
+
+                    Alert(parentStage, "Sensor disconnected", alertText)
                 }
             }
         }

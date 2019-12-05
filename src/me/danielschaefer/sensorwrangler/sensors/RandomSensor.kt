@@ -33,7 +33,7 @@ class RandomSensor: Sensor() {
 
     private var updater: ScheduledExecutorService? = null
 
-    override fun connect() {
+    override fun specificConnect() {
         // TODO: Tie the lifetime of this to the window
         updater = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
             scheduleAtFixedRate({
@@ -44,14 +44,9 @@ class RandomSensor: Sensor() {
                 }
             }, 0, updateInterval, TimeUnit.MILLISECONDS)
         }
-
-        super.connect()
     }
 
-    override fun disconnect(reason: String?) {
-        connected = false
+    override fun specificDisconnect(reason: String?) {
         updater?.shutdown()
-
-        super.disconnect(reason)
     }
 }

@@ -38,14 +38,11 @@ class RandomWalkSensor : Sensor() {
 
     private var updaters: MutableList<ScheduledExecutorService> = mutableListOf()
 
-    override fun disconnect(reason: String?) {
-        for (updater in updaters)
-            updater.shutdown()
-
-        super.disconnect(reason)
+    override fun specificDisconnect(reason: String?) {
+        updaters.forEach { it.shutdown() }
     }
 
-    override fun connect() {
+    override fun specificConnect() {
         for (measurement in measurements) {
             // TODO: Tie the lifetime of this to the window
             updaters.add(Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
@@ -67,8 +64,6 @@ class RandomWalkSensor : Sensor() {
                 }, 0, updateInterval, TimeUnit.MILLISECONDS)
             })
         }
-
-        super.connect()
     }
 
 }
