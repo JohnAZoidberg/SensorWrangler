@@ -2,7 +2,9 @@ package me.danielschaefer.sensorwrangler.recording
 
 import me.danielschaefer.sensorwrangler.Measurement
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.sql.Connection
 
 object DataPoint: Table() {
     // TODO: Probably the first 3 cols should be the primary key
@@ -12,10 +14,17 @@ object DataPoint: Table() {
     val value = double("value")
 }
 
-class DatabaseRecorder(connection: String, username: String, password: String): Recorder {
+/**
+ * @param connection
+ * @param username can be empty
+ * @param password can be empty
+ * @param driver
+ */
+class DatabaseRecorder(connection: String, username: String, password: String, driver: String): Recorder {
     init {
-        Database.connect("jdbc:postgresql://$connection", driver = "org.postgresql.Driver",
-            user = username, password = password)
+        Database.connect("jdbc:$connection", driver = driver, user = username, password = password)
+        // Tell SQLite3 to enforce transactional integrity by serializing writes from different connections
+        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
     }
 
     override fun recordValue(timestamp: String, measurement: Measurement, value: Double) {

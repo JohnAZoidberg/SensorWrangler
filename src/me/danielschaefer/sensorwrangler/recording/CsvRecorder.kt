@@ -16,7 +16,7 @@ class CsvRecorder(file: File): Recorder {
     }
 
     override fun recordValue(timestamp: String, measurement: Measurement, value: Double) {
-        writer.write("${measurement.sensor.title},${measurement.description},$timestamp,${value}\n")
+        writer.write("${measurement.sensor.title},${measurement.description},$timestamp,$value\n")
         // Always flush, so that a consumer can follow the values live
         writer.flush()
     }

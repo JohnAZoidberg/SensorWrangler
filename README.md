@@ -104,9 +104,16 @@ sensor, which opens up a port on localhost and generates random values.
 Record to a CSV formatted file. Can be `tail -f`ed
 
 ### DatabaseRecorder
-Connect to a database via JDBC (currently only PostgreSQL)
+Connect to a database via JDBC.
 
-If your database is running on `localhost` at port `5432` in database `wrangler`, your connection string is: `[::1]:5432/wrangler`
+For PostgreSQL, the connection string is `postgresql://[::1]:5432/wrangler` and the driver is `org.postgresql.Driver`,
+if your database is running on `localhost` at port `5432` in database `wrangler`.
+
+For SQLite, the connection string is `sqlite:/var/my.db` and the driver is `org.sqlite.JDBC`,
+if your database is located at `/var/my.db`.
+
+The library for connecting to the database is Jetbrains's Exposed.
+To use a different database, check the [supported](https://github.com/JetBrains/Exposed#Dialects) DBs and add the required JDBC driver to the classpath before starting SensorWrangler.
 
 ### Socket recorder
 Opens a TCP socket and writes CSV formatted lines to client sockets.
