@@ -70,11 +70,15 @@ With [openant](https://github.com/Tigge/openant/blob/master/examples/heart_rate_
 This file can be used by the FileSensor.
 
 #### Garmin Bike Speed Sensor and Cadence Sensor
-Coming soon to the AntPlusSensor.
-First, support for their data pages has to be implemented in `j-antplus`. Watch the progess [here](https://github.com/glever/j-antplus/issues/1).
+Supported with `AntSpeedSensor` and `AntCadenceSensor`.
+
+#### ELITE Suito
+Supported with `AntStationaryBike`.
+
+#### Garmin Vector 3
+Supported with `AntPowerSensor`.
 
 ### Virtual Sensors
-
 If you don't have any physical sensors yet, you can still try out the
 visualization functionality by using the random sensors:
 
