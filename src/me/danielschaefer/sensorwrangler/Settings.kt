@@ -24,6 +24,7 @@ open class Settings {
     val supportedSensors: MutableList<KClass<out Sensor>> = mutableListOf(
         AntCadenceSensor::class,
         AntHeartRateSensor::class,
+        AntPowerSensor::class,
         AntSpeedSensor::class,
         RandomSensor::class,
         RandomWalkSensor::class,
