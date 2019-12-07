@@ -13,6 +13,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
 import javafx.scene.layout.*
+import javafx.scene.text.Text
 import javafx.stage.Stage
 import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.NamedThreadFactory
@@ -64,7 +65,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 rowLoop@ for (row in 0 until rows) {
                     for (col in 0 until cols) {
                         // Dummy chart as a placeholder
-                        val chartBox = VBox()
+                        val chartBox = VBox(10.0)
                         val fxChart = LineChart<String, Number>(CategoryAxis(), NumberAxis())
                         val chartDropdown = ComboBox<String>().apply {
                             App.instance.wrangler.charts.addListener(ListChangeListener {
@@ -190,6 +191,22 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun createFxChart(chart: Chart): Node? {
         return when (chart) {
+            is CurrentValueGraph -> {
+                GridPane().apply {
+                    vgap = 20.0
+                    hgap = 20.0
+
+                    chart.axes.forEachIndexed { row, axis ->
+                        val text = Text(axis.description)
+                        val value = Text()
+                        axis.dataPoints.addListener(ListChangeListener {
+                            it.next()
+                            value.text = it.addedSubList.last().value.toString()
+                        })
+                        addRow(row, text, value)
+                    }
+                }
+            }
             is BarGraph -> {
                 val xAxis = CategoryAxis().apply {
                     label = chart.axisNames[0]

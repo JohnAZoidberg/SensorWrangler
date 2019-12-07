@@ -17,6 +17,7 @@
     - Line chart
     - Scatter chart
     - Bar chart
+    - Current value chart
 - Combine measurements of sensors
   - Average of multiple measurements
 - Extensibility: Easily add new Sensors, Charts and Recorders
@@ -128,3 +129,5 @@ See the above GIF for examples.
 - Line chart
 - Scatter chart
 - Bar chart
+- Current value chart
+  - Shows the current values of multiple measurements

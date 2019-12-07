@@ -1,9 +1,6 @@
 package me.danielschaefer.sensorwrangler
 
-import me.danielschaefer.sensorwrangler.gui.BarGraph
-import me.danielschaefer.sensorwrangler.gui.Chart
-import me.danielschaefer.sensorwrangler.gui.LineGraph
-import me.danielschaefer.sensorwrangler.gui.ScatterGraph
+import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.recording.CsvRecorder
 import me.danielschaefer.sensorwrangler.recording.DatabaseRecorder
 import me.danielschaefer.sensorwrangler.recording.Recorder
@@ -42,6 +39,7 @@ open class Settings {
     )
 
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
+        CurrentValueGraph::class,
         LineGraph::class,
         ScatterGraph::class,
         BarGraph::class
