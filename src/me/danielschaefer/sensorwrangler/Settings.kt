@@ -58,6 +58,13 @@ open class Settings {
         picker=Picker.Directory)
     var recordingDirectory: String = Paths.get("").toAbsolutePath().toString()
 
+    @Preference("Rows in chart grid",
+        explanation = "How many rows of charts the grid has")
+    var chartGridRows: Int = 2
+
+    @Preference("Columns in chart grid",
+        explanation = "How many columns of charts the grid has")
+    var chartGridCols: Int = 2
 
     // TODO: Make overridable by cmdline param or environment variable
     val configPath: String = "wrangler.settings"

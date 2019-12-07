@@ -36,23 +36,33 @@ class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
     }
 
     private fun addPreference(row: Int, property: KMutableProperty<*>, annotation: Preference): Boolean {
-        when (property.returnType) {
-            String::class.createType(), String::class.createType(nullable = true) -> {
-                val label = Label(annotation.description)
-                label.tooltip = Tooltip(annotation.explanation)
-                val field = TextField(property.getter.call(App.instance.settings) as String?).apply {
+        val settingsObj = App.instance.settings
+        val label = Label(annotation.description)
+        label.tooltip = Tooltip(annotation.explanation)
+
+        val field = when (property.returnType) {
+            Int::class.createType() -> {
+                TextField((property.getter.call(settingsObj) as Int).toString()).apply {
                     this.textProperty().addListener { observable, oldValue, newValue ->
                         if (text == null)
                             return@addListener
 
-                        property.setter.call(App.instance.settings, newValue)
+                        property.setter.call(settingsObj, newValue.toInt())
                     }
                 }
-                contentBox.add(label, 0, row)
-                contentBox.add(field, 1, row)
+            }
+            String::class.createType(), String::class.createType(nullable = true) -> {
+                TextField(property.getter.call(settingsObj) as String?).apply {
+                    this.textProperty().addListener { observable, oldValue, newValue ->
+                        if (text == null)
+                            return@addListener
 
-                if (annotation.picker != Picker.None)
-                    addPicker(row, annotation, property, field)
+                        property.setter.call(settingsObj, newValue)
+                    }
+
+                    if (annotation.picker != Picker.None)
+                        addPicker(row, annotation, property, this)
+                }
             }
             else -> {
                 println(property.returnType)
@@ -60,10 +70,13 @@ class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
             }
         }
 
+        contentBox.add(label, 0, row)
+        contentBox.add(field, 1, row)
+
         return true
     }
 
-    private fun addPicker( row: Int, annotation: Preference, property: KMutableProperty<*>, field: TextField) {
+    private fun addPicker(row: Int, annotation: Preference, property: KMutableProperty<*>, field: TextField) {
         val chooserButton = Button("Choose path")
         chooserButton.setOnAction {
             when (annotation.picker) {

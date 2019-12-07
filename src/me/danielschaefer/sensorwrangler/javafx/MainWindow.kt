@@ -35,7 +35,6 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     private var paused: Boolean = false
     private var live: Boolean = true
     private var lastUpperBound: Double? = null
-    private val jfxSettings = JavaFxSettings()
 
     fun import() {
         if (!App.instance.wrangler.import(App.instance.settings.configPath)) {
@@ -58,8 +57,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             val allChartsBox = GridPane().apply {
                 padding = Insets(25.0)
 
-                val rows = jfxSettings.rows;
-                val cols = jfxSettings.cols;
+                val rows = App.instance.settings.chartGridRows;
+                val cols = App.instance.settings.chartGridCols;
 
                 //val fxChartIterator = fxCharts.iterator()
                 rowLoop@ for (row in 0 until rows) {

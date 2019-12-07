@@ -13,6 +13,7 @@
   - Just implement the `Recorder` interface and call `addRecorder()` on your instance of `SensorWrangler`
 - Flexible visualization of sensor data
   - Pause, continue and jump-to-now time travelling
+  - Cusomizable number of charts
   - Charts
     - Line chart
     - Scatter chart
@@ -135,3 +136,7 @@ See the above GIF for examples.
 - Distribution chart
   - Shows the distribution between left and right values
   - Measurement value is of range 0 - 100, which signifies percentage of "right"
+
+### Customizable grid
+The charts are displayed in a grid, which is 2x2 in size, by default.
+The number of rows and columns can be changed in the Settings window but it will only change when saving the configuration and restarting the program.
