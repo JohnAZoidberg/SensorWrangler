@@ -10,10 +10,7 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Measurement
-import me.danielschaefer.sensorwrangler.gui.BarGraph
-import me.danielschaefer.sensorwrangler.gui.CurrentValueGraph
-import me.danielschaefer.sensorwrangler.gui.LineGraph
-import me.danielschaefer.sensorwrangler.gui.ScatterGraph
+import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.ChartTab
 
@@ -73,10 +70,37 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
         val withDotsLabel = Label("With dots")
         val withDotsField = CheckBox()
 
+        val addMeasurementButton = Button("Add y-axis measurement").apply {
+            setOnAction {
+                addYAxis()
+            }
+        }
+
         val typeDropdown = ComboBox<String>().apply{
             items.addAll(App.instance.settings.supportedCharts.map { it.simpleName })
             valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
                 when (newValue) {
+                    DistributionGraph::class.simpleName -> {
+                        withDotsLabel.isVisible = false
+                        withDotsField.isVisible = false
+                        tickSpacingField.isVisible = false
+                        tickSpacingLabel.isVisible = false
+                        windowSizeField.isVisible = false
+                        windowSizeLabel.isVisible = false
+                        lowerBoundLabel.isVisible = false
+                        upperBoundField.isVisible = false
+                        upperBoundLabel.isVisible = false
+                        lowerBoundField.isVisible = false
+
+                        xAxisNameField.isVisible = false
+                        xAxisNameLabel.isVisible = false
+                        xAxisTimeLabel.isVisible = false
+                        yAxisNameField.isVisible = false
+                        yAxisNameLabel.isVisible = false
+                        axisMeasurementLabel.isVisible = false
+                        axisLabelLabel.isVisible = false
+                        addMeasurementButton.isDisable = true
+                    }
                     CurrentValueGraph::class.simpleName -> {
                         withDotsLabel.isVisible = false
                         withDotsField.isVisible = false
@@ -96,6 +120,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         yAxisNameLabel.isVisible = false
                         axisMeasurementLabel.isVisible = false
                         axisLabelLabel.isVisible = false
+                        addMeasurementButton.isDisable = false
                     }
                     BarGraph::class.simpleName -> {
                         withDotsLabel.isVisible = false
@@ -116,6 +141,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         yAxisNameLabel.isVisible = true
                         axisMeasurementLabel.isVisible = true
                         axisLabelLabel.isVisible = true
+                        addMeasurementButton.isDisable = false
                     }
                     LineGraph::class.simpleName -> {
                         withDotsLabel.isVisible = true
@@ -136,6 +162,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         yAxisNameLabel.isVisible = true
                         axisMeasurementLabel.isVisible = true
                         axisLabelLabel.isVisible = true
+                        addMeasurementButton.isDisable = false
                     }
                     ScatterGraph::class.simpleName -> {
                         withDotsLabel.isVisible = false
@@ -156,6 +183,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         yAxisNameLabel.isVisible = true
                         axisMeasurementLabel.isVisible = true
                         axisLabelLabel.isVisible = true
+                        addMeasurementButton.isDisable = false
                     }
                 }
             })
@@ -199,11 +227,6 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(yAxisNameLabel, 0, row)
             add(yAxisNameField, 1, row++)
 
-            val addMeasurementButton = Button("Add y-axis measurement").apply {
-                setOnAction {
-                    addYAxis()
-                }
-            }
             add(addMeasurementButton, 2, row++)
         }
 
@@ -257,6 +280,10 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                     CurrentValueGraph::class.simpleName -> CurrentValueGraph().apply {
                         title = chartNameField.text
                         axes = selectedMeasurements
+                    }
+                    DistributionGraph::class.simpleName -> DistributionGraph().apply {
+                        title = chartNameField.text
+                        axis = selectedMeasurements.first()
                     }
                     else -> TODO("This chart is not recognized.")
                 }

@@ -18,6 +18,7 @@
     - Scatter chart
     - Bar chart
     - Current value chart
+    - Distribution chart
 - Combine measurements of sensors
   - Average of multiple measurements
 - Extensibility: Easily add new Sensors, Charts and Recorders
@@ -131,3 +132,6 @@ See the above GIF for examples.
 - Bar chart
 - Current value chart
   - Shows the current values of multiple measurements
+- Distribution chart
+  - Shows the distribution between left and right values
+  - Measurement value is of range 0 - 100, which signifies percentage of "right"
