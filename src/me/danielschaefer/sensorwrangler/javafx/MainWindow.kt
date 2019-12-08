@@ -323,7 +323,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
             is DistributionGraph -> {
                 PieChart().apply {
-                    this.startAngle = 90.0
+                    this.startAngle = -90.0
                     // Start at 0, we need a starting value to later change the yValue of that
                     val leftData = PieChart.Data("Left", 50.0)
                     val rightData = PieChart.Data("Right", 50.0)
