@@ -240,6 +240,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     }
 
                     data.add(series)
+                    this.isLegendVisible = false  // It's useless for bar charts
                 }
             }
             is AxisGraph -> {
