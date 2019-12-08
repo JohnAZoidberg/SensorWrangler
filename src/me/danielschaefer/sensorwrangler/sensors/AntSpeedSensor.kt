@@ -4,8 +4,8 @@ package me.danielschaefer.sensorwrangler.sensors
 import be.glever.ant.message.AntMessage
 import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
-import be.glever.antplus.hrm.datapage.HrmDataPageRegistry
 import be.glever.antplus.speedcadence.SpeedChannel
+import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
 import be.glever.antplus.speedcadence.datapage.main.SpeedCadenceDataPage5Motion
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
@@ -14,9 +14,9 @@ import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import kotlin.random.Random
 
 class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
-    override val registry = HrmDataPageRegistry()
+    override val registry = SpeedCadenceDataPageRegistry()
 
-    override val title: String = "AntCadenceSensor" + Random.nextInt(0, 100)
+    override val title: String = "AntSpeedSensor" + Random.nextInt(0, 100)
 
     private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
         description = "Speed " + Random.nextInt(0, 100)
