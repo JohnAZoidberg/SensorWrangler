@@ -59,12 +59,20 @@ open class Settings {
     var recordingDirectory: String = Paths.get("").toAbsolutePath().toString()
 
     @Preference("Rows in chart grid",
-        explanation = "How many rows of charts the grid has")
+        explanation = "How many rows of charts the grid has. Takes effect only after app restart.")
     var chartGridRows: Int = 2
 
     @Preference("Columns in chart grid",
-        explanation = "How many columns of charts the grid has")
+        explanation = "How many columns of charts the grid has. Takes effect only after app restart.")
     var chartGridCols: Int = 2
+
+    @Preference("Pixel width of a new window",
+        explanation = "How pixels the main window is wide on app launch. Takes effect only after app restart.")
+    var defaultWindowWidth: Int = 800
+
+    @Preference("Columns in chart grid",
+        explanation = "How pixels the main window is high on app launch. Takes effect only after app restart.")
+    var defaultWindowHeight: Int = 600
 
     // TODO: Make overridable by cmdline param or environment variable
     val configPath: String = "wrangler.settings"

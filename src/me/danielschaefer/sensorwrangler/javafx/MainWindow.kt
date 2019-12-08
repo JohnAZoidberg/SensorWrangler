@@ -188,7 +188,9 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
             val vBox = VBox(createMenuBar(primaryStage), allChartsBox, playBox)
 
-            scene = Scene(vBox, 800.0, 600.0)
+            scene = Scene(vBox,
+                App.instance.settings.defaultWindowWidth.toDouble(),
+                App.instance.settings.defaultWindowHeight.toDouble())
             // TODO: Set an icon for the program - how to embed resources in the .jar?
             //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
 
