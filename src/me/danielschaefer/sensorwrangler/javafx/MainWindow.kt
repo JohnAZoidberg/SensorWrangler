@@ -6,6 +6,7 @@ import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.event.EventHandler
 import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.chart.*
@@ -29,7 +30,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
     private var paused: Boolean = false
@@ -55,6 +55,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             title = "SensorWrangler"
 
             val allChartsBox = GridPane().apply {
+                // Let grid fill available space
+                HBox.setHgrow(this, Priority.ALWAYS)
+                VBox.setVgrow(this, Priority.ALWAYS)
+
+                hgap = 25.0
+                vgap = 25.0
                 padding = Insets(25.0)
 
                 val rows = App.instance.settings.chartGridRows;
@@ -62,10 +68,26 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                 //val fxChartIterator = fxCharts.iterator()
                 rowLoop@ for (row in 0 until rows) {
+                    rowConstraints.add(RowConstraints().apply {
+                        // Force row to resize, only then will the grid resize to its parent
+                        vgrow = Priority.ALWAYS
+                        // Keep all rows at the same height
+                        percentHeight = 100.0 / rows
+                    })
+
                     for (col in 0 until cols) {
-                        // Dummy chart as a placeholder
-                        val chartBox = VBox(10.0)
-                        val fxChart = LineChart<String, Number>(CategoryAxis(), NumberAxis())
+                        // Add column only once
+                        if (row == 0)
+                            columnConstraints.add(ColumnConstraints().apply {
+                                // Force row to resize, only then will the grid resize to its parent
+                                hgrow = Priority.ALWAYS
+                                // Keep all columns at the same width
+                                percentWidth = 100.0 / cols
+                            })
+
+                        val chartBox = VBox(10.0).apply {
+                            alignment = Pos.BOTTOM_CENTER
+                        }
                         val chartDropdown = ComboBox<String>().apply {
                             App.instance.wrangler.charts.addListener(ListChangeListener {
                                 items.setAll(it.list.map { it.title })
@@ -90,7 +112,9 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                 println("Switched from chart $oldValue to $newValue")
                             })
                         }
-                        chartBox.children.setAll(fxChart, chartDropdown)
+
+                        chartBox.children.setAll(Text("No Chart"), chartDropdown)
+
                         add(chartBox, col, row)
                     }
                 }
@@ -167,7 +191,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             scene = Scene(vBox, 800.0, 600.0)
             // TODO: Set an icon for the program - how to embed resources in the .jar?
             //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
-            sizeToScene()
+
             show()
 
             Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update lastUpperBound")).apply {
