@@ -4,11 +4,10 @@ import be.glever.ant.channel.AntChannel
 import be.glever.ant.message.AntMessage
 import be.glever.ant.usb.AntUsbDevice
 import be.glever.ant.usb.AntUsbDeviceFactory
-import be.glever.antplus.FluxProvider
 import be.glever.antplus.common.datapage.registry.AbstractDataPageRegistry
 import kotlin.concurrent.thread
 
-abstract class AntPlusSensor<T> : Sensor() where T : AntChannel, T : FluxProvider {
+abstract class AntPlusSensor<T : AntChannel> : Sensor() {
     protected abstract val registry: AbstractDataPageRegistry
 
     override fun specificConnect() {
