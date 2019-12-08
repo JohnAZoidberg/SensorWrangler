@@ -21,9 +21,12 @@ abstract class AntPlusSensor<T : AntChannel> : Sensor() {
             } else {
                 // TODO: Wrap in try-catch and disconnect
                 antDevice.use { device ->
-                    // TODO: Support multiple ANT devices. Problem: Cannot initialize multiple times
-                    device.initialize()
-                    device.closeAllChannels() // Otherwise channels stay open on usb dongle even if program shuts down
+                    // TODO: use catches all exceptions and discards them - we want them logged!
+                    if (!device.isInitialized) {
+                        device.initialize()
+                        device.closeAllChannels() // Otherwise channels stay open on usb dongle even if program shuts down
+                    }
+
                     createChannel(device).events.doOnNext { handleMessage(it) }.subscribe()
                     System.`in`.read()  // TODO: Use better method to sleep thread indefinitely
                 }
