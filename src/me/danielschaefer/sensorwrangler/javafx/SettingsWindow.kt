@@ -42,7 +42,7 @@ class SettingsWindow(val parentStage: Stage) : Stage() {
             children.addAll(tabPane)
         }
 
-        scene = Scene(mainContent, 800.0, 600.0)
+        scene = Scene(mainContent)
         title = "Settings"
 
         sizeToScene()
