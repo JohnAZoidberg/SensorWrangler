@@ -2,6 +2,22 @@
 
 ![Preview](https://danielschaefer.me/SensorWrangler/0.1.0.gif)
 
+## Goals
+The aim of this project is to provide a free/libre software solution for using fitness sensors.
+
+
+To provide that, five features are necessary:
+
+- Get data from sensors (using any protocol)
+- Control fitness equipment (like resistance of a bike trainer)
+- Provide a simple visualization of the data
+- Provide simple transformation abilities (e.g. average same measurements from different sensor)
+- Export (live) data to a number of targets (e.g. file, socket, as library, ...)
+
+This project is **not** going to implement a complex featureset like that of [GoldenCheetah](https://www.goldencheetah.org/).
+
+It should be easy, to add new sensors and export targets.
+
 ## Features
 - Free software (GPLv2 licensed)
 - Read data from fitness tracking sensors
