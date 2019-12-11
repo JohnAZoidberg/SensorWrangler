@@ -34,7 +34,9 @@ import java.util.concurrent.TimeUnit
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
     private var paused: Boolean = false
     private var live: Boolean = true
-    private var lastUpperBound: Double? = null
+
+    private lateinit var timeSlider: Slider
+    private lateinit var buttonSkipToNow: Button
 
     init {
         primaryStage.apply {
@@ -44,14 +46,17 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
             val vBox = VBox(createMenuBar(primaryStage), createAllChartsBox(), createPlayBox())
 
-            scene = Scene(vBox,
+            scene = Scene(
+                vBox,
                 App.instance.settings.defaultWindowWidth.toDouble(),
-                App.instance.settings.defaultWindowHeight.toDouble())
+                App.instance.settings.defaultWindowHeight.toDouble()
+            )
 
             // TODO: Set an icon for the program - how to embed resources in the .jar?
             //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
 
             show()
+
             updateShownTimeWindow()
         }
     }
@@ -144,17 +149,19 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 HBox.setHgrow(this, Priority.ALWAYS)
             }
 
-            val slider = Slider().apply {
-                min = -60.0;
-                max = 0.0;
-                value = 0.0;
-                isShowTickLabels = true;
-                isShowTickMarks = true;
-                majorTickUnit = 10.0;
-                minorTickCount = 1;
-                blockIncrement = 1.0;
+            timeSlider = Slider().apply {
+                // TODO: Maybe start this only when the first sensor is connected
+                min = Date().time.toDouble()
+                max = min
+                value = min
+
+                isShowTickMarks = false
+                majorTickUnit = 10_000.0  // 10s
+                minorTickCount = 0
+                blockIncrement = 1_000.0
                 HBox.setHgrow(this, Priority.ALWAYS)
-                isDisable = true
+
+                isShowTickLabels = false
                 labelFormatter = object : StringConverter<Double>() {
                     override fun toString(value: Double): String? {
                         return if (value == 0.0) "now" else "$value s"
@@ -169,10 +176,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 }
             }
 
-            val buttonSkipToNow = Button("Skip to now").apply {
+            buttonSkipToNow = Button("Skip to now").apply {
                 isDisable = true
                 onAction = EventHandler {
-                    lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
+                    timeSlider.value = timeSlider.max
                     live = true
                     isDisable = true
                 }
@@ -182,7 +189,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 onAction = EventHandler {
                     paused = !paused
                     live = !paused
-                    buttonSkipToNow.isDisable = !live
+
+                    if (paused)
+                        buttonSkipToNow.isDisable = false
+
                     text = if (paused) "Start" else "Pause"
                 }
             }
@@ -200,24 +210,28 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 })
             }
 
-            children.addAll(slider, buttonPause, buttonSkipToNow, buttonProjected)
+            children.addAll(timeSlider, buttonPause, buttonSkipToNow, buttonProjected)
         }
     }
 
     private fun updateShownTimeWindow() {
-        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update lastUpperBound")).apply {
+        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update slider")).apply {
             scheduleAtFixedRate({
+                val actuallyLive = timeSlider.value == timeSlider.max
+                timeSlider.max = Date().time.toDouble()
+
                 if (paused)
                     return@scheduleAtFixedRate
 
-                if (lastUpperBound == null)
-                    lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
-
-                lastUpperBound?.let {
-                    // TODO: This might slowly fall behind the current time,
+                if (live and actuallyLive) {
+                    timeSlider.value = Date().time.toDouble()
+                } else {
+                    buttonSkipToNow.isDisable = false
+                    // TODO: This might slowly fall behind the time,
                     //       if this thread isn't properly scheduled every 40ms
-                    lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
+                    timeSlider.value += App.instance.settings.chartUpdatePeriod
                 }
+
             }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
         }
     }
@@ -343,13 +357,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
                             scheduleAtFixedRate({
                                 Platform.runLater {
-                                    if (paused)
-                                        return@runLater
-
-                                    lastUpperBound?.let {
-                                        xAxis.upperBound = it
-                                        xAxis.lowerBound = xAxis.upperBound - chart.windowSize
-                                    }
+                                    xAxis.upperBound = timeSlider.value
+                                    xAxis.lowerBound = xAxis.upperBound - chart.windowSize
                                 }
                             }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
                         }
