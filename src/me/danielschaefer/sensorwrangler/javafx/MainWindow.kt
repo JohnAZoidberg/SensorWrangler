@@ -36,7 +36,27 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     private var live: Boolean = true
     private var lastUpperBound: Double? = null
 
-    fun import() {
+    init {
+        primaryStage.apply {
+            import()
+
+            title = "SensorWrangler"
+
+            val vBox = VBox(createMenuBar(primaryStage), createAllChartsBox(), createPlayBox())
+
+            scene = Scene(vBox,
+                App.instance.settings.defaultWindowWidth.toDouble(),
+                App.instance.settings.defaultWindowHeight.toDouble())
+
+            // TODO: Set an icon for the program - how to embed resources in the .jar?
+            //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
+
+            show()
+            updateShownTimeWindow()
+        }
+    }
+
+    private fun import() {
         if (!App.instance.wrangler.import(App.instance.settings.configPath)) {
             Alert(primaryStage, "Import failed",
                 "Failed to import configuration because '${App.instance.settings.configPath}' was not found.")
@@ -48,169 +68,157 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
         }
     }
 
-    init {
-        primaryStage.apply {
-            import()
+    private fun createAllChartsBox(): GridPane {
+        return GridPane().apply {
+            // Let grid fill available space
+            HBox.setHgrow(this, Priority.ALWAYS)
+            VBox.setVgrow(this, Priority.ALWAYS)
 
-            title = "SensorWrangler"
+            hgap = 25.0
+            vgap = 25.0
+            padding = Insets(25.0)
 
-            val allChartsBox = GridPane().apply {
-                // Let grid fill available space
+            val rows = App.instance.settings.chartGridRows;
+            val cols = App.instance.settings.chartGridCols;
+
+            //val fxChartIterator = fxCharts.iterator()
+            rowLoop@ for (row in 0 until rows) {
+                rowConstraints.add(RowConstraints().apply {
+                    // Force row to resize, only then will the grid resize to its parent
+                    vgrow = Priority.ALWAYS
+                    // Keep all rows at the same height
+                    percentHeight = 100.0 / rows
+                })
+
+                for (col in 0 until cols) {
+                    // Add column only once
+                    if (row == 0)
+                        columnConstraints.add(ColumnConstraints().apply {
+                            // Force row to resize, only then will the grid resize to its parent
+                            hgrow = Priority.ALWAYS
+                            // Keep all columns at the same width
+                            percentWidth = 100.0 / cols
+                        })
+
+                    val chartBox = VBox(10.0).apply {
+                        alignment = Pos.BOTTOM_CENTER
+                    }
+                    val chartDropdown = ComboBox<String>().apply {
+                        App.instance.wrangler.charts.addListener(ListChangeListener {
+                            items.setAll(it.list.map { it.title })
+                        })
+                        items.addAll(App.instance.wrangler.charts.map { it.title })
+                        valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                            // No need to do anything if we don't switch to a chart
+                            // TODO: Maybe remove the current chart. Except it's not possible to manually select null
+                            if (newValue == null)
+                                return@ChangeListener
+
+                            oldValue?.let {
+                                App.instance.wrangler.findChartByTitle(oldValue)?.let {
+                                    it.shown = false
+                                }
+                            }
+
+                            App.instance.wrangler.findChartByTitle(newValue)?.let {
+                                it.shown = true
+                                chartBox.children[0] = createFxChart(it)
+                            }
+                            println("Switched from chart $oldValue to $newValue")
+                        })
+                    }
+
+                    chartBox.children.setAll(Text("No Chart"), chartDropdown)
+
+                    add(chartBox, col, row)
+                }
+            }
+        }
+    }
+
+    private fun createPlayBox(): HBox {
+        return HBox(10.0).apply {
+            padding = Insets(25.0)
+
+            val spacer = fun() = Region().apply {
                 HBox.setHgrow(this, Priority.ALWAYS)
-                VBox.setVgrow(this, Priority.ALWAYS)
+            }
 
-                hgap = 25.0
-                vgap = 25.0
-                padding = Insets(25.0)
+            val slider = Slider().apply {
+                min = -60.0;
+                max = 0.0;
+                value = 0.0;
+                isShowTickLabels = true;
+                isShowTickMarks = true;
+                majorTickUnit = 10.0;
+                minorTickCount = 1;
+                blockIncrement = 1.0;
+                HBox.setHgrow(this, Priority.ALWAYS)
+                isDisable = true
+                labelFormatter = object : StringConverter<Double>() {
+                    override fun toString(value: Double): String? {
+                        return if (value == 0.0) "now" else "$value s"
+                    }
 
-                val rows = App.instance.settings.chartGridRows;
-                val cols = App.instance.settings.chartGridCols;
-
-                //val fxChartIterator = fxCharts.iterator()
-                rowLoop@ for (row in 0 until rows) {
-                    rowConstraints.add(RowConstraints().apply {
-                        // Force row to resize, only then will the grid resize to its parent
-                        vgrow = Priority.ALWAYS
-                        // Keep all rows at the same height
-                        percentHeight = 100.0 / rows
-                    })
-
-                    for (col in 0 until cols) {
-                        // Add column only once
-                        if (row == 0)
-                            columnConstraints.add(ColumnConstraints().apply {
-                                // Force row to resize, only then will the grid resize to its parent
-                                hgrow = Priority.ALWAYS
-                                // Keep all columns at the same width
-                                percentWidth = 100.0 / cols
-                            })
-
-                        val chartBox = VBox(10.0).apply {
-                            alignment = Pos.BOTTOM_CENTER
-                        }
-                        val chartDropdown = ComboBox<String>().apply {
-                            App.instance.wrangler.charts.addListener(ListChangeListener {
-                                items.setAll(it.list.map { it.title })
-                            })
-                            items.addAll(App.instance.wrangler.charts.map { it.title })
-                            valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
-                                // No need to do anything if we don't switch to a chart
-                                // TODO: Maybe remove the current chart. Except it's not possible to manually select null
-                                if (newValue == null)
-                                    return@ChangeListener
-
-                                oldValue?.let {
-                                    App.instance.wrangler.findChartByTitle(oldValue)?.let {
-                                        it.shown = false
-                                    }
-                                }
-
-                                App.instance.wrangler.findChartByTitle(newValue)?.let {
-                                    it.shown = true
-                                    chartBox.children[0] = createFxChart(it)
-                                }
-                                println("Switched from chart $oldValue to $newValue")
-                            })
-                        }
-
-                        chartBox.children.setAll(Text("No Chart"), chartDropdown)
-
-                        add(chartBox, col, row)
+                    override fun fromString(string: String?): Double {
+                        return if (string == "now")
+                            0.0
+                        else
+                            string!!.removeSuffix(" s").toDouble()
                     }
                 }
             }
 
-            // TODO: Make this useful
-            val playBox = HBox(10.0).apply {
-                padding = Insets(25.0)
-
-                val spacer = fun() = Region().apply {
-                    HBox.setHgrow(this, Priority.ALWAYS)
-                }
-
-                val slider = Slider().apply {
-                    min = -60.0;
-                    max = 0.0;
-                    value = 0.0;
-                    isShowTickLabels = true;
-                    isShowTickMarks = true;
-                    majorTickUnit = 10.0;
-                    minorTickCount = 1;
-                    blockIncrement = 1.0;
-                    HBox.setHgrow(this, Priority.ALWAYS)
+            val buttonSkipToNow = Button("Skip to now").apply {
+                isDisable = true
+                onAction = EventHandler {
+                    lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
+                    live = true
                     isDisable = true
-                    labelFormatter = object : StringConverter<Double>() {
-                        override fun toString(value: Double): String? {
-                            return if (value == 0.0) "now" else "$value s"
-                        }
-
-                        override fun fromString(string: String?): Double {
-                            return if (string == "now")
-                                0.0
-                            else
-                                string!!.removeSuffix(" s").toDouble()
-                        }
-                    }
                 }
-
-                val buttonSkipToNow = Button("Skip to now").apply {
-                    isDisable = true
-                    onAction = EventHandler {
-                        lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
-                        live = true
-                        isDisable = true
-                    }
-                }
-
-                val buttonPause = Button("Pause").apply {
-                    onAction = EventHandler {
-                        paused = !paused
-                        live = !paused
-                        buttonSkipToNow.isDisable = !live
-                        text = if (paused) "Start" else "Pause"
-                    }
-                }
-
-                val buttonProjected = Button("Start Recording").apply {
-                    onAction = EventHandler {
-                        if (App.instance.wrangler.isRecording.value) {
-                            App.instance.wrangler.stopRecording()
-                        } else {
-                            StartRecordingPopup(primaryStage)
-                        }
-                    }
-                    App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
-                        text = if (new) "Stop Recording" else "Start Recording"
-                    })
-                }
-
-                children.addAll(slider, buttonPause, buttonSkipToNow, buttonProjected)
             }
-            val vBox = VBox(createMenuBar(primaryStage), allChartsBox, playBox)
 
-            scene = Scene(vBox,
-                App.instance.settings.defaultWindowWidth.toDouble(),
-                App.instance.settings.defaultWindowHeight.toDouble())
-            // TODO: Set an icon for the program - how to embed resources in the .jar?
-            //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
-
-            show()
-
-            Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update lastUpperBound")).apply {
-                scheduleAtFixedRate({
-                    if (paused)
-                        return@scheduleAtFixedRate
-
-                    if (lastUpperBound == null)
-                        lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
-
-                    lastUpperBound?.let {
-                        // TODO: This might slowly fall behind the current time,
-                        //       if this thread isn't properly scheduled every 40ms
-                        lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
-                    }
-                }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+            val buttonPause = Button("Pause").apply {
+                onAction = EventHandler {
+                    paused = !paused
+                    live = !paused
+                    buttonSkipToNow.isDisable = !live
+                    text = if (paused) "Start" else "Pause"
+                }
             }
+
+            val buttonProjected = Button("Start Recording").apply {
+                onAction = EventHandler {
+                    if (App.instance.wrangler.isRecording.value) {
+                        App.instance.wrangler.stopRecording()
+                    } else {
+                        StartRecordingPopup(primaryStage)
+                    }
+                }
+                App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
+                    text = if (new) "Stop Recording" else "Start Recording"
+                })
+            }
+
+            children.addAll(slider, buttonPause, buttonSkipToNow, buttonProjected)
+        }
+    }
+
+    private fun updateShownTimeWindow() {
+        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update lastUpperBound")).apply {
+            scheduleAtFixedRate({
+                if (paused)
+                    return@scheduleAtFixedRate
+
+                if (lastUpperBound == null)
+                    lastUpperBound = Date().time.toDouble() - App.instance.settings.chartUpdatePeriod
+
+                lastUpperBound?.let {
+                    // TODO: This might slowly fall behind the current time,
+                    //       if this thread isn't properly scheduled every 40ms
+                    lastUpperBound = it.plus(App.instance.settings.chartUpdatePeriod)
+                }
+            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
         }
     }
 
