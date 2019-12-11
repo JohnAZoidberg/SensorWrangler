@@ -35,6 +35,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private lateinit var timeSlider: Slider
     private lateinit var buttonSkipToNow: Button
+    private lateinit var timeMultiplier: ComboBox<Int>
 
     init {
         primaryStage.apply {
@@ -158,11 +159,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
         }
 
         buttonSkipToNow = Button("Skip to now").apply {
-            isDisable = true
+            isDisable = live
             onAction = EventHandler {
                 timeSlider.value = timeSlider.max
                 live = !paused
                 isDisable = live
+                timeMultiplier.isDisable = live
             }
         }
 
@@ -172,6 +174,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                 if (paused) {
                     buttonSkipToNow.isDisable = false
+                    timeMultiplier.isDisable = false
                     live = false
                 }
 
@@ -209,7 +212,28 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             selectedTimeLabel.text = StringUtil.formatDate(new)
         }
 
-        val buttonBox = HBox(10.0, selectedTimeBox, spacer(), buttonPause, buttonSkipToNow, buttonProjected)
+        timeMultiplier = ComboBox<Int>().apply {
+            isDisable = live
+
+            items.addAll(-200, -150, -100, -50, 50, 100, 150, 200)
+            value = 100
+
+            valueProperty().addListener{ _, _, new ->
+                App.instance.settings.chartUpdateMultiplier = new
+            }
+            this.converter = object : StringConverter<Int>() {
+                override fun toString(value: Int): String? {
+                    return "${value / 100.0} x"
+                }
+
+                override fun fromString(string: String?): Int {
+                    // TODO: Is this really necessary?
+                    return 0
+                }
+            }
+        }
+
+        val buttonBox = HBox(10.0, selectedTimeBox, spacer(), timeMultiplier, buttonPause, buttonSkipToNow, buttonProjected)
         val sliderBox = HBox(10.0, beginningLabel, timeSlider, nowLabel)
 
         return VBox(10.0, buttonBox, sliderBox).apply {
@@ -229,9 +253,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     timeSlider.value = Date().time.toDouble()
                 } else {
                     buttonSkipToNow.isDisable = false
+                    timeMultiplier.isDisable = false
                     // TODO: This might slowly fall behind the time,
                     //       if this thread isn't properly scheduled every 40ms
-                    timeSlider.value += App.instance.settings.chartUpdatePeriod
+                    timeSlider.value += App.instance.settings.chartUpdatePeriod * (App.instance.settings.chartUpdateMultiplier / 100.0)
                 }
 
             }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS

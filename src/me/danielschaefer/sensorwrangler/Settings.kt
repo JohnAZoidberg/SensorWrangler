@@ -7,15 +7,18 @@ import me.danielschaefer.sensorwrangler.recording.Recorder
 import me.danielschaefer.sensorwrangler.recording.SocketRecorder
 import me.danielschaefer.sensorwrangler.sensors.*
 import java.nio.file.Paths
-import java.time.format.DateTimeFormatter
 import kotlin.reflect.KClass
 
 /**
  * General Settings for the entire program
  */
 open class Settings {
+    /**
+     * How fast time should move, in percent.
+     */
+    var chartUpdateMultiplier: Int = 100
     val chartUpdatePeriod: Double = 40.0
-    val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
+
     val version = "0.4.0"
 
     val supportedSensors: MutableList<KClass<out Sensor>> = mutableListOf(
