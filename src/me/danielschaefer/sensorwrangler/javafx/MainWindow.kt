@@ -161,18 +161,19 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             isDisable = true
             onAction = EventHandler {
                 timeSlider.value = timeSlider.max
-                live = true
-                isDisable = true
+                live = !paused
+                isDisable = live
             }
         }
 
         val buttonPause = Button("Pause").apply {
             onAction = EventHandler {
                 paused = !paused
-                live = !paused
 
-                if (paused)
+                if (paused) {
                     buttonSkipToNow.isDisable = false
+                    live = false
+                }
 
                 text = if (paused) "Start" else "Pause"
             }
@@ -219,13 +220,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
     private fun updateShownTimeWindow() {
         Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update slider")).apply {
             scheduleAtFixedRate({
-                val actuallyLive = timeSlider.value == timeSlider.max
                 timeSlider.max = Date().time.toDouble()
 
                 if (paused)
                     return@scheduleAtFixedRate
 
-                if (live and actuallyLive) {
+                if (live) {
                     timeSlider.value = Date().time.toDouble()
                 } else {
                     buttonSkipToNow.isDisable = false
