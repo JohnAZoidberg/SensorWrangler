@@ -246,10 +246,25 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     chart.axes.forEachIndexed { row, axis ->
                         val text = Text(axis.description)
                         val value = Text()
-                        axis.dataPoints.addListener(ListChangeListener {
-                            it.next()
-                            value.text = it.addedSubList.last().value.toString()
-                        })
+
+                        // Show data from now until chart.windowSize ago
+                        // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
+                        //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
+                        // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
+                        //       Or maybe have one thread for all charts?
+                        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
+                            scheduleAtFixedRate({
+                                Platform.runLater {
+                                    // Get latest value that is before the current slider selection
+                                    // The assumption is that the list of data points is sorted by timestamp
+                                    // TODO: Measurements should have a second list of the sorted list
+                                    val sortedDataPoints = axis.dataPoints
+                                    val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+
+                                    value.text = (latestDataPoint?.value ?: 0.0).toString()
+                                }
+                            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                        }
                         addRow(row, text, value)
                     }
                 }
@@ -270,6 +285,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     upperBound = chart.upperBound
                 }
                 BarChart(xAxis, fxYAxis).apply {
+                    animated = false
                     val series = XYChart.Series<String, Number>().apply {
                         name = chart.title
                         val emptyList = mutableListOf<XYChart.Data<String, Number>>()
@@ -281,10 +297,23 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         val data = XYChart.Data(yAxis.description, 0.0 as Number)
                         series.data.add(data)
 
-                        yAxis.dataPoints.addListener(ListChangeListener {
-                            it.next()
-                            data.yValue = it.addedSubList.last().value
-                        })
+                        // Show data from now until chart.windowSize ago
+                        // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
+                        //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
+                        // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
+                        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
+                            scheduleAtFixedRate({
+                                Platform.runLater {
+                                    // Get latest value that is before the current slider selection
+                                    // The assumption is that the list of data points is sorted by timestamp
+                                    // TODO: Measurements should have a second list of the sorted list
+                                    val sortedDataPoints = yAxis.dataPoints
+                                    val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+
+                                    data.yValue = latestDataPoint?.value ?: 0.0
+                                }
+                            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                        }
                     }
 
                     data.add(series)
@@ -354,6 +383,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                         // Show data from now until chart.windowSize ago
                         // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
+                        //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
+                        // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
                         Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
                             scheduleAtFixedRate({
                                 Platform.runLater {
@@ -367,16 +398,31 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
             is DistributionGraph -> {
                 PieChart().apply {
-                    this.startAngle = -90.0
+                    animated = false
+                    startAngle = -90.0
+
                     // Start at 0, we need a starting value to later change the yValue of that
                     val leftData = PieChart.Data("Left", 50.0)
                     val rightData = PieChart.Data("Right", 50.0)
 
-                    chart.axis.dataPoints.addListener(ListChangeListener {
-                        it.next()
-                        rightData.pieValue = it.addedSubList.last().value
-                        leftData.pieValue = 100.0 - rightData.pieValue
-                    })
+                    // Show data from now until chart.windowSize ago
+                    // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
+                    //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
+                    // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
+                    Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
+                        scheduleAtFixedRate({
+                            Platform.runLater {
+                                // Get latest value that is before the current slider selection
+                                // The assumption is that the list of data points is sorted by timestamp
+                                // TODO: Measurements should have a second list of the sorted list
+                                val sortedDataPoints = chart.axis.dataPoints
+                                val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+
+                                rightData.pieValue = latestDataPoint?.value ?: 50.0
+                                leftData.pieValue = 100.0 - rightData.pieValue
+                            }
+                        }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                    }
 
                     data = FXCollections.observableArrayList(listOf(leftData, rightData))
                 }
