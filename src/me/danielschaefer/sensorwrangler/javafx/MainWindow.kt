@@ -19,14 +19,12 @@ import javafx.stage.Stage
 import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.NamedThreadFactory
 import me.danielschaefer.sensorwrangler.SensorWrangler
+import me.danielschaefer.sensorwrangler.StringUtil
 import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 import me.danielschaefer.sensorwrangler.sensors.Sensor
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -141,76 +139,80 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
         }
     }
 
-    private fun createPlayBox(): HBox {
-        return HBox(10.0).apply {
-            padding = Insets(25.0)
+    private fun createPlayBox(): Node {
+        val spacer = fun() = Region().apply {
+            HBox.setHgrow(this, Priority.ALWAYS)
+        }
 
-            val spacer = fun() = Region().apply {
-                HBox.setHgrow(this, Priority.ALWAYS)
-            }
+        timeSlider = Slider().apply {
+            // TODO: Maybe start this only when the first sensor is connected
+            min = Date().time.toDouble()
+            max = min
+            value = min
 
-            timeSlider = Slider().apply {
-                // TODO: Maybe start this only when the first sensor is connected
-                min = Date().time.toDouble()
-                max = min
-                value = min
+            // No ticks
+            isShowTickMarks = false
+            isShowTickLabels = false
+            minorTickCount = 0
+            HBox.setHgrow(this, Priority.ALWAYS)
+        }
 
-                isShowTickMarks = false
-                majorTickUnit = 10_000.0  // 10s
-                minorTickCount = 0
-                blockIncrement = 1_000.0
-                HBox.setHgrow(this, Priority.ALWAYS)
-
-                isShowTickLabels = false
-                labelFormatter = object : StringConverter<Double>() {
-                    override fun toString(value: Double): String? {
-                        return if (value == 0.0) "now" else "$value s"
-                    }
-
-                    override fun fromString(string: String?): Double {
-                        return if (string == "now")
-                            0.0
-                        else
-                            string!!.removeSuffix(" s").toDouble()
-                    }
-                }
-            }
-
-            buttonSkipToNow = Button("Skip to now").apply {
+        buttonSkipToNow = Button("Skip to now").apply {
+            isDisable = true
+            onAction = EventHandler {
+                timeSlider.value = timeSlider.max
+                live = true
                 isDisable = true
-                onAction = EventHandler {
-                    timeSlider.value = timeSlider.max
-                    live = true
-                    isDisable = true
+            }
+        }
+
+        val buttonPause = Button("Pause").apply {
+            onAction = EventHandler {
+                paused = !paused
+                live = !paused
+
+                if (paused)
+                    buttonSkipToNow.isDisable = false
+
+                text = if (paused) "Start" else "Pause"
+            }
+        }
+
+        val buttonProjected = Button("Start Recording").apply {
+            onAction = EventHandler {
+                if (App.instance.wrangler.isRecording.value) {
+                    App.instance.wrangler.stopRecording()
+                } else {
+                    StartRecordingPopup(primaryStage)
                 }
             }
+            App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
+                text = if (new) "Stop Recording" else "Start Recording"
+            })
+        }
 
-            val buttonPause = Button("Pause").apply {
-                onAction = EventHandler {
-                    paused = !paused
-                    live = !paused
+        val selectedTimeLabel = Text()
+        val selectedTimeBox = HBox(Text("Timestamp displayed: "), selectedTimeLabel)
+        val beginningLabel = Text(StringUtil.formatDate(timeSlider.min))
+        val nowLabel = Text()
 
-                    if (paused)
-                        buttonSkipToNow.isDisable = false
+        timeSlider.minProperty().addListener { _, _, new ->
+            beginningLabel.text = StringUtil.formatDate(new)
+        }
 
-                    text = if (paused) "Start" else "Pause"
-                }
-            }
+        timeSlider.maxProperty().addListener { _, _, new ->
+            nowLabel.text = StringUtil.formatDate(new)
+        }
 
-            val buttonProjected = Button("Start Recording").apply {
-                onAction = EventHandler {
-                    if (App.instance.wrangler.isRecording.value) {
-                        App.instance.wrangler.stopRecording()
-                    } else {
-                        StartRecordingPopup(primaryStage)
-                    }
-                }
-                App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
-                    text = if (new) "Stop Recording" else "Start Recording"
-                })
-            }
+        timeSlider.valueProperty().addListener { _, _, new ->
+            selectedTimeLabel.text = StringUtil.formatDate(new)
+        }
 
-            children.addAll(timeSlider, buttonPause, buttonSkipToNow, buttonProjected)
+        val buttonBox = HBox(10.0, selectedTimeBox, spacer(), buttonPause, buttonSkipToNow, buttonProjected)
+        val sliderBox = HBox(10.0, beginningLabel, timeSlider, nowLabel)
+
+        return VBox(10.0, buttonBox, sliderBox).apply {
+            padding = Insets(25.0)
         }
     }
 
@@ -329,10 +331,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                     tickLabelFormatter = object : StringConverter<Number>() {
                         override fun toString(unixTime: Number): String? {
-                            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-                            return Instant.ofEpochMilli(unixTime.toLong())
-                                .atZone(ZoneId.of("GMT+1"))  // TODO: Think about how to deal with TZs
-                                .format(formatter)
+                            return StringUtil.formatDate(unixTime)
                         }
 
                         override fun fromString(string: String?): Number {
