@@ -83,17 +83,31 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
 
         val addButton = Button("Add average").apply {
             onAction = EventHandler {
+                var firstUnit: Measurement.Unit? = null
+
                 val selectedMeasurements: MutableList<Measurement> = mutableListOf()
                 for (i in 0 until sensors.size) {
                     val selectedSensor = App.instance.wrangler.findSensorByTitle(sensors[i].value)
-                    selectedSensor?.measurements?.filter { it.description == measurements[i].value }?.let {
-                        selectedMeasurements.add(it[0])
+                    selectedSensor?.measurements?.first { it.description == measurements[i].value }?.let {
+                        if (firstUnit == null)
+                            firstUnit = it.unit
+
+                        if (firstUnit != it.unit) {
+                            Alert(parentStage, "Invalid average", "Only measurements with the same unit can be averaged.")
+                            return@EventHandler
+                        }
+
+                        selectedMeasurements.add(it)
                     }
                 }
 
                 if (selectedMeasurements.isEmpty())
                     return@EventHandler
 
+                if (selectedMeasurements.distinct().size != selectedMeasurements.size) {
+                    Alert(parentStage, "Invalid average", "Cannot average a measurement with itself.")
+                    return@EventHandler
+                }
 
 
                 App.instance.wrangler.sensors.add(Averager().apply {
