@@ -14,6 +14,7 @@ import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.recording.Recorder
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.io.BufferedReader
@@ -33,13 +34,33 @@ class SensorWrangler {
     val isRecording: ReadOnlyBooleanProperty
         get() = recording.readOnlyProperty
 
-    val sensors: ObservableList<VirtualSensor> = FXCollections.observableList(mutableListOf())
+    val sensors: ObservableList<VirtualSensor> = FXCollections.observableList(mutableListOf<VirtualSensor>()).apply {
+        // Add all listeners to new sensors
+        addListener(ListChangeListener {
+            it.next()
+            it.addedSubList.filterIsInstance<Sensor>().forEach { sensor ->
+                sensorConnectionListeners.forEach { listener -> sensor.addConnectionChangeListener(listener) }
+            }
+        })
+    }
     val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf())
 
     private val recorders: MutableList<Recorder> = mutableListOf()
-
     private var recordingListeners: MutableList<ListChangeListener<DataPoint>> = mutableListOf()
     private var recording: ReadOnlyBooleanWrapper = ReadOnlyBooleanWrapper(false)
+
+    private val sensorConnectionListeners: ObservableList<ConnectionChangeListener> = FXCollections.observableArrayList(mutableListOf<ConnectionChangeListener>()).apply {
+        // Add/remove new listener to/from all sensors
+        addListener(ListChangeListener {
+            it.next()
+            it.addedSubList.forEach { listener ->
+                sensors.filterIsInstance<Sensor>().forEach { sensor -> sensor.addConnectionChangeListener(listener) }
+            }
+            it.removed.forEach { listener ->
+                sensors.filterIsInstance<Sensor>().forEach { sensor -> sensor.removeConnectionChangeListener(listener) }
+            }
+        })
+    }
 
     private val objectMapper = ObjectMapper().apply {
         disable(
@@ -204,5 +225,9 @@ class SensorWrangler {
     fun addRecorder(recorder: Recorder) {
         recorders.add(recorder)
         startRecording()
+    }
+
+    fun addSensorConnectionListener(listener: ConnectionChangeListener ) {
+        sensorConnectionListeners.add(listener)
     }
 }

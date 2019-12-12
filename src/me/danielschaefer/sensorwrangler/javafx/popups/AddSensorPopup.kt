@@ -15,7 +15,6 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.App
-import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
 import me.danielschaefer.sensorwrangler.javafx.SensorTab
 import java.io.File
 import kotlin.reflect.KMutableProperty
@@ -142,7 +141,6 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                        for ((property, getValue) in propertyMap) {
                            property.setter.call(newSensor, getValue())
                        }
-                       newSensor.addConnectionChangeListener(JavaFXUtil.createConnectionChangeListener(parentStage))
                        App.instance.wrangler.sensors.add(newSensor)
 
                        // Select the new sensor if SensorTab is currently shown

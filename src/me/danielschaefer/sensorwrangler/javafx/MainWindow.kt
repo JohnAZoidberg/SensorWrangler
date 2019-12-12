@@ -25,7 +25,7 @@ import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
-import me.danielschaefer.sensorwrangler.sensors.Sensor
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -85,9 +85,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             return
         }
 
-        App.instance.wrangler.sensors.filterIsInstance<Sensor>().forEach {
-            it.addConnectionChangeListener(JavaFXUtil.createConnectionChangeListener(primaryStage))
-        }
+        App.instance.wrangler.addSensorConnectionListener(JavaFXUtil.createConnectionChangeListener(primaryStage))
     }
 
     private fun createAllChartsBox(): GridPane {

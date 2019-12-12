@@ -28,6 +28,10 @@ abstract class Sensor : VirtualSensor() {
         connectionListeners.add(listener)
     }
 
+    fun removeConnectionChangeListener(listener: ConnectionChangeListener) {
+        connectionListeners.remove(listener)
+    }
+
     fun connect() {
         // Don't connect twice
         if (connected)
