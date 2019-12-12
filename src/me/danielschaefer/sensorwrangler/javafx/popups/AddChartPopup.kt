@@ -26,7 +26,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
 
         yAxisSensors.add(ComboBox<String>().apply {
             items.setAll(App.instance.wrangler.sensors.map { it.title })
-            valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+            valueProperty().addListener(ChangeListener { _, _, newValue ->
                 if (newValue == null)
                     return@ChangeListener
 

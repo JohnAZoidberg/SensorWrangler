@@ -19,6 +19,7 @@ import me.danielschaefer.sensorwrangler.sensors.Averager
 class AddAveragePopup(parentStage: Stage) : Stage() {
     private val measurements: MutableList<ComboBox<String>> = mutableListOf()
     private val sensors: MutableList<ComboBox<String>> = mutableListOf()
+    private val units: MutableList<Text> = mutableListOf()
     private val formGrid: GridPane
 
     private fun addMeasurement() {
@@ -26,7 +27,7 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
 
         sensors.add(ComboBox<String>().apply {
             items.setAll(App.instance.wrangler.sensors.filter { it !is Averager }.map { it.title })
-            valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+            valueProperty().addListener(ChangeListener { _, _, newValue ->
                 if (newValue == null)
                     return@ChangeListener
 
@@ -35,14 +36,29 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
                     return@ChangeListener
 
                 measurements[newAxisIndex].items.setAll(sensor.measurements.map { it.description })
+                units[newAxisIndex].text = ""
                 sizeToScene()
             })
         })
-        measurements.add(ComboBox<String>())
+        measurements.add(ComboBox<String>().apply {
+            valueProperty().addListener(ChangeListener { _,  _, newValue ->
+                if (newValue == null)
+                    return@ChangeListener
+
+                val sensor = App.instance.wrangler.findVirtualSensorByTitle(sensors[newAxisIndex].value)
+                if (sensor == null)
+                    return@ChangeListener
+
+                units[newAxisIndex].text = sensor.measurements.first { it.description == newValue }.unit.toString()
+                sizeToScene()
+            })
+        })
+        units.add(Text())
 
         formGrid.add(Label("Measurement ${newAxisIndex + 1}"), 0, newAxisIndex + 1)
         formGrid.add(sensors[newAxisIndex], 1, newAxisIndex + 1)
         formGrid.add(measurements[newAxisIndex], 2, newAxisIndex + 1)
+        formGrid.add(units[newAxisIndex], 3, newAxisIndex + 1)
         sizeToScene()
     }
 
@@ -94,7 +110,7 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
             alignment = Pos.CENTER;
         }
         scene = Scene(contentBox)
-        title = "Add Chart"
+        title = "Add Average"
 
         sizeToScene()
         show()
