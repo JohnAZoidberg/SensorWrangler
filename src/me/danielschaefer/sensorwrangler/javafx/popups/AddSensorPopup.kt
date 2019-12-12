@@ -72,22 +72,24 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                            val input: Node = when {
                                property.returnType.isSubtypeOf(String::class.createType()) -> {
                                    TextField().apply {
-                                       propertyMap[property] = { text }
+                                       propertyMap[property] = {
+                                           if (text.isEmpty()) null else text
+                                       }
                                    }
                                }
                                property.returnType.isSubtypeOf(Long::class.createType()) -> {
                                    TextField().apply {
-                                       propertyMap[property] = { text.toLong() }
+                                       propertyMap[property] = { text.toLongOrNull() }
                                    }
                                }
                                property.returnType.isSubtypeOf(Double::class.createType()) -> {
                                    TextField().apply {
-                                       propertyMap[property] = { text.toDouble() }
+                                       propertyMap[property] = { text.toDoubleOrNull() }
                                    }
                                }
                                property.returnType.isSubtypeOf(Int::class.createType()) -> {
                                    TextField().apply {
-                                       propertyMap[property] = { text.toInt() }
+                                       propertyMap[property] = { text.toIntOrNull() }
                                    }
                                }
                                property.returnType.isSubtypeOf(Boolean::class.createType()) -> {
@@ -116,7 +118,7 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                                                    fileLabel.text = it
                                                }
                                            }
-                                           propertyMap[property] = { File(fileLabel.text) }
+                                           propertyMap[property] = { fileLabel.text?.let { File(it) } }
                                        }
                                        children.addAll(fileLabel, fileButton)
                                    }
@@ -146,7 +148,14 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                    addSensorButton.setOnAction {
                        val newSensor = supportedSensor.createInstance()
                        for ((property, getValue) in propertyMap) {
-                           property.setter.call(newSensor, getValue())
+                           val propertyValue = getValue()
+                           if (propertyValue == null) {
+                               // TODO: Show what the actual problem is
+                               Alert(parentStage, "Form invalid", "The form isn't properly filled.")
+                               return@setOnAction
+                           }
+
+                           property.setter.call(newSensor, propertyValue)
                        }
                        App.instance.wrangler.sensors.add(newSensor)
 
