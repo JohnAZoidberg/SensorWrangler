@@ -162,10 +162,16 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
         }
 
         timeSlider = Slider().apply {
-            // TODO: Maybe start this only when the first sensor is connected
+            var connectedSensors = 0
             min = Date().time.toDouble()
             max = min
             value = min
+
+            App.instance.wrangler.addSensorConnectionListener(ConnectionChangeListener { _, connected, _ ->
+                connectedSensors += if (connected) 1 else -1
+                if (connectedSensors > 0)
+                    min = Date().time.toDouble()
+            })
 
             // No ticks
             isShowTickMarks = false
