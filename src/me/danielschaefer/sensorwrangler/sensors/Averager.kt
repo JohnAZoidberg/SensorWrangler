@@ -35,9 +35,9 @@ class Averager: VirtualSensor() {
         if (measurement != null)
             return
 
-        if (sourceMeasurements.all { it.unit == sourceMeasurements.first().unit }) {
+        if (sourceMeasurements.all { it.unit != sourceMeasurements.first().unit }) {
             println("Cannot average measurements with different units")
-            //FIXME: return
+            return
         }
 
         measurement = Measurement(this, 0, sourceMeasurements.first().unit).apply {
