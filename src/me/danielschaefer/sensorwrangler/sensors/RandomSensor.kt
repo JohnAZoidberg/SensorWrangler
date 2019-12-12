@@ -26,7 +26,7 @@ class RandomSensor: Sensor() {
     @SensorProperty(title = "Maximum value")
     var maxValue = 10;
 
-    private val measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.UNITLESS).apply{
         description = "Random measurement " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(measurement)

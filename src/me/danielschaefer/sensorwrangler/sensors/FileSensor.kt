@@ -13,7 +13,7 @@ import kotlin.random.Random
 class FileSensor: Sensor() {
     override val title: String = "FileSensor ${Random.nextInt(0, 100)}"
 
-    private val measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.BPM).apply{
         description = "HeartRate"
     }
     override val measurements: List<Measurement> = listOf(measurement)

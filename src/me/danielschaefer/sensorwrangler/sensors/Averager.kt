@@ -35,7 +35,12 @@ class Averager: VirtualSensor() {
         if (measurement != null)
             return
 
-        measurement = Measurement(this, 0, Measurement.Unit.METER).apply {
+        if (sourceMeasurements.all { it.unit == sourceMeasurements.first().unit }) {
+            println("Cannot average measurements with different units")
+            //FIXME: return
+        }
+
+        measurement = Measurement(this, 0, sourceMeasurements.first().unit).apply {
             description = "Average of\n" + sourceMeasurements.joinToString(separator = ",\n") {
                 it.description ?: ""
             }

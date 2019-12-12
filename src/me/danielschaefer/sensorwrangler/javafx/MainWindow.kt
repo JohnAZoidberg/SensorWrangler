@@ -310,7 +310,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                     val sortedDataPoints = axis.dataPoints
                                     val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
 
-                                    value.text = (latestDataPoint?.value ?: 0.0).toString()
+                                    value.text = "${(latestDataPoint?.value ?: 0.0)}${axis.unit.unitAppendix}"
                                 }
                             }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
                         }
@@ -320,14 +320,14 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
             is BarGraph -> {
                 val xAxis = CategoryAxis().apply {
-                    label = chart.axisNames[0]
+                    //label = chart.axisNames[0]
                     animated = false
                     // Long labels are automatically rotated to 90°.
                     // Setting it to 0° doesn't change that behaviour *shrug*
                     tickLabelRotation = 360.0
                 }
                 val fxYAxis = NumberAxis().apply {
-                    label = chart.axisNames[0]
+                    label = chart.yAxisLabel
                     animated = false
                     isAutoRanging = false
                     lowerBound = chart.lowerBound
@@ -371,7 +371,6 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
             is AxisGraph -> {
                 val xAxis = NumberAxis().apply {
-                    label = chart.axisNames[0]
                     isAutoRanging = false
                     tickUnit = 5_000.0  // Tick mark every 5 seconds
                     animated = false
@@ -389,7 +388,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 }
 
                 val fxYAxis = NumberAxis().apply {
-                    label = chart.axisNames[1]
+                    label = chart.yAxisLabel
                     isAutoRanging = false
                     lowerBound = chart.lowerBound
                     upperBound = chart.upperBound

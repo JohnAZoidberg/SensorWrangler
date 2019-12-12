@@ -7,8 +7,8 @@ class BarGraph: Chart() {
     @JsonProperty("title")
     override lateinit var title: String
 
-    @JsonProperty("axisNames")
-    lateinit var axisNames: Array<String>
+    @JsonProperty("yAxisLabel")
+    lateinit var yAxisLabel: String
 
     @JsonProperty("yAxes")
     lateinit var yAxes: List<Measurement>

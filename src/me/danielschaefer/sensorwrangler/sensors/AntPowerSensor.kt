@@ -13,13 +13,13 @@ import kotlin.random.Random
 class AntPowerSensor: AntPlusSensor<PowerChannel>() {
     override val title: String = "AntPowerSensor" + Random.nextInt(0, 100)
 
-    private val powerMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val powerMeasurement = Measurement(this, 0, Measurement.Unit.WATT).apply{
         description = "Power " + Random.nextInt(0, 100)
     }
-    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply{
         description = "Cadence " + Random.nextInt(0, 100)
     }
-    private val powerDistributionMeasurment = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val powerDistributionMeasurment = Measurement(this, 0, Measurement.Unit.PERCENTAGE).apply{
         description = "Power distribution" + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(powerMeasurement, cadenceMeasurement, powerDistributionMeasurment)

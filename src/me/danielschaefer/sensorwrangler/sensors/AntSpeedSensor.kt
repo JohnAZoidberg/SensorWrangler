@@ -18,7 +18,7 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
 
     override val title: String = "AntSpeedSensor" + Random.nextInt(0, 100)
 
-    private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER_PER_SECOND).apply{
         description = "Speed " + Random.nextInt(0, 100)
     }
     private val distanceMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{

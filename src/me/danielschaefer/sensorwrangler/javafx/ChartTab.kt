@@ -67,8 +67,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                             when (chart) {
                                 is BarGraph -> {
                                     items.addAll(
-                                        TableRow("X-axis label", chart.axisNames[0]),
-                                        TableRow("Y-axis label", chart.axisNames[1]),
+                                        TableRow("Y-axis label", chart.yAxisLabel),
                                         TableRow("Y-axis lower bound", chart.lowerBound.toString()),
                                         TableRow("Y-axis upper bound", chart.upperBound.toString())
                                     )
@@ -85,8 +84,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                                             TableRow("With dots", StringUtil.yesNo(chart.withDots))
                                         )
                                     items.addAll(
-                                        TableRow("X-axis label", chart.axisNames[0]),
-                                        TableRow("Y-axis label", chart.axisNames[1]),
+                                        TableRow("Y-axis label", chart.yAxisLabel),
                                         TableRow("Y-axis lower bound", chart.lowerBound.toString()),
                                         TableRow("Y-axis upper bound", chart.upperBound.toString()),
                                         TableRow("Y-axis tick spacing", chart.tickSpacing.toString()),

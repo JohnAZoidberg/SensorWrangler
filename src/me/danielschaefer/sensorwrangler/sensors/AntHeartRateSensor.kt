@@ -16,7 +16,7 @@ class AntHeartRateSensor : AntPlusSensor<HRMChannel>() {
 
     override val title: String = "AntHeartRateSensor" + Random.nextInt(0, 100)
 
-    private val measurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.BPM).apply{
         description = "Heartrate " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(measurement)

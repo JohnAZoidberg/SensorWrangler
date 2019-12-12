@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.App
@@ -92,6 +93,12 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                                property.returnType.isSubtypeOf(Boolean::class.createType()) -> {
                                    CheckBox().apply {
                                        propertyMap[property] = { isSelected }
+                                   }
+                               }
+                               property.returnType.isSubtypeOf(Measurement.Unit::class.createType()) -> {
+                                   ComboBox<Measurement.Unit>().apply {
+                                       items.addAll(Measurement.Unit.values())
+                                       propertyMap[property] = { value }
                                    }
                                }
                                property.returnType.isSubtypeOf(File::class.createType()) -> {

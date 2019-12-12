@@ -7,8 +7,8 @@ class ScatterGraph : AxisGraph() {
         @JsonProperty("title")
         override lateinit var title: String
 
-        @JsonProperty("axisNames")
-        override lateinit var axisNames: Array<String>
+        @JsonProperty("yAxisLabel")
+        override lateinit var yAxisLabel: String
 
         @JsonProperty("yAxes")
         override lateinit var yAxes: List<Measurement>

@@ -13,13 +13,13 @@ import kotlin.random.Random
 class AntStationaryBike : AntPlusSensor<FecChannel>(){
     override val title: String = "AntPlusStationaryBike" + Random.nextInt(0, 100)
 
-    private val powerMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val powerMeasurement = Measurement(this, 0, Measurement.Unit.WATT).apply{
         description = "Power " + Random.nextInt(0, 100)
     }
-    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply{
         description = "Cadence " + Random.nextInt(0, 100)
     }
-    private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER_PER_SECOND).apply{
         description = "Speed " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(powerMeasurement, cadenceMeasurement, speedMeasurement)

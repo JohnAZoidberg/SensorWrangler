@@ -13,7 +13,7 @@ import kotlin.random.Random
 class AntCadenceSensor : AntPlusSensor<CadenceChannel>(){
     override val title: String = "AntCadenceSensor" + Random.nextInt(0, 100)
 
-    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply{
         description = "Cadence " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(cadenceMeasurement)

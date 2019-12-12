@@ -46,9 +46,43 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
         addDataPoint(Date().time, value)
     }
 
-    // TODO: Actually use it
     enum class Unit {
-        METER, SECOND
+        BPM,
+        METER,
+        METER_PER_SECOND,
+        PERCENTAGE,
+        RPM,
+        UNITLESS,
+        WATT;
+
+        override fun toString(): String {
+            return when (this) {
+                BPM -> "BPM"
+                METER -> "Meter"
+                METER_PER_SECOND -> "Meter per second"
+                PERCENTAGE -> "Percentage"
+                RPM -> "RPM"
+                UNITLESS -> "Unitless"
+                WATT -> "Watt"
+            }
+        }
+
+        val abbreviation: String
+            get() = when (this) {
+                BPM -> "BPM"
+                METER -> "m"
+                METER_PER_SECOND -> "m/s"
+                PERCENTAGE -> "%"
+                RPM -> "RPM"
+                UNITLESS -> ""
+                WATT -> "W"
+            }
+
+        val unitAppendix: String
+          get() = when (this) {
+              UNITLESS -> ""
+              else -> " [ $abbreviation ]"
+          }
     }
 }
 

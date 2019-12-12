@@ -8,6 +8,7 @@ import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
+import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.gui.*
@@ -17,6 +18,7 @@ import me.danielschaefer.sensorwrangler.javafx.ChartTab
 class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage() {
     private val yAxisMeasurements: MutableList<ComboBox<String>> = mutableListOf()
     private val yAxisSensors: MutableList<ComboBox<String>> = mutableListOf()
+    private val yAxisUnits: MutableList<Text> = mutableListOf()
     private val formGrid: GridPane
 
     private fun addYAxis() {
@@ -33,15 +35,30 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                     return@ChangeListener
 
                 yAxisMeasurements[newAxisIndex].items.setAll(sensor.measurements.map { it.description })
+                yAxisUnits[newAxisIndex].text = ""
                 sizeToScene()
             })
         })
-        yAxisMeasurements.add(ComboBox())
+        yAxisMeasurements.add(ComboBox<String>().apply {
+            valueProperty().addListener(ChangeListener { _,  _, newValue ->
+                if (newValue == null)
+                    return@ChangeListener
+
+                val sensor = App.instance.wrangler.findVirtualSensorByTitle(yAxisSensors[newAxisIndex].value)
+                if (sensor == null)
+                    return@ChangeListener
+
+                yAxisUnits[newAxisIndex].text = sensor.measurements.first { it.description == newValue }.unit.toString()
+                sizeToScene()
+            })
+        })
+        yAxisUnits.add(Text())
 
         val newRowIndex = formGrid.rowCount
-        formGrid.add(Label("Y-Axis ${newAxisIndex + 1}"), 0, newRowIndex)
-        formGrid.add(yAxisSensors[newAxisIndex], 2, newRowIndex)
-        formGrid.add(yAxisMeasurements[newAxisIndex], 3, newRowIndex)
+        formGrid.add(Label("Measurement ${newAxisIndex + 1}"), 0, newRowIndex)
+        formGrid.add(yAxisSensors[newAxisIndex], 1, newRowIndex)
+        formGrid.add(yAxisMeasurements[newAxisIndex], 2, newRowIndex)
+        formGrid.add(yAxisUnits[newAxisIndex], 3, newRowIndex)
         sizeToScene()
     }
 
@@ -50,18 +67,16 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
 
         val chartNameField = TextField()
 
-        val xAxisNameField = TextField()
-        val xAxisNameLabel = Label("X-Axis")
         val yAxisNameField = TextField()
-        val yAxisNameLabel = Label("Y-Axis")
+        val yAxisNameLabel = Label("Y-Axis label")
         val lowerBoundField = TextField("-25.0")
         val lowerBoundLabel = Label("Lower Bound")
         val upperBoundField = TextField("25.0")
         val upperBoundLabel = Label("Upper Bound")
 
-        val xAxisTimeLabel = Label("Time")
-        val axisLabelLabel = Label("Label")
+        val axisSensorLabel = Label("Sensor")
         val axisMeasurementLabel = Label("Measurement")
+        val axisUnitLabel = Label("Unit")
 
         val tickSpacingLabel = Label("Tick spacing")
         val tickSpacingField = TextField("5")
@@ -92,13 +107,9 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         upperBoundLabel.isVisible = false
                         lowerBoundField.isVisible = false
 
-                        xAxisNameField.isVisible = false
-                        xAxisNameLabel.isVisible = false
-                        xAxisTimeLabel.isVisible = false
                         yAxisNameField.isVisible = false
                         yAxisNameLabel.isVisible = false
-                        axisMeasurementLabel.isVisible = false
-                        axisLabelLabel.isVisible = false
+                        axisUnitLabel.isVisible = true
                         addMeasurementButton.isDisable = true
                     }
                     CurrentValueGraph::class.simpleName -> {
@@ -113,13 +124,8 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         upperBoundLabel.isVisible = false
                         lowerBoundField.isVisible = false
 
-                        xAxisNameField.isVisible = false
-                        xAxisNameLabel.isVisible = false
-                        xAxisTimeLabel.isVisible = false
                         yAxisNameField.isVisible = false
                         yAxisNameLabel.isVisible = false
-                        axisMeasurementLabel.isVisible = false
-                        axisLabelLabel.isVisible = false
                         addMeasurementButton.isDisable = false
                     }
                     BarGraph::class.simpleName -> {
@@ -134,13 +140,8 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         upperBoundLabel.isVisible = true
                         lowerBoundField.isVisible = true
 
-                        xAxisNameField.isVisible = true
-                        xAxisNameLabel.isVisible = true
-                        xAxisTimeLabel.isVisible = true
                         yAxisNameField.isVisible = false
                         yAxisNameLabel.isVisible = true
-                        axisMeasurementLabel.isVisible = true
-                        axisLabelLabel.isVisible = true
                         addMeasurementButton.isDisable = false
                     }
                     LineGraph::class.simpleName -> {
@@ -155,13 +156,8 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         upperBoundLabel.isVisible = true
                         lowerBoundField.isVisible = true
 
-                        xAxisNameField.isVisible = true
-                        xAxisNameLabel.isVisible = true
-                        xAxisTimeLabel.isVisible = true
                         yAxisNameField.isVisible = false
                         yAxisNameLabel.isVisible = true
-                        axisMeasurementLabel.isVisible = true
-                        axisLabelLabel.isVisible = true
                         addMeasurementButton.isDisable = false
                     }
                     ScatterGraph::class.simpleName -> {
@@ -176,13 +172,8 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         upperBoundLabel.isVisible = true
                         lowerBoundField.isVisible = true
 
-                        xAxisNameField.isVisible = true
-                        xAxisNameLabel.isVisible = true
-                        xAxisTimeLabel.isVisible = true
                         yAxisNameField.isVisible = false
                         yAxisNameLabel.isVisible = true
-                        axisMeasurementLabel.isVisible = true
-                        axisLabelLabel.isVisible = true
                         addMeasurementButton.isDisable = false
                     }
                 }
@@ -217,17 +208,14 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(withDotsLabel, 0, row)
             add(withDotsField, 1, row++)
 
-            add(axisLabelLabel, 1, row)
-            add(axisMeasurementLabel, 2, row++)
-
-            add(xAxisNameLabel, 0, row)
-            add(xAxisNameField, 1, row)
-            add(xAxisTimeLabel, 2, row++)
-
             add(yAxisNameLabel, 0, row)
             add(yAxisNameField, 1, row++)
 
             add(addMeasurementButton, 2, row++)
+
+            add(axisSensorLabel, 1, row)
+            add(axisMeasurementLabel, 2, row)
+            add(axisUnitLabel, 3, row++)
         }
 
         // Already display one measurement input field
@@ -246,11 +234,10 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                 if (selectedMeasurements.isEmpty())
                     return@EventHandler
 
-                val axisNames = arrayOf(xAxisNameField.text, yAxisNameField.text)
                 val newChart = when (typeDropdown.value) {
                     LineGraph::class.simpleName -> LineGraph().apply {
                         title = chartNameField.text
-                        this.axisNames = axisNames
+                        this.yAxisLabel = yAxisNameField.text
                         yAxes = selectedMeasurements
 
                         windowSize = windowSizeField.text.toInt() * 1_000
@@ -261,7 +248,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                     }
                     ScatterGraph::class.simpleName -> ScatterGraph().apply {
                         title = chartNameField.text
-                        this.axisNames = axisNames
+                        this.yAxisLabel = yAxisNameField.text
                         yAxes = selectedMeasurements
 
                         windowSize = windowSizeField.text.toInt() * 1_000
@@ -271,7 +258,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                     }
                     BarGraph::class.simpleName -> BarGraph().apply {
                         title = chartNameField.text
-                        this.axisNames = axisNames
+                        this.yAxisLabel = yAxisNameField.text
                         yAxes = selectedMeasurements
 
                         lowerBound = lowerBoundField.text.toDouble()
