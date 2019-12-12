@@ -21,8 +21,9 @@ abstract class Sensor : VirtualSensor() {
 
         specificDisconnect(reason)
         for (listener in connectionListeners)
-            listener.onDisconnect(this, reason)
+            listener.onChanged(this, false, reason)
     }
+
     fun addConnectionChangeListener(listener: ConnectionChangeListener) {
         connectionListeners.add(listener)
     }
@@ -35,7 +36,7 @@ abstract class Sensor : VirtualSensor() {
         specificConnect()
         connected = true
         for (listener in connectionListeners)
-            listener.onConnect()
+            listener.onChanged(this, true, null)
     }
 
     /**

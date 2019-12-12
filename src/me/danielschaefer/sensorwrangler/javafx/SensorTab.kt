@@ -118,28 +118,23 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                                     }
                                 }
                             }
-                            sensor.addConnectionChangeListener(object : ConnectionChangeListener {
-                                override fun onConnect() {
-                                    // Could be called from a non-UI thread
-                                    Platform.runLater {
+                            // TODO: Listener should be removed later, when this stage is destroyed
+                            sensor.addConnectionChangeListener(ConnectionChangeListener { _, connected, _ ->
+                                // Could be called from a non-UI thread
+                                Platform.runLater {
+                                    if (connected) {
                                         connectButton.text = "Disconnect"
                                         connectButton.setOnAction {
                                             // TODO: Add popup for connection dialog
                                             sensor.disconnect()
                                         }
-                                    }
-                                }
-
-                                override fun onDisconnect(sensor: Sensor, reason: String?) {
-                                    // Could be called from a non-UI thread
-                                    Platform.runLater {
+                                    } else {
                                         connectButton.text = "Connect"
                                         connectButton.setOnAction {
                                             sensor.connect()
                                         }
                                     }
                                 }
-
                             })
                         }
 
