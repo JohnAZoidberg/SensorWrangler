@@ -177,7 +177,14 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             isShowTickMarks = false
             isShowTickLabels = false
             minorTickCount = 0
+
+            // Fill all of the horizontal space
             HBox.setHgrow(this, Priority.ALWAYS)
+
+            // When the user changes the slider value (drag or click), we're not live anymore
+            setOnMousePressed { e ->
+                live.value = false
+            }
         }
 
         buttonSkipToNow = Button().apply {
