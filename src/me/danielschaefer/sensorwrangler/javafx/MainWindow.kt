@@ -1,6 +1,7 @@
 package me.danielschaefer.sensorwrangler.javafx
 
 import javafx.application.Platform
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
@@ -30,11 +31,12 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
-    private var paused: Boolean = false
-    private var live: Boolean = true
+    private var paused = SimpleBooleanProperty(false).apply {}
+    private var live = SimpleBooleanProperty(true)
 
     private lateinit var timeSlider: Slider
     private lateinit var buttonSkipToNow: Button
+    private lateinit var buttonPause: Button
     private lateinit var timeMultiplier: ComboBox<Int>
 
     init {
@@ -53,6 +55,22 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
             // TODO: Set an icon for the program - how to embed resources in the .jar?
             //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
+
+            live.addListener { _, _, newLive ->
+                if (timeMultiplier.value < 100) {
+                    live.value = false
+                    return@addListener
+                }
+                buttonSkipToNow.isDisable = newLive
+            }
+            paused.addListener { _, _, newPaused ->
+                if (newPaused) {
+                    live.value = false
+                    buttonPause.text = "Start"
+                } else {
+                    buttonPause.text = "Pause"
+                }
+            }
 
             show()
 
@@ -158,27 +176,22 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             HBox.setHgrow(this, Priority.ALWAYS)
         }
 
-        buttonSkipToNow = Button("Skip to now").apply {
-            isDisable = live
+        buttonSkipToNow = Button().apply {
             onAction = EventHandler {
+                live.value = !paused.value
                 timeSlider.value = timeSlider.max
-                live = !paused
-                isDisable = live
-                timeMultiplier.isDisable = live
             }
+            disabledProperty().addListener { _, _, newIsDisable ->
+                text = if (newIsDisable) "Live" else "Skip to now"
+            }
+
+            // Must come after the disable listener, so setting this value triggers it
+            isDisable = live.value
         }
 
-        val buttonPause = Button("Pause").apply {
+        buttonPause = Button("Pause").apply {
             onAction = EventHandler {
-                paused = !paused
-
-                if (paused) {
-                    buttonSkipToNow.isDisable = false
-                    timeMultiplier.isDisable = false
-                    live = false
-                }
-
-                text = if (paused) "Start" else "Pause"
+                paused.value = !paused.value
             }
         }
 
@@ -213,13 +226,15 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
         }
 
         timeMultiplier = ComboBox<Int>().apply {
-            isDisable = live
-
             items.addAll(-200, -150, -100, -50, 50, 100, 150, 200)
             value = 100
 
             valueProperty().addListener{ _, _, new ->
                 App.instance.settings.chartUpdateMultiplier = new
+
+                // If we go slower than 1x, we'll fall behind current time
+                if (new < 100)
+                    live.value = false
             }
             this.converter = object : StringConverter<Int>() {
                 override fun toString(value: Int): String? {
@@ -246,18 +261,14 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             scheduleAtFixedRate({
                 timeSlider.max = Date().time.toDouble()
 
-                if (paused)
+                // Don't update the current value if paused
+                if (paused.value)
                     return@scheduleAtFixedRate
 
-                if (live) {
+                if (live.value)
                     timeSlider.value = Date().time.toDouble()
-                } else {
-                    buttonSkipToNow.isDisable = false
-                    timeMultiplier.isDisable = false
-                    // TODO: This might slowly fall behind the time,
-                    //       if this thread isn't properly scheduled every 40ms
+                else
                     timeSlider.value += App.instance.settings.chartUpdatePeriod * (App.instance.settings.chartUpdateMultiplier / 100.0)
-                }
 
             }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
         }
