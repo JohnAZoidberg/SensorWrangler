@@ -125,7 +125,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     val chartBox = VBox(10.0).apply {
                         alignment = Pos.BOTTOM_CENTER
                     }
-                    val chartPane = VBox()
+                    val stackPane = OpaqueStackPane(Text("No Chart"))
                     val chartDropdown = ComboBox<Chart>().apply {
                         items.addAll(App.instance.wrangler.charts)
                         App.instance.wrangler.charts.addListener(ListChangeListener {
@@ -145,14 +145,17 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                             newChart.showOne()
                             val fxChart = createFxChart(newChart)
-                            chartPane.children.setAll(fxChart)
+
+                            if (stackPane.children.size > 1)
+                                stackPane.children.remove(1, stackPane.children.size)
+                            stackPane.children.add(fxChart)
 
                             // TODO: Delete this listener when chart is deselected, then we can also remove `&& chartPane.children.contains(fxChart)`
                             newChart.shown.addListener { _, _, newShown ->
                                 // Replace deselected chart by transparent pane
-                                if (!newShown && chartPane.children.contains(fxChart)) {
+                                if (!newShown && stackPane.children.contains(fxChart)) {
                                     graphUpdaters.remove(fxChart)
-                                    chartPane.children.clear()
+                                    stackPane.children.remove(fxChart)
                                     value = null
                                 }
                             }
@@ -160,7 +163,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         })
                     }
 
-                    chartBox.children.setAll(StackPane(Text("No Chart"), chartPane), chartDropdown)
+                    chartBox.children.setAll(stackPane, chartDropdown)
 
                     add(chartBox, col, row)
                 }
