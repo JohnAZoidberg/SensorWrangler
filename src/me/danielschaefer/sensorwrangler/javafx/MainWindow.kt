@@ -57,12 +57,14 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
 
             live.addListener { _, _, newLive ->
-                if (timeMultiplier.value < 100) {
+                // If we go slower than 1x, we'll fall behind current time
+                if (timeMultiplier.value < 100)
                     live.value = false
-                    return@addListener
-                }
+
+                // Can't skip to now, if we're already live
                 buttonSkipToNow.isDisable = newLive
             }
+
             paused.addListener { _, _, newPaused ->
                 if (newPaused) {
                     live.value = false
@@ -123,32 +125,41 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     val chartBox = VBox(10.0).apply {
                         alignment = Pos.BOTTOM_CENTER
                     }
-                    val chartDropdown = ComboBox<String>().apply {
+                    val chartPane = VBox()
+                    val chartDropdown = ComboBox<Chart>().apply {
+                        items.addAll(App.instance.wrangler.charts)
                         App.instance.wrangler.charts.addListener(ListChangeListener {
-                            items.setAll(it.list.map { it.title })
+                            it.next()
+                            items.addAll(it.addedSubList)
+                            items.removeAll(it.removed)
                         })
-                        items.addAll(App.instance.wrangler.charts.map { it.title })
-                        valueProperty().addListener(ChangeListener { observable, oldValue, newValue ->
+                        valueProperty().addListener(ChangeListener { _, oldChart, newChart ->
                             // No need to do anything if we don't switch to a chart
                             // TODO: Maybe remove the current chart. Except it's not possible to manually select null
-                            if (newValue == null)
+                            if (newChart == null)
                                 return@ChangeListener
 
-                            oldValue?.let {
-                                App.instance.wrangler.findChartByTitle(oldValue)?.let {
-                                    it.shown = false
-                                }
+                            oldChart?.let {
+                                oldChart.hideOne()
                             }
 
-                            App.instance.wrangler.findChartByTitle(newValue)?.let {
-                                it.shown = true
-                                chartBox.children[0] = createFxChart(it)
+                            newChart.showOne()
+                            val fxChart = createFxChart(newChart)
+                            chartPane.children.setAll(fxChart)
+
+                            // TODO: Delete this listener when chart is deselected, then we can also remove `&& chartPane.children.contains(fxChart)`
+                            newChart.shown.addListener { _, _, newShown ->
+                                // Replace deselected chart by transparent pane
+                                if (!newShown && chartPane.children.contains(fxChart)) {
+                                    chartPane.children.clear()
+                                    value = null
+                                }
                             }
-                            println("Switched from chart $oldValue to $newValue")
+                            println("Switched from chart '$oldChart' to '$newChart'")
                         })
                     }
 
-                    chartBox.children.setAll(Text("No Chart"), chartDropdown)
+                    chartBox.children.setAll(StackPane(Text("No Chart"), chartPane), chartDropdown)
 
                     add(chartBox, col, row)
                 }
@@ -182,9 +193,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             HBox.setHgrow(this, Priority.ALWAYS)
 
             // When the user changes the slider value (drag or click), we're not live anymore
-            setOnMousePressed { e ->
-                live.value = false
-            }
+            setOnMousePressed { live.value = false }
         }
 
         buttonSkipToNow = Button().apply {
@@ -214,7 +223,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     StartRecordingPopup(primaryStage)
                 }
             }
-            App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { observable, old, new ->
+            App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { _, _, new ->
                 text = if (new) "Stop Recording" else "Start Recording"
             })
         }
@@ -334,6 +343,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     upperBound = chart.upperBound
                 }
                 BarChart(xAxis, fxYAxis).apply {
+                    title = chart.title  // TODO: Actually we don't need this at all, since the combo box already shows it
                     animated = false
                     val series = XYChart.Series<String, Number>().apply {
                         name = chart.title

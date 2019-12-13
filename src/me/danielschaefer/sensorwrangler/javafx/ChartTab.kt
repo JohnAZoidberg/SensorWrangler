@@ -35,7 +35,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                 })
 
                 // TODO: Cache these for better performance
-                selectionModel.selectedItemProperty().addListener(ChangeListener { x, oldValue, newValue ->
+                selectionModel.selectedItemProperty().addListener(ChangeListener { _, _, newValue ->
                     if (newValue == null)
                         return@ChangeListener
 
@@ -61,7 +61,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                             items.setAll(
                                 TableRow("Title", chart.title),
                                 TableRow("Type", chart::class.simpleName),
-                                TableRow("Currently shown?", StringUtil.yesNo(chart.shown))
+                                TableRow("Currently shown?", StringUtil.yesNo(chart.shown.value))
                             )
 
                             when (chart) {
