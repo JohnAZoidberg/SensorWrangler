@@ -1,6 +1,5 @@
 package me.danielschaefer.sensorwrangler.javafx
 
-import javafx.application.Platform
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ChangeListener
 import javafx.collections.FXCollections
@@ -31,6 +30,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
+    private val graphUpdaters: MutableMap<Node?, MutableList<() -> Unit>> = mutableMapOf()
     private var paused = SimpleBooleanProperty(false).apply {}
     private var live = SimpleBooleanProperty(true)
 
@@ -151,6 +151,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                             newChart.shown.addListener { _, _, newShown ->
                                 // Replace deselected chart by transparent pane
                                 if (!newShown && chartPane.children.contains(fxChart)) {
+                                    graphUpdaters.remove(fxChart)
                                     chartPane.children.clear()
                                     value = null
                                 }
@@ -290,6 +291,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 else
                     timeSlider.value += App.instance.settings.chartUpdatePeriod * (App.instance.settings.chartUpdateMultiplier / 100.0)
 
+                graphUpdaters.forEach{ (_, updaters) -> updaters.forEach { it() } }
             }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
         }
     }
@@ -305,23 +307,13 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         val text = Text(axis.description)
                         val value = Text()
 
-                        // Show data from now until chart.windowSize ago
-                        // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
-                        //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
-                        // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
-                        //       Or maybe have one thread for all charts?
-                        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
-                            scheduleAtFixedRate({
-                                Platform.runLater {
-                                    // Get latest value that is before the current slider selection
-                                    // The assumption is that the list of data points is sorted by timestamp
-                                    // TODO: Measurements should have a second list of the sorted list
-                                    val sortedDataPoints = axis.dataPoints
-                                    val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+                        // Show current value
+                        addGraphUpdater(this) {
+                            // We assume they're already sorted by timestamp, this is not necessarily the case
+                            val sortedDataPoints = axis.dataPoints
+                            val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
 
-                                    value.text = "${(latestDataPoint?.value ?: 0.0)}${axis.unit.unitAppendix}"
-                                }
-                            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                            value.text = "${(latestDataPoint?.value ?: 0.0)}${axis.unit.unitAppendix}"
                         }
                         addRow(row, text, value)
                     }
@@ -357,21 +349,14 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         series.data.add(data)
 
                         // Show data from now until chart.windowSize ago
-                        // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
-                        //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
-                        // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
-                        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
-                            scheduleAtFixedRate({
-                                Platform.runLater {
-                                    // Get latest value that is before the current slider selection
-                                    // The assumption is that the list of data points is sorted by timestamp
-                                    // TODO: Measurements should have a second list of the sorted list
-                                    val sortedDataPoints = yAxis.dataPoints
-                                    val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+                        addGraphUpdater(this) {
+                            // Get latest value that is before the current slider selection
+                            // The assumption is that the list of data points is sorted by timestamp
+                            // TODO: Measurements should have a second list of the sorted list
+                            val sortedDataPoints = yAxis.dataPoints
+                            val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
 
-                                    data.yValue = latestDataPoint?.value ?: 0.0
-                                }
-                            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                            data.yValue = latestDataPoint?.value ?: 0.0
                         }
                     }
 
@@ -437,16 +422,9 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                         fxChart.data.add(series)
 
                         // Show data from now until chart.windowSize ago
-                        // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
-                        //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
-                        // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
-                        Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
-                            scheduleAtFixedRate({
-                                Platform.runLater {
-                                    xAxis.upperBound = timeSlider.value
-                                    xAxis.lowerBound = xAxis.upperBound - chart.windowSize
-                                }
-                            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                        addGraphUpdater(this) {
+                            xAxis.upperBound = timeSlider.value
+                            xAxis.lowerBound = xAxis.upperBound - chart.windowSize
                         }
                     }
                 }
@@ -461,22 +439,15 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     val rightData = PieChart.Data("Right", 50.0)
 
                     // Show data from now until chart.windowSize ago
-                    // TODO: Maybe dynamically adjust the period, e.g. if a sensors measures faster than 40ms
-                    //       (The normal frequency of ANT+ sensors is 4Hz or 250ms)
-                    // TODO: Kill thread, when chart is deselected. Can we bind its lifetime to the JavaFX chart object?
-                    Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update ${chart.title} window")).apply {
-                        scheduleAtFixedRate({
-                            Platform.runLater {
-                                // Get latest value that is before the current slider selection
-                                // The assumption is that the list of data points is sorted by timestamp
-                                // TODO: Measurements should have a second list of the sorted list
-                                val sortedDataPoints = chart.axis.dataPoints
-                                val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+                    addGraphUpdater(this) {
+                        // Get latest value that is before the current slider selection
+                        // The assumption is that the list of data points is sorted by timestamp
+                        // TODO: Measurements should have a second list of the sorted list
+                        val sortedDataPoints = chart.axis.dataPoints
+                        val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
 
-                                rightData.pieValue = latestDataPoint?.value ?: 50.0
-                                leftData.pieValue = 100.0 - rightData.pieValue
-                            }
-                        }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                        rightData.pieValue = latestDataPoint?.value ?: 50.0
+                        leftData.pieValue = 100.0 - rightData.pieValue
                     }
 
                     data = FXCollections.observableArrayList(listOf(leftData, rightData))
@@ -487,5 +458,12 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 null
             }
         }
+    }
+
+    private fun addGraphUpdater(node: Node, updater: () -> Unit) {
+        if (!graphUpdaters.containsKey(node))
+            graphUpdaters[node] = mutableListOf()
+
+        graphUpdaters[node]?.add(updater)
     }
 }
