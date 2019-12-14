@@ -33,8 +33,6 @@ open class Settings {
         SocketSensor::class
     )
 
-    val supportedFormulas: MutableList<KClass<Any>> = mutableListOf()
-
     val supportedRecorders: MutableList<KClass<out Recorder>> = mutableListOf(
         CsvRecorder::class,
         DatabaseRecorder::class,

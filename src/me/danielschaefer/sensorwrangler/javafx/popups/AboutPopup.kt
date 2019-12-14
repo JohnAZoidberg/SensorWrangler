@@ -23,7 +23,6 @@ class AboutPopup(val parentStage: Stage): Stage() {
         val titleText =
             Text("SensorWrangler ${me.danielschaefer.sensorwrangler.javafx.App.instance.settings.version}")
         val sensorText = Text("Built-in sensor drivers:" + foldClassNames(App.instance.settings.supportedSensors))
-        val virtualSensorText = Text("Available formulas types:" + foldClassNames(App.instance.settings.supportedFormulas))
         val chartText = Text("Available chart types:" + foldClassNames(App.instance.settings.supportedCharts))
         val recorderText = Text("Available recorders:" + foldClassNames(App.instance.settings.supportedRecorders))
 
@@ -73,7 +72,6 @@ class AboutPopup(val parentStage: Stage): Stage() {
             25.0,
             titleText,
             sensorText,
-            virtualSensorText,
             chartText,
             recorderText,
             licenseText,
