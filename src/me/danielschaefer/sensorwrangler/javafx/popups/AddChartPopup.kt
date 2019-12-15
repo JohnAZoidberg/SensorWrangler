@@ -295,6 +295,9 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
         if (chartNameField.text.isEmpty())
             return "Chart must have a title"
 
+        if (App.instance.wrangler.charts.any { it.title == chartNameField.text })
+            return "There is already another chart with this name"
+
         if (yAxisNameField.isVisible && yAxisNameField.text.isEmpty())
             return "Y-Axis must have a name"
 
