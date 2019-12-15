@@ -260,7 +260,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 if (new < 100)
                     live.value = false
             }
-            this.converter = object : StringConverter<Int>() {
+
+            converter = object : StringConverter<Int>() {
                 override fun toString(value: Int): String? {
                     return "${value / 100.0} x"
                 }
