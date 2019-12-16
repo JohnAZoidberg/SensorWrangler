@@ -14,4 +14,8 @@ abstract class VirtualSensor {
     protected abstract var connected: Boolean
     val isConnected: Boolean
         get() = connected
+
+    override fun toString(): String {
+        return title
+    }
 }

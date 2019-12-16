@@ -15,41 +15,35 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Averager
+import me.danielschaefer.sensorwrangler.sensors.Sensor
 
 class AddAveragePopup(parentStage: Stage) : Stage() {
-    private val measurements: MutableList<ComboBox<String>> = mutableListOf()
-    private val sensors: MutableList<ComboBox<String>> = mutableListOf()
+    private val measurements: MutableList<ComboBox<Measurement>> = mutableListOf()
+    private val sensors: MutableList<ComboBox<Sensor>> = mutableListOf()
     private val units: MutableList<Text> = mutableListOf()
     private val formGrid: GridPane
 
     private fun addMeasurement() {
         val newAxisIndex = sensors.size
 
-        sensors.add(ComboBox<String>().apply {
-            items.setAll(App.instance.wrangler.sensors.filter { it !is Averager }.map { it.title })
-            valueProperty().addListener(ChangeListener { _, _, newValue ->
-                if (newValue == null)
+        sensors.add(ComboBox<Sensor>().apply {
+            // TODO: Do we want to be able to average averages?
+            items.setAll(App.instance.wrangler.sensors.filterIsInstance<Sensor>())
+            valueProperty().addListener(ChangeListener { _, _, selectedSensor ->
+                if (selectedSensor == null)
                     return@ChangeListener
 
-                val sensor = App.instance.wrangler.findSensorByTitle(newValue)
-                if (sensor == null)
-                    return@ChangeListener
-
-                measurements[newAxisIndex].items.setAll(sensor.measurements.map { it.description })
+                measurements[newAxisIndex].items.setAll(selectedSensor.measurements)
                 units[newAxisIndex].text = ""
                 sizeToScene()
             })
         })
-        measurements.add(ComboBox<String>().apply {
-            valueProperty().addListener(ChangeListener { _,  _, newValue ->
-                if (newValue == null)
+        measurements.add(ComboBox<Measurement>().apply {
+            valueProperty().addListener(ChangeListener { _,  _, selectedMeasurement ->
+                if (selectedMeasurement == null)
                     return@ChangeListener
 
-                val sensor = App.instance.wrangler.findVirtualSensorByTitle(sensors[newAxisIndex].value)
-                if (sensor == null)
-                    return@ChangeListener
-
-                units[newAxisIndex].text = sensor.measurements.first { it.description == newValue }.unit.toString()
+                units[newAxisIndex].text = selectedMeasurement.unit.toString()
                 sizeToScene()
             })
         })
@@ -83,32 +77,22 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
 
         val addButton = Button("Add average").apply {
             onAction = EventHandler {
-                var firstUnit: Measurement.Unit? = null
+                val selectedMeasurements = measurements.map { it.value }.filterNotNull()
 
-                val selectedMeasurements: MutableList<Measurement> = mutableListOf()
-                for (i in 0 until sensors.size) {
-                    val selectedSensor = App.instance.wrangler.findSensorByTitle(sensors[i].value)
-                    selectedSensor?.measurements?.first { it.description == measurements[i].value }?.let {
-                        if (firstUnit == null)
-                            firstUnit = it.unit
-
-                        if (firstUnit != it.unit) {
-                            Alert(parentStage, "Invalid average", "Only measurements with the same unit can be averaged.")
-                            return@EventHandler
-                        }
-
-                        selectedMeasurements.add(it)
-                    }
+                if (selectedMeasurements.isEmpty()) {
+                    Alert(parentStage, "Invalid average", "No measurements selected")
+                    return@EventHandler
                 }
 
-                if (selectedMeasurements.isEmpty())
+                if (!selectedMeasurements.all { it.unit == selectedMeasurements.first().unit }) {
+                    Alert(parentStage, "Invalid average", "Only measurements with the same unit can be averaged.")
                     return@EventHandler
+                }
 
                 if (selectedMeasurements.distinct().size != selectedMeasurements.size) {
                     Alert(parentStage, "Invalid average", "Cannot average a measurement with itself.")
                     return@EventHandler
                 }
-
 
                 App.instance.wrangler.sensors.add(Averager().apply {
                     sourceMeasurements = selectedMeasurements

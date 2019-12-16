@@ -15,43 +15,36 @@ import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.ChartTab
+import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage() {
-    private val yAxisMeasurements: MutableList<ComboBox<String>> = mutableListOf()
-    private val yAxisSensors: MutableList<ComboBox<String>> = mutableListOf()
+    private val yAxisMeasurements: MutableList<ComboBox<Measurement>> = mutableListOf()
+    private val yAxisSensors: MutableList<ComboBox<VirtualSensor>> = mutableListOf()
     private val yAxisUnits: MutableList<Text> = mutableListOf()
     private val formGrid: GridPane
 
     private fun addYAxis() {
         val newAxisIndex = yAxisSensors.size
 
-        yAxisSensors.add(ComboBox<String>().apply {
-            items.setAll(App.instance.wrangler.sensors.map { it.title })
-            valueProperty().addListener(ChangeListener { _, _, newValue ->
-                if (newValue == null)
+        yAxisSensors.add(ComboBox<VirtualSensor>().apply {
+            items.setAll(App.instance.wrangler.sensors)
+            valueProperty().addListener(ChangeListener { _, _, selectedSensor ->
+                if (selectedSensor == null)
                     return@ChangeListener
 
-                val sensor = App.instance.wrangler.findVirtualSensorByTitle(newValue)
-                if (sensor == null)
-                    return@ChangeListener
-
-                yAxisMeasurements[newAxisIndex].items.setAll(sensor.measurements.map { it.description })
+                yAxisMeasurements[newAxisIndex].items.setAll(selectedSensor.measurements)
                 yAxisUnits[newAxisIndex].text = ""
                 sizeToScene()
             })
         })
-        yAxisMeasurements.add(ComboBox<String>().apply {
-            valueProperty().addListener(ChangeListener { _,  _, newValue ->
-                if (newValue == null)
+        yAxisMeasurements.add(ComboBox<Measurement>().apply {
+            valueProperty().addListener(ChangeListener { _,  _, selectedMeasurement ->
+                if (selectedMeasurement == null)
                     return@ChangeListener
 
-                val sensor = App.instance.wrangler.findVirtualSensorByTitle(yAxisSensors[newAxisIndex].value)
-                if (sensor == null)
-                    return@ChangeListener
-
-                yAxisUnits[newAxisIndex].text = sensor.measurements.first { it.description == newValue }.unit.toString()
+                yAxisUnits[newAxisIndex].text = selectedMeasurement.unit.toString()
                 sizeToScene()
             })
         })
@@ -210,15 +203,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
 
         val addButton = Button("Add chart").apply {
             onAction = EventHandler {
-                val selectedMeasurements: MutableList<Measurement> = mutableListOf()
-                for (i in 0 until yAxisSensors.size) {
-                    val selectedSensor = yAxisSensors[i].value?.let {
-                        App.instance.wrangler.findVirtualSensorByTitle(it)
-                    }
-                    selectedSensor?.measurements?.filter { it.description == yAxisMeasurements[i].value }?.let {
-                        selectedMeasurements.add(it[0])
-                    }
-                }
+                val selectedMeasurements = yAxisMeasurements.map { it.value }.filterNotNull()
 
                 if (selectedMeasurements.isEmpty()) {
                     Alert(parentStage, "Form invalid", "No measurements selected")

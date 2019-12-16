@@ -46,6 +46,10 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
         addDataPoint(Date().time, value)
     }
 
+    override fun toString(): String {
+        return description ?: super.toString()
+    }
+
     enum class Unit {
         BPM,
         METER,
