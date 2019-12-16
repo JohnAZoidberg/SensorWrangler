@@ -12,10 +12,7 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
-import me.danielschaefer.sensorwrangler.gui.AxisGraph
-import me.danielschaefer.sensorwrangler.gui.BarGraph
-import me.danielschaefer.sensorwrangler.gui.Chart
-import me.danielschaefer.sensorwrangler.gui.LineGraph
+import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 class ChartTab(parentStage: Stage): Tab("Charts") {
@@ -79,6 +76,20 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                                         TableRow("Y-axis $i measurement", yAxis.description)
                                     )
                                 }
+                            }
+                            is CurrentValueGraph -> {
+                                selectedChart.axes.forEachIndexed { i, yAxis ->
+                                    items.addAll(
+                                        TableRow("Y-axis $i sensor", yAxis.sensor.title),
+                                        TableRow("Y-axis $i measurement", yAxis.description)
+                                    )
+                                }
+                            }
+                            is DistributionGraph -> {
+                                items.addAll(
+                                    TableRow("Sensor", selectedChart.axis.sensor.title),
+                                    TableRow("Measurement", selectedChart.axis.description)
+                                )
                             }
                             is AxisGraph -> {
                                 if (selectedChart is LineGraph)
