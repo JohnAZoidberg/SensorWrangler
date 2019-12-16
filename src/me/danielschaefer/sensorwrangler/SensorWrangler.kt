@@ -130,11 +130,6 @@ class SensorWrangler {
         recorders.clear()
     }
 
-    // TODO: Do we want charts to be a map indexed by the title?
-    fun findChartByTitle(title: String): Chart? {
-        return charts.find { it.title == title }
-    }
-
     // TODO: Do we want sensors to be a map indexed by the title?
     fun findVirtualSensorByTitle(title: String): VirtualSensor? {
         return sensors.find { it.title == title }

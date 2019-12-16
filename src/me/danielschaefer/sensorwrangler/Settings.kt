@@ -19,7 +19,7 @@ open class Settings {
     var chartUpdateMultiplier: Int = 100
     val chartUpdatePeriod: Double = 40.0
 
-    val version = "0.4.0"
+    val version = "0.5.0"
 
     val supportedSensors: MutableList<KClass<out Sensor>> = mutableListOf(
         AntCadenceSensor::class,

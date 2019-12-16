@@ -1,7 +1,6 @@
 package me.danielschaefer.sensorwrangler.javafx
 
 import javafx.beans.value.ChangeListener
-import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -15,11 +14,12 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.StringUtil
 import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.gui.BarGraph
+import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 
 class ChartTab(parentStage: Stage): Tab("Charts") {
-    val chartList: ListView<Text>
+    val chartList: ListView<Chart>
 
     init {
         content = HBox().apply {
@@ -27,92 +27,93 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                 HBox.setHgrow(this, Priority.SOMETIMES)
             }
 
-            chartList = ListView<Text>().apply {
-                items = FXCollections.observableList(mutableListOf())
-                items.setAll(App.instance.wrangler.charts.map { Text(it.title) })
+            chartList = ListView<Chart>().apply {
+                items.setAll(App.instance.wrangler.charts)
                 App.instance.wrangler.charts.addListener(ListChangeListener {
-                    items.setAll(it.list.map { Text(it.title) })
+                    it.next()
+                    items.setAll(it.list)
                 })
 
+                //setCellFactory {
+                //    ListCell()
+                //}
+
                 // TODO: Cache these for better performance
-                selectionModel.selectedItemProperty().addListener(ChangeListener { _, _, newValue ->
-                    if (newValue == null)
+                selectionModel.selectedItemProperty().addListener(ChangeListener { _, _, selectedChart ->
+                    if (selectedChart == null)
                         return@ChangeListener
 
                     // TODO: Pass Chart object to avoid searching and possible failure
-                    val chart = App.instance.wrangler.findChartByTitle(newValue.text)
-                    chart?.let {
-                        val chartDetailTable = TableView<TableRow>().apply {
-                            // Have columns expand to fill all available space
-                            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+                    val chartDetailTable = TableView<TableRow>().apply {
+                        // Have columns expand to fill all available space
+                        columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
-                            val firstCol = TableColumn<TableRow, Text>().apply {
-                                cellValueFactory = PropertyValueFactory("firstName")
-                                isSortable = false
-                                isReorderable = false
-                            }
-                            val secondCol = TableColumn<TableRow, Text>().apply {
-                                cellValueFactory = PropertyValueFactory("lastName")
-                                isSortable = false
-                                isReorderable = false
-                            }
-                            columns.setAll(firstCol, secondCol)
+                        val firstCol = TableColumn<TableRow, Text>().apply {
+                            cellValueFactory = PropertyValueFactory("firstName")
+                            isSortable = false
+                            isReorderable = false
+                        }
+                        val secondCol = TableColumn<TableRow, Text>().apply {
+                            cellValueFactory = PropertyValueFactory("lastName")
+                            isSortable = false
+                            isReorderable = false
+                        }
+                        columns.setAll(firstCol, secondCol)
 
-                            items.setAll(
-                                TableRow("Title", chart.title),
-                                TableRow("Type", chart::class.simpleName),
-                                TableRow("Currently shown?", StringUtil.yesNo(chart.shown.value))
-                            )
+                        items.setAll(
+                            TableRow("Title", selectedChart.title),
+                            TableRow("Type", selectedChart::class.simpleName),
+                            TableRow("Currently shown?", StringUtil.yesNo(selectedChart.shown.value))
+                        )
 
-                            when (chart) {
-                                is BarGraph -> {
+                        when (selectedChart) {
+                            is BarGraph -> {
+                                items.addAll(
+                                    TableRow("Y-axis label", selectedChart.yAxisLabel),
+                                    TableRow("Y-axis lower bound", selectedChart.lowerBound.toString()),
+                                    TableRow("Y-axis upper bound", selectedChart.upperBound.toString())
+                                )
+                                selectedChart.yAxes.forEachIndexed { i, yAxis ->
                                     items.addAll(
-                                        TableRow("Y-axis label", chart.yAxisLabel),
-                                        TableRow("Y-axis lower bound", chart.lowerBound.toString()),
-                                        TableRow("Y-axis upper bound", chart.upperBound.toString())
+                                        TableRow("Y-axis $i sensor", yAxis.sensor.title),
+                                        TableRow("Y-axis $i measurement", yAxis.description)
                                     )
-                                    chart.yAxes.forEachIndexed { i, yAxis ->
-                                        items.addAll(
-                                            TableRow("Y-axis $i sensor", yAxis.sensor.title),
-                                            TableRow("Y-axis $i measurement", yAxis.description)
-                                        )
-                                    }
                                 }
-                                is AxisGraph -> {
-                                    if (chart is LineGraph)
-                                        items.addAll(
-                                            TableRow("With dots", StringUtil.yesNo(chart.withDots))
-                                        )
+                            }
+                            is AxisGraph -> {
+                                if (selectedChart is LineGraph)
                                     items.addAll(
-                                        TableRow("Y-axis label", chart.yAxisLabel),
-                                        TableRow("Y-axis lower bound", chart.lowerBound.toString()),
-                                        TableRow("Y-axis upper bound", chart.upperBound.toString()),
-                                        TableRow("Y-axis tick spacing", chart.tickSpacing.toString()),
-                                        TableRow("Window size [s]", (chart.windowSize / 1_000).toString())
+                                        TableRow("With dots", StringUtil.yesNo(selectedChart.withDots))
                                     )
-                                    chart.yAxes.forEachIndexed { i, yAxis ->
-                                        items.addAll(
-                                            TableRow("Y-axis $i sensor", yAxis.sensor.title),
-                                            TableRow("Y-axis $i measurement", yAxis.description)
-                                        )
-                                    }
+                                items.addAll(
+                                    TableRow("Y-axis label", selectedChart.yAxisLabel),
+                                    TableRow("Y-axis lower bound", selectedChart.lowerBound.toString()),
+                                    TableRow("Y-axis upper bound", selectedChart.upperBound.toString()),
+                                    TableRow("Y-axis tick spacing", selectedChart.tickSpacing.toString()),
+                                    TableRow("Window size [s]", (selectedChart.windowSize / 1_000).toString())
+                                )
+                                selectedChart.yAxes.forEachIndexed { i, yAxis ->
+                                    items.addAll(
+                                        TableRow("Y-axis $i sensor", yAxis.sensor.title),
+                                        TableRow("Y-axis $i measurement", yAxis.description)
+                                    )
                                 }
                             }
                         }
-
-                        val removeChartButton = Button("Remove Chart").apply {
-                            setOnAction {
-                                App.instance.wrangler.charts.remove(chart)
-                                if (App.instance.wrangler.charts.size > 0) {
-                                    selectionModel.select(items.last())
-                                } else {
-                                    chartDetail.children.clear()
-                                }
-                            }
-                        }
-
-                        chartDetail.children.setAll(chartDetailTable, removeChartButton)
                     }
+
+                    val removeChartButton = Button("Remove Chart").apply {
+                        setOnAction {
+                            App.instance.wrangler.charts.remove(selectedChart)
+                            if (App.instance.wrangler.charts.size > 0) {
+                                selectionModel.select(items.last())
+                            } else {
+                                chartDetail.children.clear()
+                            }
+                        }
+                    }
+
+                    chartDetail.children.setAll(chartDetailTable, removeChartButton)
                 })
             }
 
