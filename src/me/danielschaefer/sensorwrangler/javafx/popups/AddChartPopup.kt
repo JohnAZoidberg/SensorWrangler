@@ -10,11 +10,11 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.gui.*
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.ChartTab
+import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
@@ -90,17 +90,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
 
         typeDropdown.apply {
             items.addAll(App.instance.settings.supportedCharts)
-
-            converter = object : StringConverter<KClass<out Chart>>() {
-                override fun toString(value: KClass<out Chart>?): String? {
-                    return value?.simpleName
-                }
-
-                override fun fromString(string: String?): KClass<out Chart>? {
-                    // TODO: Is this really necessary?
-                    return null
-                }
-            }
+            converter = JavaFXUtil.createSimpleClassStringConverter<Chart>()
 
             valueProperty().addListener(ChangeListener { _, _, newChart ->
                 withDotsLabel.isVisible = false
