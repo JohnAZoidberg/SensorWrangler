@@ -65,6 +65,14 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
     private val tickSpacingField = TextField("5")
     private val windowSizeField = TextField("10")
     private val withDotsField = CheckBox()
+    private val horizontalGroup = ToggleGroup()
+    private val horizontalButton = RadioButton("Horizontal").apply {
+        toggleGroup = horizontalGroup
+        isSelected = true
+    }
+    private val verticalButton = RadioButton("Vertical").apply {
+        toggleGroup = horizontalGroup
+    }
     private val typeDropdown = ComboBox<KClass<out Chart>>()
 
     init {
@@ -81,6 +89,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
         val tickSpacingLabel = Label("Tick spacing")
         val windowSizeLabel = Label("Window Size [s]")
         val withDotsLabel = Label("With dots")
+        val horizontalLabel = Label("Orientation")
 
         val addMeasurementButton = Button("Add y-axis measurement").apply {
             setOnAction {
@@ -103,11 +112,19 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                 upperBoundField.isVisible = false
                 upperBoundLabel.isVisible = false
                 lowerBoundField.isVisible = false
+                horizontalLabel.isVisible = false
+                horizontalButton.isVisible = false
+                verticalButton.isVisible = false
                 yAxisNameField.isVisible = false
                 yAxisNameLabel.isVisible = false
                 addMeasurementButton.isDisable = true
 
                 when {
+                    newChart == AngleGraph::class -> {
+                        horizontalLabel.isVisible = true
+                        horizontalButton.isVisible = true
+                        verticalButton.isVisible = true
+                    }
                     newChart == CurrentValueGraph::class -> {
                         addMeasurementButton.isDisable = false
                     }
@@ -178,6 +195,11 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(withDotsLabel, 0, row)
             add(withDotsField, 1, row++)
 
+            add(horizontalLabel, 0, row)
+            add(horizontalButton, 1, row++)
+
+            add(verticalButton, 1, row++)
+
             add(yAxisNameLabel, 0, row)
             add(yAxisNameField, 1, row++)
 
@@ -206,6 +228,11 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                 }
 
                 val newChart = when (typeDropdown.value) {
+                    AngleGraph::class -> AngleGraph().apply {
+                        title = chartNameField.text
+                        axis = selectedMeasurements.first()
+                        horizontal = horizontalButton.isSelected
+                    }
                     LineGraph::class -> LineGraph().apply {
                         title = chartNameField.text
                         this.yAxisLabel = yAxisNameField.text

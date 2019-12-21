@@ -40,6 +40,7 @@ open class Settings {
     )
 
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
+        AngleGraph::class,
         CurrentValueGraph::class,
         DistributionGraph::class,
         LineGraph::class,

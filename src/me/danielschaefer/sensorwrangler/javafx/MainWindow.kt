@@ -302,6 +302,30 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun createFxChart(chart: Chart): Node? {
         return when (chart) {
+            is AngleGraph -> {
+                PieChart().apply {
+                    val startAngleOffset = if (chart.horizontal) 0.0 else 90.0
+                    animated = false
+                    startAngle = startAngleOffset
+                    labelsVisible = false
+
+                    val leftData = PieChart.Data("Foreground", 50.0)
+                    val rightData = PieChart.Data("Background", 50.0)
+
+                    // Show data from now until chart.windowSize ago
+                    addGraphUpdater(this) {
+                        // Get latest value that is before the current slider selection
+                        // The assumption is that the list of data points is sorted by timestamp
+                        // TODO: Measurements should have a second list of the sorted list
+                        val sortedDataPoints = chart.axis.dataPoints
+                        val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+
+                        startAngle = (latestDataPoint?.value ?: 0.0) + startAngleOffset
+                    }
+
+                    data = FXCollections.observableArrayList(listOf(leftData, rightData))
+                }
+            }
             is CurrentValueGraph -> {
                 GridPane().apply {
                     vgap = 20.0

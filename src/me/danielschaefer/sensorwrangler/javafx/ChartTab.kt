@@ -64,6 +64,13 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                         )
 
                         when (selectedChart) {
+                            is AngleGraph -> {
+                                items.addAll(
+                                    TableRow("Sensor", selectedChart.axis.sensor.title),
+                                    TableRow("Measurement", selectedChart.axis.description),
+                                    TableRow("Orientation", if (selectedChart.horizontal) "Horizontal" else "Vertical")
+                                )
+                            }
                             is BarGraph -> {
                                 items.addAll(
                                     TableRow("Y-axis label", selectedChart.yAxisLabel),

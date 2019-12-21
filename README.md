@@ -31,6 +31,7 @@ It should be easy, to add new sensors and export targets.
   - Pause, continue and jump-to-now time travelling
   - Cusomizable number of charts
   - Charts
+    - Angle chart
     - Line chart
     - Scatter chart
     - Bar chart
@@ -144,6 +145,7 @@ Opens a TCP socket and writes CSV formatted lines to client sockets.
 ## Charts
 See the above GIF for examples.
 
+- Angle chart
 - Line chart
 - Scatter chart
 - Bar chart
