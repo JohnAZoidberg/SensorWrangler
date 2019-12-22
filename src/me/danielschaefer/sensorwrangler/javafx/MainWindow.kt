@@ -347,6 +347,45 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     }
                 }
             }
+            is BarDistributionGraph -> {
+                val yAxis = CategoryAxis().apply {
+                    animated = false
+                }
+                val xAxis = NumberAxis().apply {
+                    animated = false
+                    isAutoRanging = false
+                    lowerBound = 0.0
+                    upperBound = 100.0
+                }
+                StackedBarChart(xAxis, yAxis).apply {
+                    title = chart.title
+                    animated = false
+
+                    val leftData = XYChart.Data(50.0 as Number, "Distribution")
+                    val leftSeries = XYChart.Series<Number, String>().apply {
+                        data.addAll(leftData)
+                    }
+
+                    val rightData = XYChart.Data(50.0 as Number, "Distribution")
+                    val rightSeries = XYChart.Series<Number, String>().apply {
+                        data.addAll(rightData)
+                    }
+
+                    data.addAll(leftSeries, rightSeries)
+
+                    // Show data from now until chart.windowSize ago
+                    addGraphUpdater(this) {
+                        // Get latest value that is before the current slider selection
+                        // The assumption is that the list of data points is sorted by timestamp
+                        // TODO: Measurements should have a second list of the sorted list
+                        val sortedDataPoints = chart.axis.dataPoints
+                        val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+
+                        rightData.xValue = latestDataPoint?.value ?: 50
+                        leftData.xValue = 100.0 - rightData.xValue.toDouble()
+                    }
+                }
+            }
             is BarGraph -> {
                 val xAxis = CategoryAxis().apply {
                     //label = chart.axisNames[0]
@@ -457,7 +496,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     }
                 }
             }
-            is DistributionGraph -> {
+            is PieDistributionGraph -> {
                 PieChart().apply {
                     animated = false
                     startAngle = -90.0

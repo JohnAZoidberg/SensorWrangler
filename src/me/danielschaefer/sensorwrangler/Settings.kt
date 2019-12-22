@@ -41,11 +41,12 @@ open class Settings {
 
     val supportedCharts: MutableList<KClass<out Chart>> = mutableListOf(
         AngleGraph::class,
+        BarDistributionGraph::class,
+        BarGraph::class,
         CurrentValueGraph::class,
-        DistributionGraph::class,
         LineGraph::class,
-        ScatterGraph::class,
-        BarGraph::class
+        PieDistributionGraph::class,
+        ScatterGraph::class
     )
 
     // TODO: Think about how to have preferences of sensors of plugins

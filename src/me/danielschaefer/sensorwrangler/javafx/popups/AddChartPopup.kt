@@ -266,7 +266,11 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         title = chartNameField.text
                         axes = selectedMeasurements
                     }
-                    DistributionGraph::class -> DistributionGraph().apply {
+                    BarDistributionGraph::class -> BarDistributionGraph().apply {
+                        title = chartNameField.text
+                        axis = selectedMeasurements.first()
+                    }
+                    PieDistributionGraph::class -> PieDistributionGraph().apply {
                         title = chartNameField.text
                         axis = selectedMeasurements.first()
                     }

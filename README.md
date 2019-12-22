@@ -36,7 +36,8 @@ It should be easy, to add new sensors and export targets.
     - Scatter chart
     - Bar chart
     - Current value chart
-    - Distribution chart
+    - Bar Distribution chart
+    - Pie Distribution chart
 - Combine measurements of sensors
   - Average of multiple measurements
 - Extensibility: Easily add new Sensors, Charts and Recorders
@@ -154,6 +155,9 @@ See the above GIF for examples.
 - Distribution chart
   - Shows the distribution between left and right values
   - Measurement value is of range 0 - 100, which signifies percentage of "right"
+  - Visualization types
+    - Pie chart
+    - Bar chart
 
 ### Customizable grid
 The charts are displayed in a grid, which is 2x2 in size, by default.
