@@ -52,6 +52,7 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
 
     enum class Unit {
         BPM,
+        DEGREE,
         METER,
         METER_PER_SECOND,
         PERCENTAGE,
@@ -62,6 +63,7 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
         override fun toString(): String {
             return when (this) {
                 BPM -> "BPM"
+                DEGREE -> "Degree"
                 METER -> "Meter"
                 METER_PER_SECOND -> "Meter per second"
                 PERCENTAGE -> "Percentage"
@@ -74,6 +76,7 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
         val abbreviation: String
             get() = when (this) {
                 BPM -> "BPM"
+                DEGREE -> "°"
                 METER -> "m"
                 METER_PER_SECOND -> "m/s"
                 PERCENTAGE -> "%"
