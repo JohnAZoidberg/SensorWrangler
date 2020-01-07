@@ -39,7 +39,7 @@ It should be easy, to add new sensors and export targets.
     - Line chart
     - Scatter chart
     - Bar chart
-    - Current value chart
+    - Table chart
     - Bar Distribution chart
     - Pie Distribution chart
 - Combine measurements of sensors
@@ -166,8 +166,13 @@ See the above GIF for examples.
 - Line chart
 - Scatter chart
 - Bar chart
-- Current value chart
-  - Shows the current values of multiple measurements
+- Table chart
+  - Shows numerical values of multiple measurements
+    - Current value
+    - Minum value
+    - Maximum value
+    - Average value
+    - Average of last N seconds
 - Distribution chart
   - Shows the distribution between left and right values
   - Measurement value is of range 0 - 100, which signifies percentage of "right"

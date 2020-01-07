@@ -326,24 +326,41 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     data = FXCollections.observableArrayList(listOf(leftData, rightData))
                 }
             }
-            is CurrentValueGraph -> {
+            is TableGraph -> {
                 GridPane().apply {
                     vgap = 20.0
                     hgap = 20.0
 
+                    addRow(0, Text(), Text("Current"), Text("Min"), Text("Max"), Text("Total Avg"), Text("Last ${chart.lastNAvgWindow / 1_000} s Avg"))
                     chart.axes.forEachIndexed { row, axis ->
-                        val text = Text(axis.description)
-                        val value = Text()
+                        val titleText = Text(axis.description)
+                        val currentText = Text()
+                        val minText = Text()
+                        val maxText = Text()
+                        val totalAvgText = Text()
+                        val lastNSecAvg = Text()
 
                         // Show current value
                         addGraphUpdater(this) {
+                            // TODO: All of this calculation should happen in the chart
                             // We assume they're already sorted by timestamp, this is not necessarily the case
-                            val sortedDataPoints = axis.dataPoints
-                            val latestDataPoint = sortedDataPoints.lastOrNull { it.timestamp < timeSlider.value }
+                            val filteredDataPoints = axis.dataPoints.filter { it.timestamp < timeSlider.value }
+                            val latestDataPoint = filteredDataPoints.lastOrNull()
 
-                            value.text = "${(latestDataPoint?.value ?: 0.0)}${axis.unit.unitAppendix}"
+                            val filteredValues = filteredDataPoints.map { it.value }
+
+                            currentText.text = "${(latestDataPoint?.value ?: 0.0)}${axis.unit.unitAppendix}"
+                            // TODO: Is probably very inefficient for large measurements
+                            minText.text = filteredValues.min().toString()
+                            maxText.text = filteredValues.max().toString()
+                            totalAvgText.text = "%.1f".format(filteredValues.average())
+                            lastNSecAvg.text = "%.1f".format(filteredDataPoints
+                                .filter { it.timestamp < timeSlider.value
+                                       && it.timestamp > timeSlider.value - chart.lastNAvgWindow }
+                                .map { it.value }
+                                .average())
                         }
-                        addRow(row, text, value)
+                        addRow(row + 1, titleText, currentText, minText, maxText, totalAvgText, lastNSecAvg)
                     }
                 }
             }

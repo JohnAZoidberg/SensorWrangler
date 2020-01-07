@@ -84,7 +84,7 @@ class ChartTab(parentStage: Stage): Tab("Charts") {
                                     )
                                 }
                             }
-                            is CurrentValueGraph -> {
+                            is TableGraph -> {
                                 selectedChart.axes.forEachIndexed { i, yAxis ->
                                     items.addAll(
                                         TableRow("Y-axis $i sensor", yAxis.sensor.title),

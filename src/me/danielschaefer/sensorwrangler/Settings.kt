@@ -43,10 +43,10 @@ open class Settings {
         AngleGraph::class,
         BarDistributionGraph::class,
         BarGraph::class,
-        CurrentValueGraph::class,
         LineGraph::class,
         PieDistributionGraph::class,
-        ScatterGraph::class
+        ScatterGraph::class,
+        TableGraph::class
     )
 
     // TODO: Think about how to have preferences of sensors of plugins

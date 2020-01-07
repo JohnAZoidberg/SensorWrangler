@@ -73,6 +73,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
     private val verticalButton = RadioButton("Vertical").apply {
         toggleGroup = horizontalGroup
     }
+    private val lastNSecondsAvgField = TextField("60")
     private val typeDropdown = ComboBox<KClass<out Chart>>()
 
     init {
@@ -90,6 +91,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
         val windowSizeLabel = Label("Window Size [s]")
         val withDotsLabel = Label("With dots")
         val horizontalLabel = Label("Orientation")
+        val lastNSecondsAvgLabel = Label("Average last N seconds")
 
         val addMeasurementButton = Button("Add y-axis measurement").apply {
             setOnAction {
@@ -114,6 +116,8 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                 lowerBoundField.isVisible = false
                 horizontalLabel.isVisible = false
                 horizontalButton.isVisible = false
+                lastNSecondsAvgLabel.isVisible = false
+                lastNSecondsAvgField.isVisible = false
                 verticalButton.isVisible = false
                 yAxisNameField.isVisible = false
                 yAxisNameLabel.isVisible = false
@@ -125,8 +129,10 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         horizontalButton.isVisible = true
                         verticalButton.isVisible = true
                     }
-                    newChart == CurrentValueGraph::class -> {
+                    newChart == TableGraph::class -> {
                         addMeasurementButton.isDisable = false
+                        lastNSecondsAvgLabel.isVisible = true
+                        lastNSecondsAvgField.isVisible = true
                     }
                     newChart == BarGraph::class -> {
                         lowerBoundLabel.isVisible = true
@@ -198,6 +204,9 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             add(horizontalLabel, 0, row)
             add(horizontalButton, 1, row++)
 
+            add(lastNSecondsAvgLabel, 0, row)
+            add(lastNSecondsAvgField, 1, row++)
+
             add(verticalButton, 1, row++)
 
             add(yAxisNameLabel, 0, row)
@@ -262,9 +271,10 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
                         lowerBound = lowerBoundField.text.toDouble()
                         upperBound = upperBoundField.text.toDouble()
                     }
-                    CurrentValueGraph::class -> CurrentValueGraph().apply {
+                    TableGraph::class -> TableGraph().apply {
                         title = chartNameField.text
                         axes = selectedMeasurements
+                        lastNAvgWindow = lastNSecondsAvgField.text.toInt() * 1_000
                     }
                     BarDistributionGraph::class -> BarDistributionGraph().apply {
                         title = chartNameField.text
