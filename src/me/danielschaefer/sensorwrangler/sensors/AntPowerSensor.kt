@@ -1,7 +1,5 @@
 package me.danielschaefer.sensorwrangler.sensors
 
-import be.glever.ant.channel.AntChannelId
-import be.glever.ant.constants.AntPlusDeviceType
 import be.glever.ant.message.AntMessage
 import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
@@ -37,8 +35,6 @@ class AntPowerSensor: AntPlusSensor<PowerChannel>() {
         torqueBarycenterAngleMeasurement)
 
     override val registry: AbstractDataPageRegistry = PowerDataPageRegistry()
-
-    override val deviceType = AntPlusDeviceType.Power
 
     override fun handleDevSpecificMessage(antMessage: AntMessage?) {
         if (antMessage !is BroadcastDataMessage)
@@ -101,8 +97,8 @@ class AntPowerSensor: AntPlusSensor<PowerChannel>() {
         }
     }
 
-    override fun createChannel(usbDevice: AntUsbDevice, channelId: AntChannelId): PowerChannel {
-        return PowerChannel(usbDevice, channelId.deviceNumber)
+    override fun createChannel(device: AntUsbDevice): PowerChannel {
+        return PowerChannel(device)
     }
 
     private fun removeToggleBit(payload: ByteArray) {
