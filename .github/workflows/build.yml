@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         #os: [macos-latest, windows-latest, ubuntu-latest]
-        os: [ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
         bazelisk: [1.11.0]
         bazel: [4.2.2]
     steps:
@@ -48,5 +48,5 @@ jobs:
       - name: Save executable artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Gui_deploy.jar
+          name: "Gui_deploy_${{ matrix.os }}.jar.zip"
           path: bazel-bin/Gui_deploy.jar
