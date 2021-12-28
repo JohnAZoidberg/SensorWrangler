@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 rules_kotlin_version = "v1.5.0-beta-4"
 rules_kotlin_sha = "6cbd4e5768bdfae1598662e40272729ec9ece8b7bded8f0d2c81c8ff96dc139d"
@@ -47,8 +48,6 @@ maven_install(
 #        "exposed-jdbc-0.18.1
 #        "joda-time:joda-time:2.5"
 #        "org.postgresql:postgresql:42.2.5"
-#        # Connecting to ANT+ sensors
-#        # TODO: Build it from source [j-antplus](https://github.com/glever/j-antplus)
 #        # Logging (also run-time dependency of some other dependencies)
 #        "org.slf4j:slf4j-api:1.7.11"
     ],
@@ -63,3 +62,36 @@ http_archive(
     sha256 = "4ba8f4ab0ff85f2484287ab06c0d871dcb31cc54d439457d28fd4ae14b18450a",
     url = "https://github.com/bazelbuild/rules_pkg/releases/download/0.2.4/rules_pkg-0.2.4.tar.gz",
 )
+
+### j-antplus dependency ###
+# Multiple ways of getting it.
+
+# For local development.
+# Needs a BUILD and WORKSPACE file (give in the bazel branch of JohnAZoidberg/j-antplus)
+#local_repository(
+#    name = "j_antplus",
+#    path = "/home/zoid/cloudhome/projects/sensorwrangler/j-antplus",
+#)
+
+new_git_repository(
+    name = "j_antplus",
+    # Optionally use the bazel branch with BUILD and WORKSPACE file,
+    # or use the j-antplus.BUILD file in this repo.
+    #commit = "be48a010c5020b0c6a123847061a3569ecfbac28", # bazel branch
+
+    commit = "6c7dddc809303fd664bb3ab8f1197a40731578ef", # master branch
+    remote = "https://github.com/johnazoidberg/j-antplus",
+    build_file = "@//:j-antplus.BUILD",
+)
+
+# http_archive is preferreed to new_git_repository.
+# See: https://docs.bazel.build/versions/main/external.html#repository-rules
+## TODO: Doesn't work. Not sure why. Can't find the BUILD file in the other repo
+#jantplus_rev = "be48a010c5020b0c6a123847061a3569ecfbac28"
+#http_archive(
+#    name = "j_antplus",
+#    url = "https://github.com/JohnAZoidberg/j-antplus/archive/%s.tar.gz" % jantplus_rev,
+#    #sha256 = "8d0ae32b26a8229b8bef650e56811ed6efb36b9695c182a7f1d8c878b2d1be5a",
+#    # TODO: Also doesn't work because then it can't find the dependencies
+#    #build_file = "@//:j-antplus.BUILD",
+#)
