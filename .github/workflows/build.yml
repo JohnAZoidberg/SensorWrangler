@@ -1,0 +1,40 @@
+name: Build SensorWrangler with Bazel
+on:
+  push:
+    branches:
+      - github-actions
+
+jobs:
+  setup-versions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        #os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [ubuntu-latest]
+        bazelisk: [1.11.0]
+        bazel: [4.2.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Mount bazel cache  # Optional
+        uses: actions/cache@v2
+        with:
+          path: "~/.cache/bazel"
+          key: bazel
+
+      - name: Build GUI
+        run: bazel build //:Gui
+        shell: bash
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.bazel }}
+
+      - name: Build CLI
+        run: bazel build //:Cli
+        shell: bash
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.bazel }}
