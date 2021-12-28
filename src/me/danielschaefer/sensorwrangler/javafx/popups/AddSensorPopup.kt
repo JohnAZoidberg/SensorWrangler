@@ -1,7 +1,5 @@
 package me.danielschaefer.sensorwrangler.javafx.popups
 
-import be.glever.ant.channel.AntChannelId
-import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.geometry.Insets
 import javafx.scene.Node
@@ -14,18 +12,20 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
 import me.danielschaefer.sensorwrangler.javafx.SensorTab
-import me.danielschaefer.sensorwrangler.sensors.*
+import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.*
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.isSubtypeOf
 
 
 class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): Stage() {
@@ -38,14 +38,6 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
         sizeToScene()
         show()
     }
-
-    private lateinit var scanResultList: ListView<ScanResult>
-
-    private lateinit var scanButton: Button
-    private lateinit var scanBox: VBox
-    private var currentSensor: KClass<out Sensor>? = null
-    private lateinit var useScanToggle: CheckBox
-    private lateinit var scanningIndicator: ProgressIndicator
 
     private fun constructContent(): Parent {
         val addSensorButton = Button("Add sensor")
@@ -67,23 +59,13 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
             items.addAll(App.instance.settings.supportedSensors)
             converter = JavaFXUtil.createSimpleClassStringConverter<Sensor>()
 
-            valueProperty().addListener(ChangeListener { _, _, selectedSensor ->
-                currentSensor = selectedSensor
-
+            valueProperty().addListener(ChangeListener { _, _, newChart ->
                 sensorConfiguration.children.clear()
                 var sensorRow = 0
                 connectionConfiguration.children.clear()
                 var connectionRow = 0
 
-                val isScannable = selectedSensor.isSubclassOf(Scannable::class)
-                scanBox.isVisible = isScannable
-                scanButton.isVisible = isScannable
-                scanningIndicator.isVisible = isScannable
-
-                // TODO: Scan only for selected sensor type
-                //scanResultList.items.clear()
-
-                val mutableProperties = selectedSensor.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
+                val mutableProperties = newChart.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
                 val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
                 for (property in mutableProperties) {
                     for (annotation in property.annotations) {
@@ -164,13 +146,27 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
                     }
                 }
                 addSensorButton.setOnAction {
-                    if (addSensor(selectedSensor, propertyMap))
-                        close()
+                    val newSensor = newChart.createInstance()
+                    for ((property, getValue) in propertyMap) {
+                        val propertyValue = getValue()
+                        if (propertyValue == null) {
+                            // TODO: Show what the actual problem is
+                            Alert(parentStage, "Form invalid", "The form isn't properly filled.")
+                            return@setOnAction
+                        }
+
+                        property.setter.call(newSensor, propertyValue)
+                    }
+                    App.instance.wrangler.sensors.add(newSensor)
+
+                    // Select the new sensor if SensorTab is currently shown
+                    sensorTab?.sensorList?.selectionModel?.select(sensorTab.sensorList.items.last())
+
+                    close()
                 }
                 sizeToScene()
             })
         }
-
         val sensorBox = VBox().apply {
             spacing = 10.0
             padding = Insets(10.0)
@@ -183,91 +179,8 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null): 
             children.addAll(Text("Connection options"), connectionConfiguration)
         }
 
-        scanResultList = ListView<ScanResult>().apply {
-            prefHeight = 24.0 * 3;
-        }
-
-        useScanToggle = CheckBox()
-        scanBox = VBox().apply {
-            spacing = 10.0
-            padding = Insets(10.0)
-
-            children.addAll(scanResultList)
-            isVisible = false
-        }
-
-        scanningIndicator = ProgressIndicator().apply {
-            progress = 0.0
-            isVisible = false
-        }
-        val buttonBox = HBox().apply {
-            spacing = 10.0
-            padding = Insets(10.0)
-            scanButton = Button("Scan").apply {
-                isVisible = false
-                setOnAction {
-                    currentSensor?.let { cls ->
-                        val scanner = (cls.createInstance() as Scannable<ScanResult>)
-                        scanner.getScanStatusProperty().addListener { _, oldScanning, newScanning ->
-                            Platform.runLater {
-                                if (!oldScanning && newScanning) {
-                                    scanningIndicator.progress = -1.0
-                                    scanButton.isDisable = true
-                                }
-
-                                if (oldScanning && !newScanning) {
-                                    scanningIndicator.progress = 1.0
-                                    scanButton.isDisable = false
-                                }
-                            }
-                        }
-                        scanner.scan(scanResultList.items)
-                    }
-                    sizeToScene()
-                }
-            }
-           children.addAll(addSensorButton, scanButton, scanningIndicator)
-        }
-
-        return VBox(10.0, sensorTypeSelection, sensorBox, connectionBox, scanBox, buttonBox).apply {
+        return VBox(10.0, sensorTypeSelection, sensorBox, connectionBox, addSensorButton).apply {
             padding = Insets(25.0)
         }
-    }
-
-    private fun addSensor(selectedSensor: KClass<out Sensor>, propertyMap: MutableMap<KMutableProperty<*>, () -> Any?>): Boolean {
-        val newSensor = selectedSensor.createInstance()
-        for ((property, getValue) in propertyMap) {
-            val propertyValue = getValue()
-            if (propertyValue == null) {
-                // TODO: Show what the actual problem is
-                Alert(parentStage, "Form invalid", "The form isn't properly filled.")
-                return false
-            }
-
-            property.setter.call(newSensor, propertyValue)
-        }
-
-        if (newSensor is Scannable<*>) {
-            val selectedScanResult = scanResultList.selectionModel.selectedItem
-            if (selectedScanResult == null) {
-                Alert(parentStage, "Form invalid", "Scanning must be performed and a sensor selected")
-                return false
-            }
-
-            if (selectedScanResult is AntScanResult && newSensor is AntPlusSensor<*>
-                && selectedScanResult.channelId.deviceType != newSensor.deviceType) {
-                Alert(parentStage, "Form invalid", "Device type must match sensor type")
-                return false
-            }
-
-            (newSensor as Scannable<ScanResult>).configureScan(selectedScanResult)
-        }
-
-        App.instance.wrangler.sensors.add(newSensor)
-
-        // Select the new sensor if SensorTab is currently shown
-        sensorTab?.sensorList?.selectionModel?.select(sensorTab.sensorList.items.last())
-
-        return true
     }
 }
