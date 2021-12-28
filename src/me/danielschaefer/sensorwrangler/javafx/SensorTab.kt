@@ -17,7 +17,10 @@ import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
-import me.danielschaefer.sensorwrangler.sensors.*
+import me.danielschaefer.sensorwrangler.sensors.Averager
+import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
+import me.danielschaefer.sensorwrangler.sensors.Sensor
+import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -87,26 +90,11 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
                                     items.add(TableRow("", m.description))
 
                             }
-                            is AntPlusSensor<*> -> {
-                                TableRow("Manufacturer", selectedSensor.getManufacturerName()).apply {
-                                    selectedSensor.manufacturerId.addListener { _, _, _ ->
-                                        lastName = selectedSensor.getManufacturerName()
-                                    }
-                                    items.add(this)
-                                }
-
-                                TableRow("Model", selectedSensor.getModelName()).apply {
-                                    selectedSensor.modelNumber.addListener { _, _, _ ->
-                                        lastName = selectedSensor.getModelName()
-                                    }
-                                    items.add(this)
-                                }
-                            }
                         }
 
                         items.add(TableRow("Measurements", selectedSensor.measurements.size.toString()))
                         items.addAll(selectedSensor.measurements.map {
-                            TableRow("", it.description)
+                            TableRow("", it.description )
                         })
                     }
 
