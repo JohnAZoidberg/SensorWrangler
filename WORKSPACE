@@ -42,7 +42,10 @@ maven_install(
         "org.slf4j:slf4j-api:1.7.11",
         "org.jetbrains.kotlin:kotlin-reflect:1.5.0",
 
-        "org.openjfx:javafx-base:11.0.1",
+        "org.openjfx:javafx-base:linux:11.0.1",
+        "org.openjfx:javafx-controls:linux:11.0.1",
+        "org.openjfx:javafx-graphics:linux:11.0.1",
+
 
         # j-antplus dependencies
         "javax.usb:usb-api:1.0.2",
