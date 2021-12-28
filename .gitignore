@@ -1,3 +1,7 @@
 out/
 .idea
 *.iml
+bazel-bin
+bazel-sensorwrangler
+bazel-out
+bazel-testlogs
