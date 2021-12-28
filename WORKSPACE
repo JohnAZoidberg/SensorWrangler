@@ -87,6 +87,7 @@ new_git_repository(
     #commit = "be48a010c5020b0c6a123847061a3569ecfbac28", # bazel branch
 
     commit = "6c7dddc809303fd664bb3ab8f1197a40731578ef", # master branch
+    shallow_since = "1593867481 +0200",
     remote = "https://github.com/johnazoidberg/j-antplus",
     build_file = "@//:j-antplus.BUILD",
 )
