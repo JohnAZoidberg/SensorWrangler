@@ -66,6 +66,26 @@ Before building, the following dependencies have to be installed:
 
 The project targets JDK11 and Kotlin language version 1.3.
 
+### Building with Bazel
+
+Install:
+
+- Bazel 4.2
+- OpenJDK11
+
+If you have Nix installed, you can get a shell with the dependencies like this:
+
+```
+nix-shell -p gnumake openjdk bazel_4
+```
+
+Run:
+
+```
+bazel build //src/me/danielschaefer/sensorwrangler:Cli \
+  && ./bazel-bin/src/me/danielschaefer/sensorwrangler/Cli
+```
+
 ## Running the jar
 1. Get it from the [releases page](https://github.com/JohnAZoidberg/SensorWrangler/releases)
 2. Download JDK11 from [AdoptOpenJDK](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot)
