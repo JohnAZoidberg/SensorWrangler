@@ -88,11 +88,6 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
 
                             }
                             is AntPlusSensor<*> -> {
-                                TableRow("ANT Device Number", selectedSensor.channelId?.intDeviceNumber?.toString()).apply {
-                                    // No listener - device number shouldn't change
-                                    items.add(this)
-                                }
-
                                 TableRow("Manufacturer", selectedSensor.getManufacturerName()).apply {
                                     selectedSensor.manufacturerId.addListener { _, _, _ ->
                                         lastName = selectedSensor.getManufacturerName()
