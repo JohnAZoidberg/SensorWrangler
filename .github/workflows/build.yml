@@ -38,3 +38,9 @@ jobs:
         shell: bash
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel }}
+
+      - name: Save executable artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Gui_deploy.jar
+          path: bazel-bin/Gui_deploy.jar
