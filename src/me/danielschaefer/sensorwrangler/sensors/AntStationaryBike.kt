@@ -34,7 +34,7 @@ class AntStationaryBike : AntPlusSensor<FecChannel>(){
 
     override val registry = FecDataPageRegistry()
 
-    override fun handleDevSpecificMessage(antMessage: AntMessage?) {
+    override fun handleMessage(antMessage: AntMessage?) {
         if (antMessage is BroadcastDataMessage) {
             val payLoad = antMessage.payLoad
             removeToggleBit(payLoad)

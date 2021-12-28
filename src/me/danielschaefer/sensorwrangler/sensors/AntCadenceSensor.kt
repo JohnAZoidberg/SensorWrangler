@@ -1,7 +1,8 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import be.glever.ant.message.AntMessage
+import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
-import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.speedcadence.CadenceChannel
 import be.glever.antplus.speedcadence.datapage.AbstractSpeedCadenceDataPage
 import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
@@ -9,7 +10,7 @@ import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import kotlin.random.Random
 
-class AntCadenceSensor : AntSpeedCadenceSensor<CadenceChannel>(){
+class AntCadenceSensor : AntPlusSensor<CadenceChannel>(){
     override val title: String = "AntCadenceSensor" + Random.nextInt(0, 100)
 
     private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply{
@@ -20,6 +21,10 @@ class AntCadenceSensor : AntSpeedCadenceSensor<CadenceChannel>(){
     private var prevCadenceRevCount = 0
     private var firstCadenceRevCount = 0
     private var prevCadenceEventTime: Long = 0
+
+    private fun removeToggleBit(payload: ByteArray) {
+        payload[0] = (127 and payload[0].toInt()).toByte()
+    }
 
     override fun createChannel(device: AntUsbDevice): CadenceChannel {
         // Reset everything to 0 on connect
@@ -33,10 +38,15 @@ class AntCadenceSensor : AntSpeedCadenceSensor<CadenceChannel>(){
 
     override val registry = SpeedCadenceDataPageRegistry()
 
-    override fun handleSpeedCadenceDataPage(dataPage: AbstractAntPlusDataPage) {
-        when (dataPage) {
-            is AbstractSpeedCadenceDataPage ->
+    override fun handleMessage(antMessage: AntMessage?) {
+        if (antMessage is BroadcastDataMessage) {
+            val payLoad = antMessage.payLoad
+            removeToggleBit(payLoad)
+
+            val dataPage = registry.constructDataPage(payLoad)
+            if (dataPage is AbstractSpeedCadenceDataPage) {
                 calcCadence(dataPage)
+            }
         }
     }
 
