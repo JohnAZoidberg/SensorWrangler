@@ -81,9 +81,14 @@ nix-shell -p gnumake openjdk bazel_4
 
 Run:
 
-```
+```sh
+# Commandline
 bazel build //src/me/danielschaefer/sensorwrangler:Cli \
   && ./bazel-bin/src/me/danielschaefer/sensorwrangler/Cli
+
+# GUI (JavaFX)
+bazel build //src/me/danielschaefer/sensorwrangler:Gui \
+  && ./bazel-bin/src/me/danielschaefer/sensorwrangler/Gui
 ```
 
 ## Running the jar

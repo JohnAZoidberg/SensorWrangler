@@ -1,6 +1,8 @@
+# IntelliJ IDEA
 out/
 .idea
 *.iml
+# Bazel
 bazel-bin
 bazel-sensorwrangler
 bazel-out
