@@ -351,8 +351,8 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
                             currentText.text = "${(latestDataPoint?.value ?: 0.0)}${axis.unit.unitAppendix}"
                             // TODO: Is probably very inefficient for large measurements
-                            minText.text = filteredValues.min().toString()
-                            maxText.text = filteredValues.max().toString()
+                            minText.text = filteredValues.minOrNull().toString()
+                            maxText.text = filteredValues.maxOrNull().toString()
                             totalAvgText.text = "%.1f".format(filteredValues.average())
                             lastNSecAvg.text = "%.1f".format(filteredDataPoints
                                 .filter { it.timestamp < timeSlider.value
