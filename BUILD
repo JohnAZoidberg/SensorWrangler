@@ -13,10 +13,22 @@ java_library(
         "@maven//:org_postgresql_postgresql",
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
+
         "@maven//:org_openjfx_javafx_base",
-        "@maven//:org_openjfx_javafx_controls",
         "@maven//:org_openjfx_javafx_graphics",
-    ],
+        "@maven//:org_openjfx_javafx_controls",
+    ] + select({
+        "@platforms//os:linux": [
+            "@maven//:org_openjfx_javafx_base_linux",
+            "@maven//:org_openjfx_javafx_controls_linux",
+            "@maven//:org_openjfx_javafx_graphics_linux",
+        ],
+        "@platforms//os:windows": [
+           "@maven//:org_openjfx_javafx_graphics_win",
+           "@maven//:org_openjfx_javafx_base_win",
+           "@maven//:org_openjfx_javafx_controls_win",
+        ],
+    }),
 )
 
 java_binary(

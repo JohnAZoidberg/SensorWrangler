@@ -43,8 +43,17 @@ maven_install(
         "org.jetbrains.kotlin:kotlin-reflect:1.5.0",
 
         "org.openjfx:javafx-base:11.0.1",
+        "org.openjfx:javafx-base:win:11.0.1",
+        "org.openjfx:javafx-base:linux:11.0.1",
+
         "org.openjfx:javafx-controls:11.0.1",
+        "org.openjfx:javafx-controls:win:11.0.1",
+        "org.openjfx:javafx-controls:linux:11.0.1",
+
         "org.openjfx:javafx-graphics:11.0.1",
+        "org.openjfx:javafx-graphics:win:11.0.1",
+        "org.openjfx:javafx-graphics:linux:11.0.1",
+        "org.openjfx:javafx-graphics:mac:11.0.1",
 
 
         # j-antplus dependencies
