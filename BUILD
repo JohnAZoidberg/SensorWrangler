@@ -19,6 +19,5 @@ java_library(
         #"@maven//:joda-time:joda-time:2.5"
         #"@maven//:org.postgresql:postgresql:42.2.5"
         #"@maven//:org.slf4j:slf4j-api:1.7.11"
-        # TODO: j-antplus
     ],
 )
