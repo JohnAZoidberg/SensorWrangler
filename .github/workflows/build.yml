@@ -39,6 +39,12 @@ jobs:
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel }}
 
+      - name: Build GUI deploy JAR (all dependencies bundled)
+        run: bazel build --java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 //:Gui_deploy.jar
+        shell: bash
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.bazel }}
+
       - name: Save executable artifacts
         uses: actions/upload-artifact@v2
         with:
