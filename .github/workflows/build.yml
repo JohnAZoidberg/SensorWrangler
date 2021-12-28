@@ -27,14 +27,14 @@ jobs:
           path: "~/.cache/bazel"
           key: bazel
 
-      - name: Build GUI
-        run: bazel build //src/me/danielschaefer/sensorwrangler:Gui
+      - name: Build CLI
+        run: bazel build --java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 //src/me/danielschaefer/sensorwrangler:Cli
         shell: bash
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel }}
 
-      - name: Build CLI
-        run: bazel build //src/me/danielschaefer/sensorwrangler:Cli
+      - name: Build GUI
+        run: bazel build --java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 //src/me/danielschaefer/sensorwrangler:Gui
         shell: bash
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel }}
