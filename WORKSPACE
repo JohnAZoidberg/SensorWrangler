@@ -27,33 +27,40 @@ http_archive(
 load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
+    # TODO: Try to update the versions
     artifacts = [
-        #"com.expedia:graphql-kotlin:1.0.0-RC5",
-        #"com.expedia:graphql-kotlin-schema-generator:1.0.0-RC5",
-        #"com.expedia:graphql-kotlin-federation:1.0.0-RC5",
-        #"com.graphql-java:graphql-java:13.0",
-        #"org.opentest4j:opentest4j:1.1.1",
-        #"org.apiguardian:apiguardian-api:1.0.0",
-        #"org.junit.platform:junit-platform-commons:1.4.2",
-        #"org.junit.jupiter:junit-jupiter-api:5.4.2",
-        #"org.junit.jupiter:junit-jupiter-params:5.4.2",
-        #"org.apache.logging.log4j:log4j-core:2.16.0",
-        # SensorWrangler
-#        # For saving the configuration
-#        "com.fasterxml.jackson.core:jackson-databind:2.10.1"
-#        # *Tail*ing a file
-#        "commons-io:commons-io:2.6"
-#        # Recording to databases
-#        "exposed-core-0.18.1"
-#        "exposed-jdbc-0.18.1
-#        "joda-time:joda-time:2.5"
-#        "org.postgresql:postgresql:42.2.5"
-#        # Logging (also run-time dependency of some other dependencies)
-#        "org.slf4j:slf4j-api:1.7.11"
+        # For saving the configuration
+        "com.fasterxml.jackson.core:jackson-databind:2.10.1",
+        # *Tail*ing a file
+        "commons-io:commons-io:2.6",
+        # Recording to databases
+        "com.github.JetBrains.Exposed:exposed-core:0.18.1",
+        "com.github.JetBrains.Exposed:exposed-jdbc:0.18.1",
+        "joda-time:joda-time:2.5",
+        "org.postgresql:postgresql:42.2.5",
+        # Logging (also run-time dependency of some other dependencies)
+        "org.slf4j:slf4j-api:1.7.11",
+        "org.jetbrains.kotlin:kotlin-reflect:1.5.0",
+
+        "org.openjfx:javafx-base:11.0.1",
+        "org.openjfx:javafx-controls:11.0.1",
+        "org.openjfx:javafx-graphics:11.0.1",
+
+
+        # j-antplus dependencies
+        "javax.usb:usb-api:1.0.2",
+        # slf4j already present above
+        "io.projectreactor:reactor-core:3.3.4.RELEASE",
+        "org.reactivestreams:reactive-streams:1.0.3",
+        "org.usb4java:usb4java:1.3.0",
+        "ch.qos.logback:logback-core:1.2.3",
+        "ch.qos.logback:logback-classic:1.2.3",
+        "junit:junit:4.13", # Only for testing
     ],
     repositories = [
         "https://maven-central.storage.googleapis.com/repos/central/data/",
         "https://repo1.maven.org/maven2",
+        "https://jitpack.io",
     ],
 )
 

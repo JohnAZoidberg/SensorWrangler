@@ -4,10 +4,7 @@ load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
 
 kt_jvm_library(
     name = "app_lib",
-    #srcs = glob(["**/*.kt"]),
-    srcs = [
-      "Cli.kt"
-    ],
+    srcs = glob(["**/*.kt"]) + glob(["**/*.java"]),
     deps = [
         "//:java_deps",
         "@j_antplus//:j_antplus",
@@ -27,5 +24,11 @@ ktlint_fix(
 java_binary(
     name = "Cli",
     main_class = "me.danielschaefer.sensorwrangler.Cli",
+    runtime_deps = [":app_lib"],
+)
+
+java_binary(
+    name = "Gui",
+    main_class = "me.danielschaefer.sensorwrangler.Main",
     runtime_deps = [":app_lib"],
 )
