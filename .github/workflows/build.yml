@@ -2,7 +2,9 @@ name: Build SensorWrangler with Bazel
 on:
   push:
     branches:
-      - github-actions
+      - master
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened  ] # Defaults
 
 jobs:
   setup-versions:
