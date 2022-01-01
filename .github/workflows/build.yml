@@ -1,6 +1,8 @@
 name: Build SensorWrangler with Bazel
 on:
   push:
+    paths-ignore:
+      - README.md
     branches:
       - master
   pull_request:
