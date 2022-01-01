@@ -28,7 +28,7 @@ abstract class AntPlusSensor<T : AntChannel> : Sensor() {
                     }
 
                     createChannel(device).events.doOnNext { handleMessage(it) }.subscribe()
-                    System.`in`.read()  // TODO: Use better method to sleep thread indefinitely
+                    System.`in`.read() // TODO: Use better method to sleep thread indefinitely
                 }
             }
         }

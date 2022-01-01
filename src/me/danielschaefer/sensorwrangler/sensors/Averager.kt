@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.NamedThreadFactory
-import java.util.*
+import java.util.Date
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-class Averager: VirtualSensor() {
+class Averager : VirtualSensor() {
     @JsonProperty("sourceMeasurements")
     var sourceMeasurements: List<Measurement> = listOf()
 
@@ -53,22 +53,25 @@ class Averager: VirtualSensor() {
             return
 
         updater = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
-            scheduleAtFixedRate({
-                Platform.runLater {
-                    val connectedMeasurements = sourceMeasurements.filter { it.sensor.isConnected }
-                    val summedNewVals = connectedMeasurements.fold(0.0) {
-                        acc, m ->
+            scheduleAtFixedRate(
+                {
+                    Platform.runLater {
+                        val connectedMeasurements = sourceMeasurements.filter { it.sensor.isConnected }
+                        val summedNewVals = connectedMeasurements.fold(0.0) {
+                            acc, m ->
                             // Average data points of this measurement during the last $period milliseconds
                             val dataPoints = m.dataPoints.filter {
                                 it.timestamp > Date().time.toDouble() - period.toDouble()
                             }
                             acc + dataPoints.sumOf { it.value } / dataPoints.size
-                    }
+                        }
 
-                    if (connectedMeasurements.isNotEmpty())
-                        measurement?.addDataPoint(summedNewVals / connectedMeasurements.size)
-                }
-            }, 0, period, TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                        if (connectedMeasurements.isNotEmpty())
+                            measurement?.addDataPoint(summedNewVals / connectedMeasurements.size)
+                    }
+                },
+                0, period, TimeUnit.MILLISECONDS
+            ) // 40ms = 25FPS
         }
     }
 }

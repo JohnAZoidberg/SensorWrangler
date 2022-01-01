@@ -5,13 +5,27 @@ import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.CheckBox
+import javafx.scene.control.ComboBox
+import javafx.scene.control.Label
+import javafx.scene.control.RadioButton
+import javafx.scene.control.TextField
+import javafx.scene.control.ToggleGroup
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Measurement
-import me.danielschaefer.sensorwrangler.gui.*
+import me.danielschaefer.sensorwrangler.gui.AngleGraph
+import me.danielschaefer.sensorwrangler.gui.AxisGraph
+import me.danielschaefer.sensorwrangler.gui.BarDistributionGraph
+import me.danielschaefer.sensorwrangler.gui.BarGraph
+import me.danielschaefer.sensorwrangler.gui.Chart
+import me.danielschaefer.sensorwrangler.gui.LineGraph
+import me.danielschaefer.sensorwrangler.gui.PieDistributionGraph
+import me.danielschaefer.sensorwrangler.gui.ScatterGraph
+import me.danielschaefer.sensorwrangler.gui.TableGraph
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.ChartTab
 import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
@@ -19,7 +33,7 @@ import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
-class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage() {
+class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null) : Stage() {
     private val yAxisMeasurements: MutableList<ComboBox<Measurement>> = mutableListOf()
     private val yAxisSensors: MutableList<ComboBox<VirtualSensor>> = mutableListOf()
     private val yAxisUnits: MutableList<Text> = mutableListOf()
@@ -28,26 +42,34 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
     private fun addYAxis() {
         val newAxisIndex = yAxisSensors.size
 
-        yAxisSensors.add(ComboBox<VirtualSensor>().apply {
-            items.setAll(App.instance.wrangler.sensors)
-            valueProperty().addListener(ChangeListener { _, _, selectedSensor ->
-                if (selectedSensor == null)
-                    return@ChangeListener
+        yAxisSensors.add(
+            ComboBox<VirtualSensor>().apply {
+                items.setAll(App.instance.wrangler.sensors)
+                valueProperty().addListener(
+                    ChangeListener { _, _, selectedSensor ->
+                        if (selectedSensor == null)
+                            return@ChangeListener
 
-                yAxisMeasurements[newAxisIndex].items.setAll(selectedSensor.measurements)
-                yAxisUnits[newAxisIndex].text = ""
-                sizeToScene()
-            })
-        })
-        yAxisMeasurements.add(ComboBox<Measurement>().apply {
-            valueProperty().addListener(ChangeListener { _,  _, selectedMeasurement ->
-                if (selectedMeasurement == null)
-                    return@ChangeListener
+                        yAxisMeasurements[newAxisIndex].items.setAll(selectedSensor.measurements)
+                        yAxisUnits[newAxisIndex].text = ""
+                        sizeToScene()
+                    }
+                )
+            }
+        )
+        yAxisMeasurements.add(
+            ComboBox<Measurement>().apply {
+                valueProperty().addListener(
+                    ChangeListener { _, _, selectedMeasurement ->
+                        if (selectedMeasurement == null)
+                            return@ChangeListener
 
-                yAxisUnits[newAxisIndex].text = selectedMeasurement.unit.toString()
-                sizeToScene()
-            })
-        })
+                        yAxisUnits[newAxisIndex].text = selectedMeasurement.unit.toString()
+                        sizeToScene()
+                    }
+                )
+            }
+        )
         yAxisUnits.add(Text())
 
         val newRowIndex = formGrid.rowCount
@@ -103,74 +125,76 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
             items.addAll(App.instance.settings.supportedCharts)
             converter = JavaFXUtil.createSimpleClassStringConverter<Chart>()
 
-            valueProperty().addListener(ChangeListener { _, _, newChart ->
-                withDotsLabel.isVisible = false
-                withDotsField.isVisible = false
-                tickSpacingField.isVisible = false
-                tickSpacingLabel.isVisible = false
-                windowSizeField.isVisible = false
-                windowSizeLabel.isVisible = false
-                lowerBoundLabel.isVisible = false
-                upperBoundField.isVisible = false
-                upperBoundLabel.isVisible = false
-                lowerBoundField.isVisible = false
-                horizontalLabel.isVisible = false
-                horizontalButton.isVisible = false
-                lastNSecondsAvgLabel.isVisible = false
-                lastNSecondsAvgField.isVisible = false
-                verticalButton.isVisible = false
-                yAxisNameField.isVisible = false
-                yAxisNameLabel.isVisible = false
-                addMeasurementButton.isDisable = true
+            valueProperty().addListener(
+                ChangeListener { _, _, newChart ->
+                    withDotsLabel.isVisible = false
+                    withDotsField.isVisible = false
+                    tickSpacingField.isVisible = false
+                    tickSpacingLabel.isVisible = false
+                    windowSizeField.isVisible = false
+                    windowSizeLabel.isVisible = false
+                    lowerBoundLabel.isVisible = false
+                    upperBoundField.isVisible = false
+                    upperBoundLabel.isVisible = false
+                    lowerBoundField.isVisible = false
+                    horizontalLabel.isVisible = false
+                    horizontalButton.isVisible = false
+                    lastNSecondsAvgLabel.isVisible = false
+                    lastNSecondsAvgField.isVisible = false
+                    verticalButton.isVisible = false
+                    yAxisNameField.isVisible = false
+                    yAxisNameLabel.isVisible = false
+                    addMeasurementButton.isDisable = true
 
-                when {
-                    newChart == AngleGraph::class -> {
-                        horizontalLabel.isVisible = true
-                        horizontalButton.isVisible = true
-                        verticalButton.isVisible = true
-                    }
-                    newChart == TableGraph::class -> {
-                        addMeasurementButton.isDisable = false
-                        lastNSecondsAvgLabel.isVisible = true
-                        lastNSecondsAvgField.isVisible = true
-                    }
-                    newChart == BarGraph::class -> {
-                        lowerBoundLabel.isVisible = true
-                        upperBoundField.isVisible = true
-
-                        upperBoundLabel.isVisible = true
-                        lowerBoundField.isVisible = true
-
-                        yAxisNameLabel.isVisible = true
-                        yAxisNameField.isVisible = true
-
-                        addMeasurementButton.isDisable = false
-                    }
-                    newChart.isSubclassOf(AxisGraph::class) -> {
-                        if (newChart == LineGraph::class) {
-                            withDotsLabel.isVisible = true
-                            withDotsField.isVisible = true
+                    when {
+                        newChart == AngleGraph::class -> {
+                            horizontalLabel.isVisible = true
+                            horizontalButton.isVisible = true
+                            verticalButton.isVisible = true
                         }
+                        newChart == TableGraph::class -> {
+                            addMeasurementButton.isDisable = false
+                            lastNSecondsAvgLabel.isVisible = true
+                            lastNSecondsAvgField.isVisible = true
+                        }
+                        newChart == BarGraph::class -> {
+                            lowerBoundLabel.isVisible = true
+                            upperBoundField.isVisible = true
 
-                        tickSpacingField.isVisible = true
-                        tickSpacingLabel.isVisible = true
+                            upperBoundLabel.isVisible = true
+                            lowerBoundField.isVisible = true
 
-                        windowSizeField.isVisible = true
-                        windowSizeLabel.isVisible = true
+                            yAxisNameLabel.isVisible = true
+                            yAxisNameField.isVisible = true
 
-                        lowerBoundLabel.isVisible = true
-                        lowerBoundField.isVisible = true
+                            addMeasurementButton.isDisable = false
+                        }
+                        newChart.isSubclassOf(AxisGraph::class) -> {
+                            if (newChart == LineGraph::class) {
+                                withDotsLabel.isVisible = true
+                                withDotsField.isVisible = true
+                            }
 
-                        upperBoundField.isVisible = true
-                        upperBoundLabel.isVisible = true
+                            tickSpacingField.isVisible = true
+                            tickSpacingLabel.isVisible = true
 
-                        yAxisNameField.isVisible = true
-                        yAxisNameLabel.isVisible = true
+                            windowSizeField.isVisible = true
+                            windowSizeLabel.isVisible = true
 
-                        addMeasurementButton.isDisable = false
+                            lowerBoundLabel.isVisible = true
+                            lowerBoundField.isVisible = true
+
+                            upperBoundField.isVisible = true
+                            upperBoundLabel.isVisible = true
+
+                            yAxisNameField.isVisible = true
+                            yAxisNameLabel.isVisible = true
+
+                            addMeasurementButton.isDisable = false
+                        }
                     }
                 }
-            })
+            )
         }
 
         formGrid = GridPane().apply {
@@ -295,7 +319,7 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null): Stage()
 
         val contentBox = VBox(10.0, formGrid, addButton).apply {
             padding = Insets(25.0)
-            alignment = Pos.CENTER;
+            alignment = Pos.CENTER
         }
         scene = Scene(contentBox)
         title = "Add Chart"

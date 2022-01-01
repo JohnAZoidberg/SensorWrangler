@@ -28,7 +28,7 @@ object JavaFXUtil {
     }
 
     @JvmStatic
-    fun <T : Any>createSimpleClassStringConverter(): StringConverter<KClass<out T>> {
+    fun <T : Any> createSimpleClassStringConverter(): StringConverter<KClass<out T>> {
         return object : StringConverter<KClass<out T>>() {
             override fun toString(value: KClass<out T>?): String? {
                 return value?.simpleName

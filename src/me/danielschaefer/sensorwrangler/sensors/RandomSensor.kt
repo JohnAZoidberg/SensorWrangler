@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-class RandomSensor: Sensor() {
+class RandomSensor : Sensor() {
     override val title: String = "RandomSensor" + Random.nextInt(0, 100)
 
     @JsonProperty("updateInterval")
@@ -20,13 +20,13 @@ class RandomSensor: Sensor() {
 
     @JsonProperty("minValue")
     @SensorProperty(title = "Minimum value")
-    var minValue = -10;
+    var minValue = -10
 
     @JsonProperty("maxValue")
     @SensorProperty(title = "Maximum value")
-    var maxValue = 10;
+    var maxValue = 10
 
-    private val measurement = Measurement(this, 0, Measurement.Unit.UNITLESS).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.UNITLESS).apply {
         description = "Random measurement " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(measurement)
@@ -36,13 +36,16 @@ class RandomSensor: Sensor() {
     override fun specificConnect() {
         // TODO: Tie the lifetime of this to the window
         updater = Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
-            scheduleAtFixedRate({
-                Platform.runLater {
-                    connected = true
-                    val random = ThreadLocalRandom.current().nextInt(minValue, maxValue + 1)
-                    measurement.addDataPoint(random.toDouble())
-                }
-            }, 0, updateInterval, TimeUnit.MILLISECONDS)
+            scheduleAtFixedRate(
+                {
+                    Platform.runLater {
+                        connected = true
+                        val random = ThreadLocalRandom.current().nextInt(minValue, maxValue + 1)
+                        measurement.addDataPoint(random.toDouble())
+                    }
+                },
+                0, updateInterval, TimeUnit.MILLISECONDS
+            )
         }
     }
 

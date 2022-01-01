@@ -12,7 +12,7 @@ import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
 
-open class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() {
+open class Alert(parent: Stage, alertTitle: String, alertText: String) : Stage() {
     init {
         initModality(Modality.APPLICATION_MODAL)
         initOwner(parent)
@@ -25,14 +25,17 @@ open class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() 
         }
         val vBox = VBox(15.0, textLabel, okButton).apply {
             padding = Insets(25.0)
-            alignment = Pos.CENTER;
+            alignment = Pos.CENTER
         }
 
         scene = Scene(vBox)
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, EventHandler {
-            if (it.code == KeyCode.ESCAPE)
-                close()
-        })
+        scene.addEventHandler(
+            KeyEvent.KEY_PRESSED,
+            EventHandler {
+                if (it.code == KeyCode.ESCAPE)
+                    close()
+            }
+        )
         title = alertTitle
 
         sizeToScene()
@@ -40,4 +43,4 @@ open class Alert(parent: Stage, alertTitle: String, alertText: String): Stage() 
     }
 }
 
-class TodoAlert(parent: Stage) : Alert(parent, "TODO", "This functionality is not yet implemented") { }
+class TodoAlert(parent: Stage) : Alert(parent, "TODO", "This functionality is not yet implemented")

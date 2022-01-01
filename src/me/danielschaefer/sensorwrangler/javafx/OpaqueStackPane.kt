@@ -11,10 +11,12 @@ import javafx.scene.layout.StackPane
  */
 class OpaqueStackPane(vararg children: Node) : StackPane(*children) {
     init {
-        this.children.addListener(ListChangeListener {
-            it.next()
-            it.list.forEach { child -> child.isVisible = false }
-            it.list.lastOrNull()?.isVisible = true
-        })
+        this.children.addListener(
+            ListChangeListener {
+                it.next()
+                it.list.forEach { child -> child.isVisible = false }
+                it.list.lastOrNull()?.isVisible = true
+            }
+        )
     }
 }

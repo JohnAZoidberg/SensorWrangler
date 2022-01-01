@@ -2,7 +2,7 @@ package me.danielschaefer.sensorwrangler.gui
 
 import me.danielschaefer.sensorwrangler.Measurement
 
-abstract class AxisGraph: Chart() {
+abstract class AxisGraph : Chart() {
     abstract var yAxisLabel: String
     abstract var yAxes: List<Measurement>
 

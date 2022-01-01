@@ -5,7 +5,7 @@ import java.io.File
 import java.io.FileWriter
 import java.io.Writer
 
-class CsvRecorder(file: File): Recorder {
+class CsvRecorder(file: File) : Recorder {
     private val writer: Writer
 
     init {

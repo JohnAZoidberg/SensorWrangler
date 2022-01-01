@@ -9,23 +9,43 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.Scene
-import javafx.scene.chart.*
+import javafx.scene.chart.BarChart
+import javafx.scene.chart.CategoryAxis
+import javafx.scene.chart.LineChart
+import javafx.scene.chart.NumberAxis
+import javafx.scene.chart.PieChart
+import javafx.scene.chart.ScatterChart
+import javafx.scene.chart.StackedBarChart
+import javafx.scene.chart.XYChart
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
 import javafx.scene.control.Slider
-import javafx.scene.layout.*
+import javafx.scene.layout.ColumnConstraints
+import javafx.scene.layout.GridPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
+import javafx.scene.layout.Region
+import javafx.scene.layout.RowConstraints
+import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import javafx.util.StringConverter
 import me.danielschaefer.sensorwrangler.NamedThreadFactory
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.StringUtil
-import me.danielschaefer.sensorwrangler.gui.*
+import me.danielschaefer.sensorwrangler.gui.AngleGraph
+import me.danielschaefer.sensorwrangler.gui.AxisGraph
+import me.danielschaefer.sensorwrangler.gui.BarDistributionGraph
+import me.danielschaefer.sensorwrangler.gui.BarGraph
 import me.danielschaefer.sensorwrangler.gui.Chart
+import me.danielschaefer.sensorwrangler.gui.LineGraph
+import me.danielschaefer.sensorwrangler.gui.PieDistributionGraph
+import me.danielschaefer.sensorwrangler.gui.ScatterGraph
+import me.danielschaefer.sensorwrangler.gui.TableGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
-import java.util.*
+import java.util.Date
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -54,7 +74,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             )
 
             // TODO: Set an icon for the program - how to embed resources in the .jar?
-            //icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
+            // icons.add(Image(javaClass.getResourceAsStream("ruler.png")))
 
             live.addListener { _, _, newLive ->
                 // If we go slower than 1x, we'll fall behind current time
@@ -82,8 +102,10 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun import() {
         if (!App.instance.wrangler.import(App.instance.settings.configPath)) {
-            Alert(primaryStage, "Import failed",
-                "Failed to import configuration because '${App.instance.settings.configPath}' was not found.")
+            Alert(
+                primaryStage, "Import failed",
+                "Failed to import configuration because '${App.instance.settings.configPath}' was not found."
+            )
             return
         }
 
@@ -100,27 +122,31 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             vgap = 25.0
             padding = Insets(25.0)
 
-            val rows = App.instance.settings.chartGridRows;
-            val cols = App.instance.settings.chartGridCols;
+            val rows = App.instance.settings.chartGridRows
+            val cols = App.instance.settings.chartGridCols
 
-            //val fxChartIterator = fxCharts.iterator()
+            // val fxChartIterator = fxCharts.iterator()
             rowLoop@ for (row in 0 until rows) {
-                rowConstraints.add(RowConstraints().apply {
-                    // Force row to resize, only then will the grid resize to its parent
-                    vgrow = Priority.ALWAYS
-                    // Keep all rows at the same height
-                    percentHeight = 100.0 / rows
-                })
+                rowConstraints.add(
+                    RowConstraints().apply {
+                        // Force row to resize, only then will the grid resize to its parent
+                        vgrow = Priority.ALWAYS
+                        // Keep all rows at the same height
+                        percentHeight = 100.0 / rows
+                    }
+                )
 
                 for (col in 0 until cols) {
                     // Add column only once
                     if (row == 0)
-                        columnConstraints.add(ColumnConstraints().apply {
-                            // Force row to resize, only then will the grid resize to its parent
-                            hgrow = Priority.ALWAYS
-                            // Keep all columns at the same width
-                            percentWidth = 100.0 / cols
-                        })
+                        columnConstraints.add(
+                            ColumnConstraints().apply {
+                                // Force row to resize, only then will the grid resize to its parent
+                                hgrow = Priority.ALWAYS
+                                // Keep all columns at the same width
+                                percentWidth = 100.0 / cols
+                            }
+                        )
 
                     val chartBox = VBox(10.0).apply {
                         alignment = Pos.BOTTOM_CENTER
@@ -128,39 +154,43 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     val stackPane = OpaqueStackPane(Text("No Chart"))
                     val chartDropdown = ComboBox<Chart>().apply {
                         items.addAll(App.instance.wrangler.charts)
-                        App.instance.wrangler.charts.addListener(ListChangeListener {
-                            it.next()
-                            items.addAll(it.addedSubList)
-                            items.removeAll(it.removed)
-                        })
-                        valueProperty().addListener(ChangeListener { _, oldChart, newChart ->
-                            // No need to do anything if we don't switch to a chart
-                            // TODO: Maybe remove the current chart. Except it's not possible to manually select null
-                            if (newChart == null)
-                                return@ChangeListener
-
-                            oldChart?.let {
-                                oldChart.hideOne()
+                        App.instance.wrangler.charts.addListener(
+                            ListChangeListener {
+                                it.next()
+                                items.addAll(it.addedSubList)
+                                items.removeAll(it.removed)
                             }
+                        )
+                        valueProperty().addListener(
+                            ChangeListener { _, oldChart, newChart ->
+                                // No need to do anything if we don't switch to a chart
+                                // TODO: Maybe remove the current chart. Except it's not possible to manually select null
+                                if (newChart == null)
+                                    return@ChangeListener
 
-                            newChart.showOne()
-                            val fxChart = createFxChart(newChart)
-
-                            if (stackPane.children.size > 1)
-                                stackPane.children.remove(1, stackPane.children.size)
-                            stackPane.children.add(fxChart)
-
-                            // TODO: Delete this listener when chart is deselected, then we can also remove `&& chartPane.children.contains(fxChart)`
-                            newChart.shown.addListener { _, _, newShown ->
-                                // Replace deselected chart by transparent pane
-                                if (!newShown && stackPane.children.contains(fxChart)) {
-                                    graphUpdaters.remove(fxChart)
-                                    stackPane.children.remove(fxChart)
-                                    value = null
+                                oldChart?.let {
+                                    oldChart.hideOne()
                                 }
+
+                                newChart.showOne()
+                                val fxChart = createFxChart(newChart)
+
+                                if (stackPane.children.size > 1)
+                                    stackPane.children.remove(1, stackPane.children.size)
+                                stackPane.children.add(fxChart)
+
+                                // TODO: Delete this listener when chart is deselected, then we can also remove `&& chartPane.children.contains(fxChart)`
+                                newChart.shown.addListener { _, _, newShown ->
+                                    // Replace deselected chart by transparent pane
+                                    if (!newShown && stackPane.children.contains(fxChart)) {
+                                        graphUpdaters.remove(fxChart)
+                                        stackPane.children.remove(fxChart)
+                                        value = null
+                                    }
+                                }
+                                println("Switched from chart '$oldChart' to '$newChart'")
                             }
-                            println("Switched from chart '$oldChart' to '$newChart'")
-                        })
+                        )
                     }
 
                     chartBox.children.setAll(stackPane, chartDropdown)
@@ -182,11 +212,13 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             max = min
             value = min
 
-            App.instance.wrangler.addSensorConnectionListener(ConnectionChangeListener { _, connected, _ ->
-                connectedSensors += if (connected) 1 else -1
-                if (connectedSensors > 0)
-                    min = Date().time.toDouble()
-            })
+            App.instance.wrangler.addSensorConnectionListener(
+                ConnectionChangeListener { _, connected, _ ->
+                    connectedSensors += if (connected) 1 else -1
+                    if (connectedSensors > 0)
+                        min = Date().time.toDouble()
+                }
+            )
 
             // No ticks
             isShowTickMarks = false
@@ -227,9 +259,11 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     StartRecordingPopup(primaryStage)
                 }
             }
-            App.instance.wrangler.isRecording.addListener(ChangeListener<Boolean> { _, _, new ->
-                text = if (new) "Stop Recording" else "Start Recording"
-            })
+            App.instance.wrangler.isRecording.addListener(
+                ChangeListener<Boolean> { _, _, new ->
+                    text = if (new) "Stop Recording" else "Start Recording"
+                }
+            )
         }
 
         val selectedTimeLabel = Text()
@@ -253,7 +287,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             items.addAll(-200, -150, -100, -50, 50, 100, 150, 200)
             value = 100
 
-            valueProperty().addListener{ _, _, new ->
+            valueProperty().addListener { _, _, new ->
                 App.instance.settings.chartUpdateMultiplier = new
 
                 // If we go slower than 1x, we'll fall behind current time
@@ -283,20 +317,23 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun updateShownTimeWindow() {
         Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update slider")).apply {
-            scheduleAtFixedRate({
-                timeSlider.max = Date().time.toDouble()
+            scheduleAtFixedRate(
+                {
+                    timeSlider.max = Date().time.toDouble()
 
-                // Don't update the current value if paused
-                if (paused.value)
-                    return@scheduleAtFixedRate
+                    // Don't update the current value if paused
+                    if (paused.value)
+                        return@scheduleAtFixedRate
 
-                if (live.value)
-                    timeSlider.value = Date().time.toDouble()
-                else
-                    timeSlider.value += App.instance.settings.chartUpdatePeriod * (App.instance.settings.chartUpdateMultiplier / 100.0)
+                    if (live.value)
+                        timeSlider.value = Date().time.toDouble()
+                    else
+                        timeSlider.value += App.instance.settings.chartUpdatePeriod * (App.instance.settings.chartUpdateMultiplier / 100.0)
 
-                graphUpdaters.forEach{ (_, updaters) -> updaters.forEach { it() } }
-            }, 0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS)  // 40ms = 25FPS
+                    graphUpdaters.forEach { (_, updaters) -> updaters.forEach { it() } }
+                },
+                0, App.instance.settings.chartUpdatePeriod.toLong(), TimeUnit.MILLISECONDS
+            ) // 40ms = 25FPS
         }
     }
 
@@ -354,11 +391,15 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                             minText.text = "${filteredValues.minOrNull() ?: "-"}"
                             maxText.text = "${filteredValues.maxOrNull() ?: "-"}"
                             totalAvgText.text = "%.1f".format(filteredValues.average())
-                            lastNSecAvg.text = "%.1f".format(filteredDataPoints
-                                .filter { it.timestamp < timeSlider.value
-                                       && it.timestamp > timeSlider.value - chart.lastNAvgWindow }
-                                .map { it.value }
-                                .average())
+                            lastNSecAvg.text = "%.1f".format(
+                                filteredDataPoints
+                                    .filter {
+                                        it.timestamp < timeSlider.value &&
+                                            it.timestamp > timeSlider.value - chart.lastNAvgWindow
+                                    }
+                                    .map { it.value }
+                                    .average()
+                            )
                         }
                         addRow(row + 1, titleText, currentText, minText, maxText, totalAvgText, lastNSecAvg)
                     }
@@ -405,7 +446,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
             }
             is BarGraph -> {
                 val xAxis = CategoryAxis().apply {
-                    //label = chart.axisNames[0]
+                    // label = chart.axisNames[0]
                     animated = false
                     // Long labels are automatically rotated to 90°.
                     // Setting it to 0° doesn't change that behaviour *shrug*
@@ -419,7 +460,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     upperBound = chart.upperBound
                 }
                 BarChart(xAxis, fxYAxis).apply {
-                    title = chart.title  // TODO: Actually we don't need this at all, since the combo box already shows it
+                    title = chart.title // TODO: Actually we don't need this at all, since the combo box already shows it
                     animated = false
                     val series = XYChart.Series<String, Number>().apply {
                         name = chart.title
@@ -445,13 +486,13 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     }
 
                     data.add(series)
-                    this.isLegendVisible = false  // It's useless for bar charts
+                    this.isLegendVisible = false // It's useless for bar charts
                 }
             }
             is AxisGraph -> {
                 val xAxis = NumberAxis().apply {
                     isAutoRanging = false
-                    tickUnit = 5_000.0  // Tick mark every 5 seconds
+                    tickUnit = 5_000.0 // Tick mark every 5 seconds
                     animated = false
 
                     tickLabelFormatter = object : StringConverter<Number>() {
@@ -491,17 +532,18 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                             name = yAxis.description ?: "Data"
                         }
 
-
                         series.data = FXCollections.observableList(mutableListOf<XYChart.Data<Number, Number>>())
                         // Fill with past data
                         series.data.addAll(yAxis.dataPoints.map { dp -> XYChart.Data(dp.timestamp as Number, dp.value as Number) })
 
                         // TODO: Maybe we can define some sort of mapping to get rid of the additional listener,
                         //       like the cellFactory, but for charts
-                        yAxis.dataPoints.addListener(ListChangeListener {
-                            it.next()
-                            series.data.addAll(it.addedSubList.map { dp -> XYChart.Data(dp.timestamp as Number, dp.value as Number) })
-                        })
+                        yAxis.dataPoints.addListener(
+                            ListChangeListener {
+                                it.next()
+                                series.data.addAll(it.addedSubList.map { dp -> XYChart.Data(dp.timestamp as Number, dp.value as Number) })
+                            }
+                        )
 
                         fxChart.data.add(series)
 

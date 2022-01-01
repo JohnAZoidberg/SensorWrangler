@@ -3,8 +3,7 @@ package me.danielschaefer.sensorwrangler.gui
 import com.fasterxml.jackson.annotation.JsonProperty
 import me.danielschaefer.sensorwrangler.Measurement
 
-
-class LineGraph: AxisGraph() {
+class LineGraph : AxisGraph() {
     @JsonProperty("title")
     override lateinit var title: String
 

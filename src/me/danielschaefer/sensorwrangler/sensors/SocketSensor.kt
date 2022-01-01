@@ -9,10 +9,10 @@ import java.net.Socket
 import kotlin.concurrent.thread
 import kotlin.random.Random
 
-class SocketSensor: Sensor() {
+class SocketSensor : Sensor() {
     override val title: String = "SocketSensor ${Random.nextInt(0, 100)}"
 
-    private val measurement = Measurement(this, 0, Measurement.Unit.BPM).apply{
+    private val measurement = Measurement(this, 0, Measurement.Unit.BPM).apply {
         description = "HeartRate"
     }
     override val measurements: List<Measurement> = listOf(measurement)
@@ -21,11 +21,11 @@ class SocketSensor: Sensor() {
     private var thread: Thread? = null
 
     @JsonProperty("hostname")
-    @ConnectionProperty(title = "Hostname", default="localhost")
+    @ConnectionProperty(title = "Hostname", default = "localhost")
     var hostname: String = "localhost"
 
     @JsonProperty("port")
-    @ConnectionProperty(title = "Port", default="8080")
+    @ConnectionProperty(title = "Port", default = "8080")
     var port: Int = 8080
 
     override fun specificDisconnect(reason: String?) {
@@ -71,5 +71,4 @@ class SocketSensor: Sensor() {
             disconnect("Socket failed to connect: ${e.message}")
         }
     }
-
 }
