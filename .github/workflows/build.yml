@@ -9,7 +9,33 @@ on:
     types: [ assigned, opened, synchronize, reopened  ] # Defaults
 
 jobs:
-  setup-versions:
+  lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        bazelisk: [1.11.0]
+        bazel: [4.2.2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Mount bazel cache  # Optional
+        uses: actions/cache@v2
+        with:
+          path: "~/.cache/bazel"
+          key: bazel
+
+      - name: Build CLI
+        run: bazel test --test_output=all //src/me/danielschaefer/sensorwrangler:lint_test
+        shell: bash
+        env:
+          USE_BAZEL_VERSION: ${{ matrix.bazel }}
+  build-and-upload:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -43,6 +69,7 @@ jobs:
         env:
           USE_BAZEL_VERSION: ${{ matrix.bazel }}
 
+      # Should be very quick because it's already built. Just need to package it
       - name: Build GUI deploy JAR (all dependencies bundled)
         run: bazel build --java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 --host_java_toolchain=@bazel_tools//tools/jdk:toolchain_java11 //:Gui_deploy.jar
         shell: bash
