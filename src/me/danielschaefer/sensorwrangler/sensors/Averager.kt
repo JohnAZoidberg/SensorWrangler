@@ -62,7 +62,7 @@ class Averager: VirtualSensor() {
                             val dataPoints = m.dataPoints.filter {
                                 it.timestamp > Date().time.toDouble() - period.toDouble()
                             }
-                            acc + dataPoints.sumByDouble { it.value } / dataPoints.size
+                            acc + dataPoints.sumOf { it.value } / dataPoints.size
                     }
 
                     if (connectedMeasurements.isNotEmpty())
