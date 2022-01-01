@@ -18,3 +18,16 @@ java_library(
         "@maven//:org_openjfx_javafx_graphics",
     ],
 )
+
+java_binary(
+    name = "Cli",
+    main_class = "me.danielschaefer.sensorwrangler.Cli",
+    # TODO: Not sure how to include the src/style.css
+    runtime_deps = ["//src/me/danielschaefer/sensorwrangler:cli_lib"],
+)
+
+java_binary(
+    name = "Gui",
+    main_class = "me.danielschaefer.sensorwrangler.Main",
+    runtime_deps = ["//src/me/danielschaefer/sensorwrangler:app_lib"],
+)

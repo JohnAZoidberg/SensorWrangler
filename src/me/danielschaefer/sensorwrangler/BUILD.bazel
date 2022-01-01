@@ -9,11 +9,13 @@ kt_jvm_library(
         "//:java_deps",
         "@j_antplus//:j_antplus",
     ],
+    visibility = ["//visibility:public"],
 )
 
 kt_jvm_library(
     name = "cli_lib",
     srcs = [ "Cli.kt" ],
+    visibility = ["//visibility:public"],
 )
 
 ktlint_test(
@@ -24,16 +26,4 @@ ktlint_test(
 ktlint_fix(
     name = "lint_fix",
     srcs = glob(["**/*.kt"]),
-)
-
-java_binary(
-    name = "Cli",
-    main_class = "me.danielschaefer.sensorwrangler.Cli",
-    runtime_deps = [":cli_lib"],
-)
-
-java_binary(
-    name = "Gui",
-    main_class = "me.danielschaefer.sensorwrangler.Main",
-    runtime_deps = [":app_lib"],
 )

@@ -83,12 +83,12 @@ Run:
 
 ```sh
 # Commandline
-bazel build //src/me/danielschaefer/sensorwrangler:Cli \
-  && ./bazel-bin/src/me/danielschaefer/sensorwrangler/Cli
+bazel build //:Cli \
+  && ./bazel-bin/Cli
 
 # GUI (JavaFX)
-bazel build //src/me/danielschaefer/sensorwrangler:Gui \
-  && ./bazel-bin/src/me/danielschaefer/sensorwrangler/Gui
+bazel build //:Gui \
+  && ./bazel-bin/Gui
 ```
 
 ## Running the jar
