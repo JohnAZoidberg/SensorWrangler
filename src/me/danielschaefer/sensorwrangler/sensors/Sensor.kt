@@ -1,6 +1,5 @@
 package me.danielschaefer.sensorwrangler.sensors
 
-
 /**
  * Abstract Sensor
  *

@@ -1,12 +1,17 @@
 package me.danielschaefer.sensorwrangler.recording
 
 import me.danielschaefer.sensorwrangler.Measurement
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.Connection
 
-object DataPoint: Table() {
+object DataPoint : Table() {
     // TODO: Probably the first 3 cols should be the primary key
     val timestamp = varchar("timestamp", 50).primaryKey()
     val sensor = varchar("sensor", 100)
@@ -20,7 +25,7 @@ object DataPoint: Table() {
  * @param password can be empty
  * @param driver
  */
-class DatabaseRecorder(connection: String, username: String, password: String, driver: String): Recorder {
+class DatabaseRecorder(connection: String, username: String, password: String, driver: String) : Recorder {
     init {
         Database.connect("jdbc:$connection", driver = driver, user = username, password = password)
         // Tell SQLite3 to enforce transactional integrity by serializing writes from different connections
@@ -32,7 +37,7 @@ class DatabaseRecorder(connection: String, username: String, password: String, d
             // print sql to std-out
             addLogger(StdOutSqlLogger)
 
-            SchemaUtils.create (DataPoint)
+            SchemaUtils.create(DataPoint)
 
             DataPoint.insert {
                 it[DataPoint.timestamp] = timestamp

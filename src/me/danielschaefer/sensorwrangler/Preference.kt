@@ -15,6 +15,4 @@ enum class Picker {
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.PROPERTY)
-annotation class Preference(val description: String, val explanation: String, val picker: Picker = Picker.None) {
-
-}
+annotation class Preference(val description: String, val explanation: String, val picker: Picker = Picker.None)

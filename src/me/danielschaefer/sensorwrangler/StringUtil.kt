@@ -4,7 +4,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-
 object StringUtil {
     @JvmStatic
     fun yesNo(bool: Boolean): String {
@@ -22,7 +21,7 @@ object StringUtil {
     @JvmStatic
     fun formatDate(timestamp: Long): String {
         return Instant.ofEpochMilli(timestamp)
-            .atZone(ZoneId.of("GMT+1"))  // TODO: Think about how to deal with TZs
+            .atZone(ZoneId.of("GMT+1")) // TODO: Think about how to deal with TZs
             .format(formatter)
     }
 }

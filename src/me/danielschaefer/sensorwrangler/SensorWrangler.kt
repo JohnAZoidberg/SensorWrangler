@@ -24,11 +24,9 @@ import java.io.FileWriter
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaType
-
 
 class SensorWrangler {
     val isRecording: ReadOnlyBooleanProperty
@@ -36,19 +34,23 @@ class SensorWrangler {
 
     val sensors: ObservableList<VirtualSensor> = FXCollections.observableList(mutableListOf<VirtualSensor>()).apply {
         // Add all listeners to new sensors
-        addListener(ListChangeListener {
-            it.next()
-            it.addedSubList.filterIsInstance<Sensor>().forEach { sensor ->
-                sensorConnectionListeners.forEach { listener -> sensor.addConnectionChangeListener(listener) }
+        addListener(
+            ListChangeListener {
+                it.next()
+                it.addedSubList.filterIsInstance<Sensor>().forEach { sensor ->
+                    sensorConnectionListeners.forEach { listener -> sensor.addConnectionChangeListener(listener) }
+                }
             }
-        })
+        )
     }
     val charts: ObservableList<Chart> = FXCollections.observableList(mutableListOf<Chart>()).apply {
-        addListener(ListChangeListener {
-            it.next()
-            // Remove chart from UI, when it's removed
-            it.removed.forEach { chart -> chart.hideAll() }
-        })
+        addListener(
+            ListChangeListener {
+                it.next()
+                // Remove chart from UI, when it's removed
+                it.removed.forEach { chart -> chart.hideAll() }
+            }
+        )
     }
 
     private val recorders: MutableList<Recorder> = mutableListOf()
@@ -57,15 +59,17 @@ class SensorWrangler {
 
     private val sensorConnectionListeners: ObservableList<ConnectionChangeListener> = FXCollections.observableArrayList(mutableListOf<ConnectionChangeListener>()).apply {
         // Add/remove new listener to/from all sensors
-        addListener(ListChangeListener {
-            it.next()
-            it.addedSubList.forEach { listener ->
-                sensors.filterIsInstance<Sensor>().forEach { sensor -> sensor.addConnectionChangeListener(listener) }
+        addListener(
+            ListChangeListener {
+                it.next()
+                it.addedSubList.forEach { listener ->
+                    sensors.filterIsInstance<Sensor>().forEach { sensor -> sensor.addConnectionChangeListener(listener) }
+                }
+                it.removed.forEach { listener ->
+                    sensors.filterIsInstance<Sensor>().forEach { sensor -> sensor.removeConnectionChangeListener(listener) }
+                }
             }
-            it.removed.forEach { listener ->
-                sensors.filterIsInstance<Sensor>().forEach { sensor -> sensor.removeConnectionChangeListener(listener) }
-            }
-        })
+        )
     }
 
     private val objectMapper = ObjectMapper().apply {
@@ -106,7 +110,7 @@ class SensorWrangler {
                     for (newValue in listChange.addedSubList) {
                         val formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
                         val newDateTime = Instant.ofEpochMilli(newValue.timestamp)
-                            .atZone(ZoneId.of("GMT+1"))  // TODO: Think about how to deal with TZs
+                            .atZone(ZoneId.of("GMT+1")) // TODO: Think about how to deal with TZs
                             .format(formatter)
                         recorders.forEach { it.recordValue(newDateTime, measurement, newValue.value) }
                     }
@@ -173,7 +177,7 @@ class SensorWrangler {
     fun import(path: String): Boolean {
         try {
             val reader = BufferedReader(FileReader(path))
-            while(reader.ready()) {
+            while (reader.ready()) {
                 val (prefix, jsonObject) = reader.readLine().split("@")
 
                 val myMap: HashMap<*, *> = ObjectMapper().readValue(jsonObject, HashMap::class.java)
@@ -219,7 +223,7 @@ class SensorWrangler {
         startRecording()
     }
 
-    fun addSensorConnectionListener(listener: ConnectionChangeListener ) {
+    fun addSensorConnectionListener(listener: ConnectionChangeListener) {
         sensorConnectionListeners.add(listener)
     }
 }

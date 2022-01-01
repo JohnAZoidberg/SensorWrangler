@@ -1,6 +1,5 @@
 package me.danielschaefer.sensorwrangler.sensors
 
-
 import be.glever.ant.message.AntMessage
 import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
@@ -18,17 +17,17 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
 
     override val title: String = "AntSpeedSensor" + Random.nextInt(0, 100)
 
-    private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER_PER_SECOND).apply{
+    private val speedMeasurement = Measurement(this, 0, Measurement.Unit.METER_PER_SECOND).apply {
         description = "Speed " + Random.nextInt(0, 100)
     }
-    private val distanceMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply{
+    private val distanceMeasurement = Measurement(this, 0, Measurement.Unit.METER).apply {
         description = "Distance " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(speedMeasurement, distanceMeasurement)
 
     @JsonProperty("wheelDiameter")
     @SensorProperty(title = "Wheel diameter [in]")
-    var wheelDiameter = 28;
+    var wheelDiameter = 28
 
     private var prevSpeedRevCount = 0
     private var firstSpeedRevCount = 0
@@ -59,7 +58,7 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
             val payLoad = antMessage.payLoad
             removeToggleBit(payLoad)
             val dataPage = registry.constructDataPage(payLoad)
-            //LOG.debug(() -> "Received datapage " + dataPage.toString());
+            // LOG.debug(() -> "Received datapage " + dataPage.toString());
             if (dataPage is SpeedCadenceDataPage5Motion) {
                 calcSpeedDistance(dataPage, wheelDiameter * 2.54)
             }
@@ -120,5 +119,4 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
     private fun calculateDistance(circumference: Double, curRevCount: Int, firstRevCount: Int): Double {
         return circumference * (curRevCount - firstRevCount)
     }
-
 }

@@ -10,7 +10,7 @@ import javafx.collections.ObservableList
 import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.sensors.Averager
 import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
-import java.util.*
+import java.util.Date
 
 // TODO: Maybe use Instant instead of Long
 // TODO: Allow other value instead of Double. Some measurements are not numeric
@@ -87,10 +87,10 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
             }
 
         val unitAppendix: String
-          get() = when (this) {
-              UNITLESS -> ""
-              else -> " [ $abbreviation ]"
-          }
+            get() = when (this) {
+                UNITLESS -> ""
+                else -> " [ $abbreviation ]"
+            }
     }
 }
 

@@ -10,10 +10,10 @@ import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import kotlin.random.Random
 
-class AntCadenceSensor : AntPlusSensor<CadenceChannel>(){
+class AntCadenceSensor : AntPlusSensor<CadenceChannel>() {
     override val title: String = "AntCadenceSensor" + Random.nextInt(0, 100)
 
-    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply{
+    private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply {
         description = "Cadence " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(cadenceMeasurement)
@@ -88,5 +88,4 @@ class AntCadenceSensor : AntPlusSensor<CadenceChannel>(){
         val revDiff = curRevCount - prevRevCount
         return 1000 * 60 * (revDiff / timeDiff)
     }
-
 }

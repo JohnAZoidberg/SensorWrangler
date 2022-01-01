@@ -26,27 +26,35 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
     private fun addMeasurement() {
         val newAxisIndex = sensors.size
 
-        sensors.add(ComboBox<Sensor>().apply {
-            // TODO: Do we want to be able to average averages?
-            items.setAll(App.instance.wrangler.sensors.filterIsInstance<Sensor>())
-            valueProperty().addListener(ChangeListener { _, _, selectedSensor ->
-                if (selectedSensor == null)
-                    return@ChangeListener
+        sensors.add(
+            ComboBox<Sensor>().apply {
+                // TODO: Do we want to be able to average averages?
+                items.setAll(App.instance.wrangler.sensors.filterIsInstance<Sensor>())
+                valueProperty().addListener(
+                    ChangeListener { _, _, selectedSensor ->
+                        if (selectedSensor == null)
+                            return@ChangeListener
 
-                measurements[newAxisIndex].items.setAll(selectedSensor.measurements)
-                units[newAxisIndex].text = ""
-                sizeToScene()
-            })
-        })
-        measurements.add(ComboBox<Measurement>().apply {
-            valueProperty().addListener(ChangeListener { _,  _, selectedMeasurement ->
-                if (selectedMeasurement == null)
-                    return@ChangeListener
+                        measurements[newAxisIndex].items.setAll(selectedSensor.measurements)
+                        units[newAxisIndex].text = ""
+                        sizeToScene()
+                    }
+                )
+            }
+        )
+        measurements.add(
+            ComboBox<Measurement>().apply {
+                valueProperty().addListener(
+                    ChangeListener { _, _, selectedMeasurement ->
+                        if (selectedMeasurement == null)
+                            return@ChangeListener
 
-                units[newAxisIndex].text = selectedMeasurement.unit.toString()
-                sizeToScene()
-            })
-        })
+                        units[newAxisIndex].text = selectedMeasurement.unit.toString()
+                        sizeToScene()
+                    }
+                )
+            }
+        )
         units.add(Text())
 
         formGrid.add(Label("Measurement ${newAxisIndex + 1}"), 0, newAxisIndex + 1)
@@ -63,7 +71,6 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
             padding = Insets(25.0)
             hgap = 10.0
             vgap = 10.0
-
 
             val addMeasurementButton = Button("Add measurement").apply {
                 setOnAction { addMeasurement() }
@@ -94,10 +101,12 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
                     return@EventHandler
                 }
 
-                App.instance.wrangler.sensors.add(Averager().apply {
-                    sourceMeasurements = selectedMeasurements
-                    connect()
-                })
+                App.instance.wrangler.sensors.add(
+                    Averager().apply {
+                        sourceMeasurements = selectedMeasurements
+                        connect()
+                    }
+                )
                 close()
             }
         }
@@ -105,7 +114,7 @@ class AddAveragePopup(parentStage: Stage) : Stage() {
         val explanationLabel = Text("Average each of the inputs over the last second.\n" + "Measurements of disconnected sensors are ignored.")
         val contentBox = VBox(10.0, explanationLabel, formGrid, addButton).apply {
             padding = Insets(25.0)
-            alignment = Pos.CENTER;
+            alignment = Pos.CENTER
         }
         scene = Scene(contentBox)
         title = "Add Average"

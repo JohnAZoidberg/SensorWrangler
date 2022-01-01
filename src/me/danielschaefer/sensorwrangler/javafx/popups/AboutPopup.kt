@@ -10,7 +10,7 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.javafx.App
 import kotlin.reflect.KClass
 
-class AboutPopup(val parentStage: Stage): Stage() {
+class AboutPopup(val parentStage: Stage) : Stage() {
     private fun foldClassNames(classes: Collection<KClass<*>>): String {
         return classes.fold("", { acc, cls -> "$acc\n  - ${cls.simpleName}" })
     }
@@ -39,7 +39,8 @@ class AboutPopup(val parentStage: Stage): Stage() {
         val licenseText = TextFlow(
             Text(
                 """
-                This program is """.trimIndent()
+                This program is 
+                """.trimIndent()
             ),
             freeSoftware,
             Text(
@@ -47,7 +48,7 @@ class AboutPopup(val parentStage: Stage): Stage() {
                 licensed under the terms of the GNU Public License version 2 (GPLv2).
                 It was developed at the Corporate State University Baden-Württemberg (DHBW) in Stuttgart.
                 Source code hosting and issue tracking is available at
-            """.trimIndent()
+                """.trimIndent()
             ),
             github,
             Text(".\nContributions are always welcome.")
@@ -69,16 +70,17 @@ class AboutPopup(val parentStage: Stage): Stage() {
 
         scene = Scene(
             VBox(
-            25.0,
-            titleText,
-            sensorText,
-            chartText,
-            recorderText,
-            licenseText,
-            aboutText
-        ).apply {
-            padding = Insets(25.0)
-        })
+                25.0,
+                titleText,
+                sensorText,
+                chartText,
+                recorderText,
+                licenseText,
+                aboutText
+            ).apply {
+                padding = Insets(25.0)
+            }
+        )
         title = "About - SensorWrangler"
 
         sizeToScene()

@@ -6,7 +6,12 @@ import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.ListView
+import javafx.scene.control.Separator
+import javafx.scene.control.Tab
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableView
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
@@ -24,7 +29,7 @@ import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 
-class SensorTab(parentStage: Stage): Tab("Sensors") {
+class SensorTab(parentStage: Stage) : Tab("Sensors") {
     val sensorList: ListView<VirtualSensor>
 
     init {
@@ -36,127 +41,136 @@ class SensorTab(parentStage: Stage): Tab("Sensors") {
             sensorList = ListView<VirtualSensor>().apply {
                 items = FXCollections.observableList(mutableListOf())
                 items.setAll(App.instance.wrangler.sensors)
-                App.instance.wrangler.sensors.addListener(ListChangeListener {
-                    items.setAll(it.list)
-                })
+                App.instance.wrangler.sensors.addListener(
+                    ListChangeListener {
+                        items.setAll(it.list)
+                    }
+                )
 
                 // TODO: Cache these for better performance
-                selectionModel.selectedItemProperty().addListener(ChangeListener { _, _, selectedSensor ->
-                    if (selectedSensor == null)
-                        return@ChangeListener
+                selectionModel.selectedItemProperty().addListener(
+                    ChangeListener { _, _, selectedSensor ->
+                        if (selectedSensor == null)
+                            return@ChangeListener
 
-                    // TODO: Pass Sensor object to avoid searching and possible failure
-                    val sensorDetailTable = TableView<TableRow>().apply {
-                        // Have columns expand to fill all available space
-                        columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+                        // TODO: Pass Sensor object to avoid searching and possible failure
+                        val sensorDetailTable = TableView<TableRow>().apply {
+                            // Have columns expand to fill all available space
+                            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 
-                        val firstCol = TableColumn<TableRow, Text>().apply {
-                            cellValueFactory = PropertyValueFactory("firstName")
-                            isSortable = false
-                            isReorderable = false
-                        }
-                        val secondCol = TableColumn<TableRow, Text>().apply {
-                            cellValueFactory = PropertyValueFactory("lastName")
-                            isSortable = false
-                            isReorderable = false
-                        }
-                        columns.setAll(firstCol, secondCol)
+                            val firstCol = TableColumn<TableRow, Text>().apply {
+                                cellValueFactory = PropertyValueFactory("firstName")
+                                isSortable = false
+                                isReorderable = false
+                            }
+                            val secondCol = TableColumn<TableRow, Text>().apply {
+                                cellValueFactory = PropertyValueFactory("lastName")
+                                isSortable = false
+                                isReorderable = false
+                            }
+                            columns.setAll(firstCol, secondCol)
 
-                        items.clear()
-                        items.add(TableRow("Title", selectedSensor.title))
-                        items.add(TableRow("Type", selectedSensor::class.simpleName))
+                            items.clear()
+                            items.add(TableRow("Title", selectedSensor.title))
+                            items.add(TableRow("Type", selectedSensor::class.simpleName))
 
-                        // Information about a specific type of sensor
-                        val mutableProperties = selectedSensor::class.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
-                        val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
-                        for (property in mutableProperties) {
-                            for (annotation in property.annotations) {
-                                when (annotation) {
-                                    is SensorProperty -> {
-                                        items.add(TableRow(annotation.title, property.getter.call(selectedSensor).toString()))
+                            // Information about a specific type of sensor
+                            val mutableProperties = selectedSensor::class.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
+                            val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
+                            for (property in mutableProperties) {
+                                for (annotation in property.annotations) {
+                                    when (annotation) {
+                                        is SensorProperty -> {
+                                            items.add(TableRow(annotation.title, property.getter.call(selectedSensor).toString()))
+                                        }
+                                        is ConnectionProperty -> {
+                                            items.add(TableRow(annotation.title, property.getter.call(selectedSensor).toString()))
+                                        }
                                     }
-                                    is ConnectionProperty -> {
-                                        items.add(TableRow(annotation.title, property.getter.call(selectedSensor).toString()))
-                                    }
                                 }
                             }
-                        }
 
-                        // Information about virtual sensor - not currently modular, so no reflection here
-                        when (selectedSensor) {
-                            is Averager -> {
-                                items.add(TableRow("Source measurements", ""))
-                                for (m in selectedSensor.sourceMeasurements)
-                                    items.add(TableRow("", m.description))
-
-                            }
-                        }
-
-                        items.add(TableRow("Measurements", selectedSensor.measurements.size.toString()))
-                        items.addAll(selectedSensor.measurements.map {
-                            TableRow("", it.description )
-                        })
-                    }
-
-                    // TODO: Handle disconnection for VirtualSensor or maybe gray the button out
-
-                    var connectButton = Button("Disconnect").apply {
-                        isDisable = true
-                    }
-
-                    if (selectedSensor is Sensor) {
-                        connectButton = Button().apply {
-                            if (selectedSensor.isConnected) {
-                                text = "Disonnect"
-                                setOnAction {
-                                    selectedSensor.disconnect()
-                                }
-                            } else {
-                                text = "Connect"
-                                setOnAction {
-                                    selectedSensor.connect()
+                            // Information about virtual sensor - not currently modular, so no reflection here
+                            when (selectedSensor) {
+                                is Averager -> {
+                                    items.add(TableRow("Source measurements", ""))
+                                    for (m in selectedSensor.sourceMeasurements)
+                                        items.add(TableRow("", m.description))
                                 }
                             }
+
+                            items.add(TableRow("Measurements", selectedSensor.measurements.size.toString()))
+                            items.addAll(
+                                selectedSensor.measurements.map {
+                                    TableRow("", it.description)
+                                }
+                            )
                         }
-                        // TODO: Listener should be removed later, when this stage is destroyed
-                        selectedSensor.addConnectionChangeListener(ConnectionChangeListener { _, connected, _ ->
-                            // Could be called from a non-UI thread
-                            Platform.runLater {
-                                if (connected) {
-                                    connectButton.text = "Disconnect"
-                                    connectButton.setOnAction {
-                                        // TODO: Add popup for connection dialog
+
+                        // TODO: Handle disconnection for VirtualSensor or maybe gray the button out
+
+                        var connectButton = Button("Disconnect").apply {
+                            isDisable = true
+                        }
+
+                        if (selectedSensor is Sensor) {
+                            connectButton = Button().apply {
+                                if (selectedSensor.isConnected) {
+                                    text = "Disonnect"
+                                    setOnAction {
                                         selectedSensor.disconnect()
                                     }
                                 } else {
-                                    connectButton.text = "Connect"
-                                    connectButton.setOnAction {
+                                    text = "Connect"
+                                    setOnAction {
                                         selectedSensor.connect()
                                     }
                                 }
                             }
-                        })
-                    }
+                            // TODO: Listener should be removed later, when this stage is destroyed
+                            selectedSensor.addConnectionChangeListener(
+                                ConnectionChangeListener { _, connected, _ ->
+                                    // Could be called from a non-UI thread
+                                    Platform.runLater {
+                                        if (connected) {
+                                            connectButton.text = "Disconnect"
+                                            connectButton.setOnAction {
+                                                // TODO: Add popup for connection dialog
+                                                selectedSensor.disconnect()
+                                            }
+                                        } else {
+                                            connectButton.text = "Connect"
+                                            connectButton.setOnAction {
+                                                selectedSensor.connect()
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        }
 
-                    val removeSensorButton = Button("Remove Sensor").apply {
-                        setOnAction {
-                            if (selectedSensor.isConnected) {
-                                Alert(parentStage, "Sensor is connected",
-                                    "Please disconnect the sensor before removing it.")
-                            } else {
-                                App.instance.wrangler.removeSensor(selectedSensor)
-                                if (App.instance.wrangler.sensors.size > 0) {
-                                    selectionModel.select(items.last())
+                        val removeSensorButton = Button("Remove Sensor").apply {
+                            setOnAction {
+                                if (selectedSensor.isConnected) {
+                                    Alert(
+                                        parentStage, "Sensor is connected",
+                                        "Please disconnect the sensor before removing it."
+                                    )
                                 } else {
-                                     sensorDetail.children.clear()
+                                    App.instance.wrangler.removeSensor(selectedSensor)
+                                    if (App.instance.wrangler.sensors.size > 0) {
+                                        selectionModel.select(items.last())
+                                    } else {
+                                        sensorDetail.children.clear()
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    val sensorButtons = HBox(10.0, connectButton, removeSensorButton)
-                    sensorDetail.children.setAll(sensorDetailTable, sensorButtons)
-                })
+                        val sensorButtons = HBox(10.0, connectButton, removeSensorButton)
+                        sensorDetail.children.setAll(sensorDetailTable, sensorButtons)
+                    }
+                )
             }
 
             val addSensorButton = Button("Add Sensor").apply {

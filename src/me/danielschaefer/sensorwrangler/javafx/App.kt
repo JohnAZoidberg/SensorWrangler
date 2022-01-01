@@ -7,7 +7,7 @@ import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.Settings
 import kotlin.system.exitProcess
 
-class App: Application() {
+class App : Application() {
     val wrangler = SensorWrangler()
     val settings = Settings()
 
@@ -37,7 +37,7 @@ class App: Application() {
         Platform.exit()
         // TODO: Properly close all stages
         // TODO: Stop all Executors
-        exitProcess(0);
+        exitProcess(0)
     }
 
     companion object {

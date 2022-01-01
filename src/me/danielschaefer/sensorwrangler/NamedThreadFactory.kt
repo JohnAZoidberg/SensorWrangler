@@ -18,4 +18,3 @@ class NamedThreadFactory constructor(var threadName: String) : ThreadFactory {
         group = if (s != null) s.threadGroup else Thread.currentThread().threadGroup
     }
 }
-

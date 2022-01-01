@@ -3,7 +3,7 @@ package me.danielschaefer.sensorwrangler.gui
 import com.fasterxml.jackson.annotation.JsonProperty
 import me.danielschaefer.sensorwrangler.Measurement
 
-class BarGraph: Chart() {
+class BarGraph : Chart() {
     @JsonProperty("title")
     override lateinit var title: String
 

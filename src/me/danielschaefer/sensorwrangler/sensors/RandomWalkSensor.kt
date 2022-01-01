@@ -33,7 +33,7 @@ class RandomWalkSensor : Sensor() {
     // TODO: Allow this to be set by the user
     var unit: Measurement.Unit = Measurement.Unit.UNITLESS
 
-    private val measurement: Measurement = Measurement(this, 0, unit).apply{
+    private val measurement: Measurement = Measurement(this, 0, unit).apply {
         description = "Random walk " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(measurement)
@@ -46,23 +46,28 @@ class RandomWalkSensor : Sensor() {
 
     override fun specificConnect() {
         // TODO: Tie the lifetime of this to the window
-        updaters.add(Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
-            scheduleAtFixedRate({
-                Platform.runLater {
-                    val currentPos = if (measurement.dataPoints.isEmpty())
-                        ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
-                    else
-                        measurement.dataPoints.last().value
+        updaters.add(
+            Executors.newSingleThreadScheduledExecutor(NamedThreadFactory("Update $title values")).apply {
+                scheduleAtFixedRate(
+                    {
+                        Platform.runLater {
+                            val currentPos = if (measurement.dataPoints.isEmpty())
+                                ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
+                            else
+                                measurement.dataPoints.last().value
 
-                    var newPos: Double
-                    do {
-                        val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
-                        newPos = currentPos + random
-                    } while (newPos < minValue || newPos > maxValue)
+                            var newPos: Double
+                            do {
+                                val random = ThreadLocalRandom.current().nextInt(-maxStep, maxStep + 1).toDouble()
+                                newPos = currentPos + random
+                            } while (newPos < minValue || newPos > maxValue)
 
-                    measurement.addDataPoint(newPos)
-                }
-            }, 0, updateInterval, TimeUnit.MILLISECONDS)
-        })
+                            measurement.addDataPoint(newPos)
+                        }
+                    },
+                    0, updateInterval, TimeUnit.MILLISECONDS
+                )
+            }
+        )
     }
 }

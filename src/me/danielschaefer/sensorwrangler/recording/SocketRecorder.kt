@@ -7,7 +7,7 @@ import java.net.Socket
 import java.net.SocketException
 import kotlin.concurrent.thread
 
-class SocketRecorder(port: Int): Recorder {
+class SocketRecorder(port: Int) : Recorder {
     private var socket: ServerSocket = ServerSocket(port)
     private var conn: Socket? = null
     private var ofStream: OutputStreamWriter? = null
