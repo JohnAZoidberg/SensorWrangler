@@ -34,14 +34,14 @@ java_library(
 java_binary(
     name = "Cli",
     main_class = "me.danielschaefer.sensorwrangler.Cli",
-    # TODO: Not sure how to include the src/style.css. Maybe it doesn't work like this
-    resources = glob(["src/main/resources/**"]) + ["src/stylesheet.css"],
+    resources = glob(["src/resources/**"]),
     runtime_deps = ["//src/me/danielschaefer/sensorwrangler:cli_lib"],
 )
 
 java_binary(
     name = "Gui",
     main_class = "me.danielschaefer.sensorwrangler.Main",
-    resources = glob(["src/main/resources/**"]),
+    # TODO: Not sure how to include the src/style.css. Maybe it doesn't work like this
+    resources = glob(["src/resources/**"]) + ["src/stylesheet.css"],
     runtime_deps = ["//src/me/danielschaefer/sensorwrangler:app_lib"],
 )
