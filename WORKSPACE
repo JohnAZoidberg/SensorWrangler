@@ -62,6 +62,7 @@ maven_install(
         "io.projectreactor:reactor-core:3.3.4.RELEASE",
         "org.reactivestreams:reactive-streams:1.0.3",
         "org.usb4java:usb4java:1.3.0",
+        "org.usb4java:usb4java-javax:1.3.0",
         "ch.qos.logback:logback-core:1.2.3",
         "ch.qos.logback:logback-classic:1.2.3",
         "junit:junit:4.13", # Only for testing

@@ -12,9 +12,16 @@ java_library(
         "@maven//:io_projectreactor_reactor_core",
         "@maven//:org_reactivestreams_reactive_streams",
         "@maven//:org_usb4java_usb4java",
+        "@maven//:org_usb4java_usb4java_javax",
         "@maven//:ch_qos_logback_logback_core",
         "@maven//:ch_qos_logback_logback_classic",
-        "@maven//:junit_junit", # Only for testing
+    ],
+)
+
+java_library(
+    name = "testing_deps",
+    exports = [
+        "@maven//:junit_junit",
     ],
 )
 
