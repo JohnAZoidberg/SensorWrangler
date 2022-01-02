@@ -27,3 +27,9 @@ ktlint_fix(
     name = "lint_fix",
     srcs = glob(["**/*.kt"]),
 )
+
+load("@rules_detekt//detekt:defs.bzl", "detekt")
+detekt(
+    name = "detekt_test",
+    srcs = glob(["**/*.kt"]),
+)

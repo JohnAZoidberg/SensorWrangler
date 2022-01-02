@@ -79,6 +79,12 @@ bazel build //:Gui_deploy.jar \
   && ./bazel-bin/Gui_deploy.jar
 ```
 
+#### Run detekt
+
+```
+bazel build //src/me/danielschaefer/sensorwrangler:detekt_test
+```
+
 ## Running the jar
 
 1. Get it from the [Releases](https://github.com/JohnAZoidberg/SensorWrangler/releases) or [Actions](https://github.com/JohnAZoidberg/SensorWrangler/actions) page

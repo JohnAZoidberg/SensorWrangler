@@ -112,3 +112,21 @@ new_git_repository(
 #    # TODO: Also doesn't work because then it can't find the dependencies
 #    #build_file = "@//:j-antplus.BUILD",
 #)
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+rules_detekt_version = "0.5.0"
+rules_detekt_sha = "65203efa2c7f252a9fbeba0abe651cd32c316858d3dbad550a5a34cf48bbe404"
+
+http_archive(
+    name = "rules_detekt",
+    sha256 = rules_detekt_sha,
+    strip_prefix = "bazel_rules_detekt-{v}".format(v = rules_detekt_version),
+    url = "https://github.com/buildfoundation/bazel_rules_detekt/archive/v{v}.tar.gz".format(v = rules_detekt_version),
+)
+
+load("@rules_detekt//detekt:dependencies.bzl", "rules_detekt_dependencies")
+rules_detekt_dependencies()
+
+load("@rules_detekt//detekt:toolchains.bzl", "rules_detekt_toolchains")
+rules_detekt_toolchains()
