@@ -6,6 +6,8 @@ import be.glever.ant.usb.AntUsbDevice
 import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.hrm.HRMChannel
 import be.glever.antplus.hrm.datapage.HrmDataPageRegistry
+import be.glever.antplus.hrm.datapage.background.HrmDataPage2ManufacturerInformation
+import be.glever.antplus.hrm.datapage.background.HrmDataPage3ProductInformation
 import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.data.Measurement
@@ -21,18 +23,29 @@ class AntHeartRateSensor : AntPlusSensor<HRMChannel>() {
     }
     override val measurements: List<Measurement> = listOf(measurement)
 
-    override fun handleMessage(antMessage: AntMessage?) {
+    override fun handleDevSpecificMessage(antMessage: AntMessage?) {
         if (antMessage is BroadcastDataMessage) {
             val payLoad = antMessage.payLoad
             removeToggleBit(payLoad)
             val dataPage: AbstractAntPlusDataPage = registry.constructDataPage(payLoad)
 
-            if (dataPage is HrmDataPage4PreviousHeartBeatEvent) {
-                // TODO: Call runLater in UI code, not here
-                // UI can only be updated from UI threads
-                Platform.runLater {
-                    measurement.addDataPoint(dataPage.computedHeartRateInBpm.toDouble())
-                }
+            when (dataPage) {
+                is HrmDataPage2ManufacturerInformation ->
+                    if (manufacturerIdProperty.value == null) {
+                        manufacturerIdProperty.value = dataPage.manufacturerId
+                        // Assign it again, to re-fire any listener. Because:
+                        // The model name can only be determined once the manufacturer ID has been determined
+                        modelNumberProperty.value = modelNumberProperty.value
+                    }
+                is HrmDataPage3ProductInformation ->
+                    if (modelNumberProperty.value == null)
+                        modelNumberProperty.value = dataPage.modelNumber.toInt()
+                is HrmDataPage4PreviousHeartBeatEvent ->
+                    // TODO: Call runLater in UI code, not here
+                    // UI can only be updated from UI threads
+                    Platform.runLater {
+                        measurement.addDataPoint(dataPage.computedHeartRateInBpm.toDouble())
+                    }
             }
         }
     }
