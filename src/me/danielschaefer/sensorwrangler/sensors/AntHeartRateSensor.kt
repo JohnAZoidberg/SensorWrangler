@@ -1,5 +1,7 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import be.glever.ant.channel.AntChannelId
+import be.glever.ant.constants.AntPlusDeviceType
 import be.glever.ant.message.AntMessage
 import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
@@ -22,6 +24,8 @@ class AntHeartRateSensor : AntPlusSensor<HRMChannel>() {
         description = "Heartrate " + Random.nextInt(0, 100)
     }
     override val measurements: List<Measurement> = listOf(measurement)
+
+    override val deviceType = AntPlusDeviceType.HRM
 
     override fun handleDevSpecificMessage(antMessage: AntMessage?) {
         if (antMessage is BroadcastDataMessage) {
@@ -60,7 +64,7 @@ class AntHeartRateSensor : AntPlusSensor<HRMChannel>() {
         payload[0] = (127 and payload[0].toInt()).toByte()
     }
 
-    override fun createChannel(device: AntUsbDevice): HRMChannel {
-        return HRMChannel(device)
+    override fun createChannel(usbDevice: AntUsbDevice, channelId: AntChannelId): HRMChannel {
+        return HRMChannel(usbDevice, channelId.deviceNumber)
     }
 }
