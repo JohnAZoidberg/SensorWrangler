@@ -1,8 +1,7 @@
 package me.danielschaefer.sensorwrangler.sensors
 
-import be.glever.ant.message.AntMessage
-import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.speedcadence.SpeedChannel
 import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
 import be.glever.antplus.speedcadence.datapage.main.SpeedCadenceDataPage5Motion
@@ -12,7 +11,7 @@ import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import kotlin.random.Random
 
-class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
+class AntSpeedSensor : AntSpeedCadenceSensor<SpeedChannel>() {
     override val registry = SpeedCadenceDataPageRegistry()
 
     override val title: String = "AntSpeedSensor" + Random.nextInt(0, 100)
@@ -33,16 +32,6 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
     private var firstSpeedRevCount = 0
     private var prevSpeedEventTime: Long = 0
 
-    /**
-     * Non-legacy devices swap the first bit of the pageNumber every 4 messages.
-     * For the moment not taking the legacy HRM devices into account.
-     *
-     * @param payload
-     */
-    private fun removeToggleBit(payload: ByteArray) {
-        payload[0] = (127 and payload[0].toInt()).toByte()
-    }
-
     override fun createChannel(device: AntUsbDevice): SpeedChannel {
         // Reset everything to 0 on connect
         // TODO: Find a better place to reset them to zero
@@ -53,15 +42,10 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
         return SpeedChannel(device)
     }
 
-    override fun handleMessage(antMessage: AntMessage?) {
-        if (antMessage is BroadcastDataMessage) {
-            val payLoad = antMessage.payLoad
-            removeToggleBit(payLoad)
-            val dataPage = registry.constructDataPage(payLoad)
-            // LOG.debug(() -> "Received datapage " + dataPage.toString());
-            if (dataPage is SpeedCadenceDataPage5Motion) {
+    override fun handleSpeedCadenceDataPage(dataPage: AbstractAntPlusDataPage) {
+        when (dataPage) {
+            is SpeedCadenceDataPage5Motion ->
                 calcSpeedDistance(dataPage, wheelDiameter * 2.54)
-            }
         }
     }
 

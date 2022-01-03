@@ -22,6 +22,7 @@ import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
 import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
+import me.danielschaefer.sensorwrangler.sensors.AntPlusSensor
 import me.danielschaefer.sensorwrangler.sensors.Averager
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import me.danielschaefer.sensorwrangler.sensors.Sensor
@@ -96,6 +97,21 @@ class SensorTab(parentStage: Stage) : Tab("Sensors") {
                                     items.add(TableRow("Source measurements", ""))
                                     for (m in selectedSensor.sourceMeasurements)
                                         items.add(TableRow("", m.description))
+                                }
+                                is AntPlusSensor<*> -> {
+                                    TableRow("Manufacturer", selectedSensor.getManufacturerName()).apply {
+                                        selectedSensor.manufacturerId.addListener { _, _, _ ->
+                                            lastName = selectedSensor.getManufacturerName()
+                                        }
+                                        items.add(this)
+                                    }
+
+                                    TableRow("Model", selectedSensor.getModelName()).apply {
+                                        selectedSensor.modelNumber.addListener { _, _, _ ->
+                                            lastName = selectedSensor.getModelName()
+                                        }
+                                        items.add(this)
+                                    }
                                 }
                             }
 

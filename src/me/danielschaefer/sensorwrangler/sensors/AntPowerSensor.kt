@@ -26,7 +26,7 @@ class AntPowerSensor : AntPlusSensor<PowerChannel>() {
 
     override val registry: AbstractDataPageRegistry = PowerDataPageRegistry()
 
-    override fun handleMessage(antMessage: AntMessage?) {
+    override fun handleDevSpecificMessage(antMessage: AntMessage?) {
         if (antMessage !is BroadcastDataMessage)
             return
 
