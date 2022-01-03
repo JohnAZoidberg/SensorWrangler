@@ -1,5 +1,7 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import be.glever.ant.channel.AntChannelId
+import be.glever.ant.constants.AntPlusDeviceType
 import be.glever.ant.usb.AntUsbDevice
 import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.speedcadence.SpeedChannel
@@ -24,6 +26,8 @@ class AntSpeedSensor : AntSpeedCadenceSensor<SpeedChannel>() {
     }
     override val measurements: List<Measurement> = listOf(speedMeasurement, distanceMeasurement)
 
+    override val deviceType = AntPlusDeviceType.Speed
+
     @JsonProperty("wheelDiameter")
     @SensorProperty(title = "Wheel diameter [in]")
     var wheelDiameter = 28
@@ -32,14 +36,14 @@ class AntSpeedSensor : AntSpeedCadenceSensor<SpeedChannel>() {
     private var firstSpeedRevCount = 0
     private var prevSpeedEventTime: Long = 0
 
-    override fun createChannel(device: AntUsbDevice): SpeedChannel {
+    override fun createChannel(usbDevice: AntUsbDevice, channelId: AntChannelId): SpeedChannel {
         // Reset everything to 0 on connect
         // TODO: Find a better place to reset them to zero
         prevSpeedRevCount = 0
         firstSpeedRevCount = 0
         prevSpeedEventTime = 0
 
-        return SpeedChannel(device)
+        return SpeedChannel(usbDevice, channelId.deviceNumber)
     }
 
     override fun handleSpeedCadenceDataPage(dataPage: AbstractAntPlusDataPage) {

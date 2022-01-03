@@ -22,6 +22,10 @@ It should be easy, to add new sensors and export targets.
 
 - Free software (GPLv2 licensed)
 - Read data from fitness tracking sensors
+  - ANT+ sensors
+  - Any other sensor via a custom bridge that offers
+    - TCP socket
+    - CSV line streaming
 - Nice user interface to easily select and connect to devices
 - Log data to file or database
   - CSV
@@ -88,6 +92,18 @@ bazel build //:Gui_deploy.jar \
 ## Supported Devices and other Sensors
 
 ### Using ANT USB-m transceiver
+Multiple ANT+ device profiles are supported. Any device implementing a supported device profile is supported:
+
+- Supported
+  - Heart Rate
+  - Speed
+  - Cadence
+  - Power
+  - Fitness Equipment Control
+- Unsupported
+  - Combined Speed and Cadence
+  - ...
+
 #### Garmin HRM 3-SS
 With the AntPlusSensor. It's configure to directly connect to the HRM (heart rate monitor).
 When running on Windows, please install the libusb driver using [Zadig](https://zadig.akeo.ie/):

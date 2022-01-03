@@ -1,5 +1,7 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import be.glever.ant.channel.AntChannelId
+import be.glever.ant.constants.AntPlusDeviceType
 import be.glever.ant.usb.AntUsbDevice
 import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.speedcadence.CadenceChannel
@@ -17,18 +19,20 @@ class AntCadenceSensor : AntSpeedCadenceSensor<CadenceChannel>() {
     }
     override val measurements: List<Measurement> = listOf(cadenceMeasurement)
 
+    override val deviceType = AntPlusDeviceType.Cadence
+
     private var prevCadenceRevCount = 0
     private var firstCadenceRevCount = 0
     private var prevCadenceEventTime: Long = 0
 
-    override fun createChannel(device: AntUsbDevice): CadenceChannel {
+    override fun createChannel(usbDevice: AntUsbDevice, channelId: AntChannelId): CadenceChannel {
         // Reset everything to 0 on connect
         // TODO: Find a better place to reset them to zero
         prevCadenceRevCount = 0
         firstCadenceRevCount = 0
         prevCadenceEventTime = 0
 
-        return CadenceChannel(device)
+        return CadenceChannel(usbDevice, channelId.deviceNumber)
     }
 
     override val registry = SpeedCadenceDataPageRegistry()
