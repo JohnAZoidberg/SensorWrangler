@@ -63,7 +63,7 @@ If you have Nix installed, you can get a shell with the dependencies like this:
 nix-shell -p gnumake openjdk bazel_4
 ```
 
-Run:
+Run (on Windows run the `.exe` files):
 
 ```sh
 # Commandline
@@ -77,6 +77,14 @@ bazel build //:Gui \
 # GUI (JavaFX bundled into the JAR)
 bazel build //:Gui_deploy.jar \
   && ./bazel-bin/Gui_deploy.jar
+```
+
+I seem to have trouble getting Bazel on Windows to find my Java installation.
+Alternatively you can just use a JDK provided by Bazel:
+
+```sh
+bazel build //:Gui --java_runtime_version=remotejdk_11
+bazel-bin/Gui.exe
 ```
 
 ## Running the jar
