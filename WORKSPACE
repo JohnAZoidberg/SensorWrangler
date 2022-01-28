@@ -1,11 +1,11 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
-rules_kotlin_version = "v1.5.0-beta-4"
+kotlin_version = "1.6.0"
 rules_kotlin_sha = "6cbd4e5768bdfae1598662e40272729ec9ece8b7bded8f0d2c81c8ff96dc139d"
 http_archive(
     name = "io_bazel_rules_kotlin",
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/%s/rules_kotlin_release.tgz" % rules_kotlin_version],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v%s/rules_kotlin_release.tgz" % kotlin_version],
     sha256 = rules_kotlin_sha,
 )
 
@@ -41,9 +41,9 @@ maven_install(
 
         # Logging (also run-time dependency of some other dependencies)
         "org.slf4j:slf4j-api:1.7.11",
-        "io.github.microutils:kotlin-logging-jvm:2.1.20",
+        "io.github.microutils:kotlin-logging-jvm:2.1.21",
 
-        "org.jetbrains.kotlin:kotlin-reflect:1.5.0",
+        "org.jetbrains.kotlin:kotlin-reflect:%s" % kotlin_version,
 
         "org.openjfx:javafx-base:11.0.1",
         "org.openjfx:javafx-base:win:11.0.1",
