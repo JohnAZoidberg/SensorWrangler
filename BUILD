@@ -63,7 +63,7 @@ java_binary(
     name = "Cli",
     main_class = "me.danielschaefer.sensorwrangler.Cli",
     # TODO: Not sure how to include the src/style.css. Maybe it doesn't work like this
-    resources = glob(["src/main/resources/**"]) + ["src/stylesheet.css"],
+    resources = glob(["src/main/resources/**"]),
     runtime_deps = ["//src/me/danielschaefer/sensorwrangler:cli_lib"],
 )
 
