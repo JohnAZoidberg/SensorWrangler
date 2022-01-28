@@ -29,8 +29,13 @@ java_library(
         "@maven//:com_github_JetBrains_Exposed_exposed_jdbc",
         "@maven//:joda_time_joda_time",
         "@maven//:org_postgresql_postgresql",
-        "@maven//:org_slf4j_slf4j_api",
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
+
+        # Logging
+        "@maven//:org_slf4j_slf4j_api",
+        "@maven//:ch_qos_logback_logback_core",
+        "@maven//:ch_qos_logback_logback_classic",
+        "@maven//:io_github_microutils_kotlin_logging_jvm",
 
         "@maven//:org_openjfx_javafx_base",
         "@maven//:org_openjfx_javafx_graphics",

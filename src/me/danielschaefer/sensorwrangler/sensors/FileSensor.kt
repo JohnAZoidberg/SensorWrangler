@@ -5,10 +5,13 @@ import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
+import mu.KotlinLogging
 import org.apache.commons.io.input.Tailer
 import org.apache.commons.io.input.TailerListenerAdapter
 import java.io.File
 import kotlin.random.Random
+
+private val logger = KotlinLogging.logger {}
 
 class FileSensor : Sensor() {
     override val title: String = "FileSensor ${Random.nextInt(0, 100)}"
@@ -42,7 +45,7 @@ class FileSensor : Sensor() {
             }
 
             override fun handle(line: String?) {
-                println("Read $line from $filePath")
+                logger.debug { "Read $line from $filePath" }
 
                 if (line == null)
                     return

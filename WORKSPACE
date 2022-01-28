@@ -38,8 +38,11 @@ maven_install(
         "com.github.JetBrains.Exposed:exposed-jdbc:0.18.1",
         "joda-time:joda-time:2.5",
         "org.postgresql:postgresql:42.2.5",
+
         # Logging (also run-time dependency of some other dependencies)
         "org.slf4j:slf4j-api:1.7.11",
+        "io.github.microutils:kotlin-logging-jvm:2.1.20",
+
         "org.jetbrains.kotlin:kotlin-reflect:1.5.0",
 
         "org.openjfx:javafx-base:11.0.1",
