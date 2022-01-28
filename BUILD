@@ -28,6 +28,11 @@ java_library(
            "@maven//:org_openjfx_javafx_base_win",
            "@maven//:org_openjfx_javafx_controls_win",
         ],
+        "@platforms//os:macos": [
+           "@maven//:org_openjfx_javafx_graphics_mac",
+           "@maven//:org_openjfx_javafx_base_mac",
+           "@maven//:org_openjfx_javafx_controls_mac",
+        ],
     }),
 )
 
