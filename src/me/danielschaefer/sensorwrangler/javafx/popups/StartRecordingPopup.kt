@@ -92,7 +92,7 @@ class StartRecordingPopup(val parentStage: Stage) : Stage() {
                             }
                             else -> TODO("Don't know how to handle this type")
                         }
-                        val label = Label(param.name?.capitalize())
+                        val label = Label(param.name?.replaceFirstChar(Char::titlecase))
                         recorderConfiguration.add(label, 0, recorderConfiguration.rowCount)
                         recorderConfiguration.add(input, 1, recorderConfiguration.rowCount)
                     }

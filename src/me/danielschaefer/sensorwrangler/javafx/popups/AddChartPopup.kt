@@ -205,42 +205,54 @@ class AddChartPopup(val parentStage: Stage, chartTab: ChartTab? = null) : Stage(
             var row = 0
 
             add(Label("Chart Type"), 0, row)
-            add(typeDropdown, 1, row++)
+            add(typeDropdown, 1, row)
+            row++
 
             add(Label("Chart Name"), 0, row)
-            add(chartNameField, 1, row++)
+            add(chartNameField, 1, row)
+            row++
 
             add(windowSizeLabel, 0, row)
-            add(windowSizeField, 1, row++)
+            add(windowSizeField, 1, row)
+            row++
 
             add(lowerBoundLabel, 0, row)
-            add(lowerBoundField, 1, row++)
+            add(lowerBoundField, 1, row)
+            row++
 
             add(upperBoundLabel, 0, row)
-            add(upperBoundField, 1, row++)
+            add(upperBoundField, 1, row)
+            row++
 
             add(tickSpacingLabel, 0, row)
-            add(tickSpacingField, 1, row++)
+            add(tickSpacingField, 1, row)
+            row++
 
             add(withDotsLabel, 0, row)
-            add(withDotsField, 1, row++)
+            add(withDotsField, 1, row)
+            row++
 
             add(horizontalLabel, 0, row)
-            add(horizontalButton, 1, row++)
+            add(horizontalButton, 1, row)
+            row++
 
             add(lastNSecondsAvgLabel, 0, row)
-            add(lastNSecondsAvgField, 1, row++)
+            add(lastNSecondsAvgField, 1, row)
+            row++
 
-            add(verticalButton, 1, row++)
+            add(verticalButton, 1, row)
+            row++
 
             add(yAxisNameLabel, 0, row)
-            add(yAxisNameField, 1, row++)
+            add(yAxisNameField, 1, row)
+            row++
 
-            add(addMeasurementButton, 2, row++)
+            add(addMeasurementButton, 2, row)
+            row++
 
             add(axisSensorLabel, 1, row)
             add(axisMeasurementLabel, 2, row)
-            add(axisUnitLabel, 3, row++)
+            add(axisUnitLabel, 3, row)
         }
 
         // Already display one measurement input field
