@@ -1,11 +1,11 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
-kotlin_version = "1.6.0"
+rules_kotlin_version = "v1.5.0-beta-4"
 rules_kotlin_sha = "6cbd4e5768bdfae1598662e40272729ec9ece8b7bded8f0d2c81c8ff96dc139d"
 http_archive(
     name = "io_bazel_rules_kotlin",
-    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/v%s/rules_kotlin_release.tgz" % kotlin_version],
+    urls = ["https://github.com/bazelbuild/rules_kotlin/releases/download/%s/rules_kotlin_release.tgz" % rules_kotlin_version],
     sha256 = rules_kotlin_sha,
 )
 
@@ -15,7 +15,7 @@ kotlin_repositories()
 
 load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_register_toolchains")
 
-kt_register_toolchains()
+register_toolchains("//:kotlin_toolchain")
 
 http_archive(
     name = "rules_jvm_external",
@@ -41,9 +41,9 @@ maven_install(
 
         # Logging (also run-time dependency of some other dependencies)
         "org.slf4j:slf4j-api:1.7.11",
-        "io.github.microutils:kotlin-logging-jvm:2.1.21",
+        "io.github.microutils:kotlin-logging-jvm:2.1.14",
 
-        "org.jetbrains.kotlin:kotlin-reflect:%s" % kotlin_version,
+        "org.jetbrains.kotlin:kotlin-reflect:1.5.0",
 
         "org.openjfx:javafx-base:11.0.1",
         "org.openjfx:javafx-base:win:11.0.1",
