@@ -21,15 +21,20 @@ define_kt_toolchain(
 )
 
 java_library(
-    name = "java_deps",
+    name = "lib_deps",
     exports = [
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        # Miscellaneous
         "@maven//:commons_io_commons_io",
+        "@maven//:joda_time_joda_time",
+        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
+
+        # Configuration Import/Export
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+
+        # Database
         "@maven//:com_github_JetBrains_Exposed_exposed_core",
         "@maven//:com_github_JetBrains_Exposed_exposed_jdbc",
-        "@maven//:joda_time_joda_time",
         "@maven//:org_postgresql_postgresql",
-        "@maven//:org_jetbrains_kotlin_kotlin_reflect",
 
         # Logging
         "@maven//:org_slf4j_slf4j_api",
@@ -37,6 +42,14 @@ java_library(
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
 
+        # ANT+
+        "@j_antplus//:j_antplus",
+    ],
+)
+
+java_library(
+    name = "gui_deps",
+    exports = [
         "@maven//:org_openjfx_javafx_base",
         "@maven//:org_openjfx_javafx_graphics",
         "@maven//:org_openjfx_javafx_controls",

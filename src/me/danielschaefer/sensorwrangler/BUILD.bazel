@@ -6,8 +6,8 @@ kt_jvm_library(
     name = "app_lib",
     srcs = glob(["**/*.kt"]) + glob(["**/*.java"]),
     deps = [
-        "//:java_deps",
-        "@j_antplus//:j_antplus",
+        "//:gui_deps",
+        "//:lib_deps",
     ],
     visibility = ["//visibility:public"],
 )
@@ -16,7 +16,7 @@ kt_jvm_library(
     name = "cli_lib",
     srcs = [ "Cli.kt" ],
     deps = [
-        "//:java_deps",
+        "//:lib_deps",
     ],
     visibility = ["//visibility:public"],
 )
