@@ -98,7 +98,7 @@ class MeasurementDeserializer @JvmOverloads constructor(vc: Class<*>? = null) : 
     override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): Measurement {
         val myMap: HashMap<*, *>? = ctxt?.readValue(jp, HashMap::class.java)
         val indexInSensor = myMap?.get("indexInSensor") as Int
-        val sensorUuid = myMap?.get("sensorUuid") as String
+        val sensorUuid = myMap.get("sensorUuid") as String
         val sensor = App.instance.wrangler.sensors.find { it.uuid == sensorUuid } as VirtualSensor
 
         if (sensor is Averager) {

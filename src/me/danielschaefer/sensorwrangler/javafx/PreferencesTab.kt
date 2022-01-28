@@ -46,7 +46,7 @@ class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
         val field = when (property.returnType) {
             Int::class.createType() -> {
                 TextField((property.getter.call(settingsObj) as Int).toString()).apply {
-                    this.textProperty().addListener { observable, oldValue, newValue ->
+                    this.textProperty().addListener { _, _, newValue ->
                         if (text == null)
                             return@addListener
 
@@ -56,7 +56,7 @@ class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
             }
             String::class.createType(), String::class.createType(nullable = true) -> {
                 TextField(property.getter.call(settingsObj) as String?).apply {
-                    this.textProperty().addListener { observable, oldValue, newValue ->
+                    this.textProperty().addListener { _, _, newValue ->
                         if (text == null)
                             return@addListener
 

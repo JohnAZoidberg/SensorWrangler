@@ -76,7 +76,6 @@ class SensorTab(parentStage: Stage) : Tab("Sensors") {
 
                             // Information about a specific type of sensor
                             val mutableProperties = selectedSensor::class.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>()
-                            val propertyMap: MutableMap<KMutableProperty<*>, () -> Any?> = mutableMapOf()
                             for (property in mutableProperties) {
                                 for (annotation in property.annotations) {
                                     when (annotation) {
