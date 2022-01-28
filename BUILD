@@ -1,6 +1,24 @@
 load("@rules_java//java:defs.bzl", "java_library")
+load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options", "kt_javac_options", "define_kt_toolchain")
 
 package(default_visibility = ["//visibility:public"])
+
+# Build with:
+# > bazel build --extra_toolchains='//:werror_toolchain'
+# to build with -Werror enabled. Useful for CI.
+kt_kotlinc_options(
+    name = "kotlinc_werror",
+    warn = "error",
+)
+kt_javac_options(
+    name = "javac_werror",
+    warn = "error",
+)
+define_kt_toolchain(
+    name = "werror_toolchain",
+    kotlinc_options = ":kotlinc_werror",
+    javac_options = ":javac_werror",
+)
 
 java_library(
     name = "java_deps",

@@ -87,6 +87,12 @@ bazel build //:Gui --java_runtime_version=remotejdk_11
 bazel-bin/Gui.exe
 ```
 
+Build with warnings as error:
+
+```sh
+bazel build --extra_toolchains='//:werror_toolchain' //:Gui
+```
+
 ## Running the jar
 
 1. Get it from the [Releases](https://github.com/JohnAZoidberg/SensorWrangler/releases) or [Actions](https://github.com/JohnAZoidberg/SensorWrangler/actions) page
