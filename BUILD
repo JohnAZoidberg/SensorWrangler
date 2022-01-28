@@ -62,14 +62,14 @@ java_library(
 java_binary(
     name = "Cli",
     main_class = "me.danielschaefer.sensorwrangler.Cli",
-    # TODO: Not sure how to include the src/style.css. Maybe it doesn't work like this
-    resources = glob(["src/main/resources/**"]),
+    classpath_resources = glob(["src/main/resources/cli/logback.xml"]),
     runtime_deps = ["//src/me/danielschaefer/sensorwrangler:cli_lib"],
 )
 
 java_binary(
     name = "Gui",
     main_class = "me.danielschaefer.sensorwrangler.Main",
-    resources = glob(["src/main/resources/**"]),
+    classpath_resources = glob(["src/main/resources/gui/logback.xml*"]),
+    resources = glob(["src/main/resources/*"]),
     runtime_deps = ["//src/me/danielschaefer/sensorwrangler:app_lib"],
 )
