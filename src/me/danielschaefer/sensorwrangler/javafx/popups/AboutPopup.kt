@@ -8,6 +8,7 @@ import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.javafx.GuiApp
 import kotlin.reflect.KClass
 
 class AboutPopup(val parentStage: Stage) : Stage() {
@@ -28,14 +29,12 @@ class AboutPopup(val parentStage: Stage) : Stage() {
 
         val freeSoftware = Hyperlink("Free Software").apply {
             setOnAction {
-                // TODO: Need the JavaFX App for this
-                // App.instance.hostServices.showDocument("https://www.gnu.org/philosophy/free-sw.en.html")
+                GuiApp.instance.hostServices.showDocument("https://www.gnu.org/philosophy/free-sw.en.html")
             }
         }
         val github = Hyperlink("https://github.com/JohnAZoidberg/SensorWrangler\n").apply {
             setOnAction {
-                // TODO: Need the JavaFX App for this
-                // App.instance.hostServices.showDocument("https://github.com/JohnAZoidberg/SensorWrangler")
+                GuiApp.instance.hostServices.showDocument("https://github.com/JohnAZoidberg/SensorWrangler")
             }
         }
         val licenseText = TextFlow(
@@ -64,8 +63,7 @@ class AboutPopup(val parentStage: Stage) : Stage() {
                 //   https://github.com/jjYBdx4IL/misc/blob/master/swing-utils/src/main/java/com/github/jjYBdx4IL/utils/awt/Desktop.java
                 // Or
                 //   https://stackoverflow.com/a/18004334/5932056
-                // TODO: Need the JavaFX App for this
-                // App.instance.hostServices.showDocument("mailto:git@danielschaefer.me")
+                GuiApp.instance.hostServices.showDocument("mailto:git@danielschaefer.me")
             }
         }
         val me = Text("Copyright 2019 Daniel Schaefer ")

@@ -10,6 +10,8 @@ private val logger = KotlinLogging.logger {}
 
 class GuiApp : Application() {
     override fun start(primaryStage: Stage) {
+        instance = this
+
         // Wrap in try/catch and print everything, to see the proper stacktrace
         // even in non-debugging environments.
         // This is especially useful if it crashes right after launching.
@@ -34,5 +36,9 @@ class GuiApp : Application() {
         // TODO: Properly close all stages
         // TODO: Stop all Executors
         exitProcess(0)
+    }
+
+    companion object {
+        lateinit var instance: GuiApp
     }
 }

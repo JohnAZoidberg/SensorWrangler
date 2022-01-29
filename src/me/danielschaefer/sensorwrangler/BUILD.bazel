@@ -1,5 +1,3 @@
-# TODO:
-# - [ ] AboutPopup
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
 
