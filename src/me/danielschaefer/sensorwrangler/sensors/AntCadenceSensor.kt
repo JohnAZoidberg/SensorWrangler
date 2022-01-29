@@ -7,7 +7,7 @@ import be.glever.antplus.speedcadence.CadenceChannel
 import be.glever.antplus.speedcadence.datapage.AbstractSpeedCadenceDataPage
 import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
 import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 import mu.KotlinLogging
 import kotlin.random.Random
 

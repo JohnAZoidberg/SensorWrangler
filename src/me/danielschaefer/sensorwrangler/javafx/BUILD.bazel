@@ -1,0 +1,17 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "javafx",
+    srcs = glob([ "**/*.kt" ]) + glob(["**/*.java"]),
+    deps = [
+        "//:lib_deps",
+        "//:gui_deps",
+        "//src/me/danielschaefer/sensorwrangler/base",
+        "//src/me/danielschaefer/sensorwrangler/gui",
+        "//src/me/danielschaefer/sensorwrangler/util",
+    ],
+    # Must not be depended upon by other packages. Only the final executable
+    visibility = [
+        "//src/me/danielschaefer/sensorwrangler:__pkg__",
+    ],
+)

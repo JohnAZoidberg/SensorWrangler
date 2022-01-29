@@ -1,4 +1,4 @@
-package me.danielschaefer.sensorwrangler
+package me.danielschaefer.sensorwrangler.base
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
@@ -10,13 +10,15 @@ import javafx.beans.property.ReadOnlyBooleanWrapper
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
-import me.danielschaefer.sensorwrangler.gui.Chart
+import me.danielschaefer.sensorwrangler.data.Chart
+import me.danielschaefer.sensorwrangler.data.DataPoint
+import me.danielschaefer.sensorwrangler.data.Measurement
+import me.danielschaefer.sensorwrangler.data.Preference
+import me.danielschaefer.sensorwrangler.data.Recorder
+import me.danielschaefer.sensorwrangler.data.VirtualSensor
 import me.danielschaefer.sensorwrangler.gui.LineGraph
-import me.danielschaefer.sensorwrangler.javafx.App
-import me.danielschaefer.sensorwrangler.recording.Recorder
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import me.danielschaefer.sensorwrangler.sensors.Sensor
-import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.io.BufferedReader
 import java.io.FileNotFoundException
 import java.io.FileReader

@@ -1,20 +1,10 @@
-package me.danielschaefer.sensorwrangler
+package me.danielschaefer.sensorwrangler.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonRootName
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import me.danielschaefer.sensorwrangler.javafx.App
-import me.danielschaefer.sensorwrangler.sensors.Averager
-import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import java.util.Date
-
-// TODO: Maybe use Instant instead of Long
-// TODO: Allow other value instead of Double. Some measurements are not numeric
-data class DataPoint(val timestamp: Long, val value: Double)
 
 @JsonRootName(value = "Measurement")
 class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: Unit) {
@@ -91,23 +81,5 @@ class Measurement(val sensor: VirtualSensor, val indexInSensor: Int, val unit: U
                 UNITLESS -> ""
                 else -> " [ $abbreviation ]"
             }
-    }
-}
-
-class MeasurementDeserializer @JvmOverloads constructor(vc: Class<*>? = null) : StdDeserializer<Measurement>(vc) {
-    override fun deserialize(jp: JsonParser, ctxt: DeserializationContext?): Measurement {
-        val myMap: HashMap<*, *>? = ctxt?.readValue(jp, HashMap::class.java)
-        val indexInSensor = myMap?.get("indexInSensor") as Int
-        val sensorUuid = myMap.get("sensorUuid") as String
-        val sensor = App.instance.wrangler.sensors.find { it.uuid == sensorUuid } as VirtualSensor
-
-        if (sensor is Averager) {
-            // This assumes that the sensors have been deserialized before this measurement
-            sensor.connect()
-        }
-
-        // TODO: Why do I have to do it here and not in the Sensor class?
-        sensor.measurements.forEach { it.sensorUuid = sensorUuid }
-        return sensor.measurements[indexInSensor]
     }
 }

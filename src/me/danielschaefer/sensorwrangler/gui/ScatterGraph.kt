@@ -1,7 +1,7 @@
 package me.danielschaefer.sensorwrangler.gui
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 
 class ScatterGraph : AxisGraph() {
     @JsonProperty("title")

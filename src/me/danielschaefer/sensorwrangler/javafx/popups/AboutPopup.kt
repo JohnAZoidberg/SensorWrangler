@@ -7,7 +7,8 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.javafx.GuiApp
 import kotlin.reflect.KClass
 
 class AboutPopup(val parentStage: Stage) : Stage() {
@@ -21,19 +22,19 @@ class AboutPopup(val parentStage: Stage) : Stage() {
         // TODO: Rewrite this with something better than bunching Text objects together
         // TODO: Add information about available sensors, virtual sensors and charts
         val titleText =
-            Text("SensorWrangler ${me.danielschaefer.sensorwrangler.javafx.App.instance.settings.version}")
+            Text("SensorWrangler ${App.instance.settings.version}")
         val sensorText = Text("Built-in sensor drivers:" + foldClassNames(App.instance.settings.supportedSensors))
         val chartText = Text("Available chart types:" + foldClassNames(App.instance.settings.supportedCharts))
         val recorderText = Text("Available recorders:" + foldClassNames(App.instance.settings.supportedRecorders))
 
         val freeSoftware = Hyperlink("Free Software").apply {
             setOnAction {
-                me.danielschaefer.sensorwrangler.javafx.App.instance.hostServices.showDocument("https://www.gnu.org/philosophy/free-sw.en.html")
+                GuiApp.instance.hostServices.showDocument("https://www.gnu.org/philosophy/free-sw.en.html")
             }
         }
         val github = Hyperlink("https://github.com/JohnAZoidberg/SensorWrangler\n").apply {
             setOnAction {
-                me.danielschaefer.sensorwrangler.javafx.App.instance.hostServices.showDocument("https://github.com/JohnAZoidberg/SensorWrangler")
+                GuiApp.instance.hostServices.showDocument("https://github.com/JohnAZoidberg/SensorWrangler")
             }
         }
         val licenseText = TextFlow(
@@ -62,7 +63,7 @@ class AboutPopup(val parentStage: Stage) : Stage() {
                 //   https://github.com/jjYBdx4IL/misc/blob/master/swing-utils/src/main/java/com/github/jjYBdx4IL/utils/awt/Desktop.java
                 // Or
                 //   https://stackoverflow.com/a/18004334/5932056
-                me.danielschaefer.sensorwrangler.javafx.App.instance.hostServices.showDocument("mailto:git@danielschaefer.me")
+                GuiApp.instance.hostServices.showDocument("mailto:git@danielschaefer.me")
             }
         }
         val me = Text("Copyright 2019 Daniel Schaefer ")

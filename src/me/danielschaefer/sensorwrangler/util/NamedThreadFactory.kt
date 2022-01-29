@@ -1,4 +1,4 @@
-package me.danielschaefer.sensorwrangler
+package me.danielschaefer.sensorwrangler.util
 
 import java.util.concurrent.ThreadFactory
 

@@ -1,7 +1,7 @@
 package me.danielschaefer.sensorwrangler
 
 import javafx.application.Application
-import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.javafx.GuiApp
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -10,7 +10,7 @@ class Main {
         @JvmStatic
         fun main(args: Array<String>) {
             logger.debug { "Launching Application" }
-            Application.launch(App::class.java, *args)
+            Application.launch(GuiApp::class.java, *args)
         }
     }
 }

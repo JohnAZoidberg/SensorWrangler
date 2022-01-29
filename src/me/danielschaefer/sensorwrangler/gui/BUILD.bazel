@@ -1,0 +1,14 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "gui",
+    srcs = glob([ "*.kt" ]),
+    deps = [
+        "//:lib_deps",
+        "//src/me/danielschaefer/sensorwrangler/data",
+    ],
+    visibility = [
+        "//src/me/danielschaefer/sensorwrangler/base:__pkg__",
+        "//src/me/danielschaefer/sensorwrangler/javafx:__pkg__",
+    ],
+)
