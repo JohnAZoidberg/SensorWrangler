@@ -1,7 +1,6 @@
-package me.danielschaefer.sensorwrangler.sensors
+package me.danielschaefer.sensorwrangler.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.danielschaefer.sensorwrangler.Measurement
 import java.util.UUID
 
 abstract class VirtualSensor {

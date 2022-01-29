@@ -1,8 +1,4 @@
-package me.danielschaefer.sensorwrangler
-
-enum class Picker {
-    FileOpen, FileSave, Directory, None
-}
+package me.danielschaefer.sensorwrangler.data
 
 /**
  * Preferences for the Preferences tab in Settings

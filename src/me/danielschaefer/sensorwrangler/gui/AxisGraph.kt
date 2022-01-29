@@ -1,6 +1,7 @@
 package me.danielschaefer.sensorwrangler.gui
 
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Chart
+import me.danielschaefer.sensorwrangler.data.Measurement
 
 abstract class AxisGraph : Chart() {
     abstract var yAxisLabel: String

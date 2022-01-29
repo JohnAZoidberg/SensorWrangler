@@ -1,6 +1,7 @@
 package me.danielschaefer.sensorwrangler.recording
 
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
+import me.danielschaefer.sensorwrangler.data.Recorder
 import java.io.File
 import java.io.FileWriter
 import java.io.Writer

@@ -1,5 +1,7 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import me.danielschaefer.sensorwrangler.data.VirtualSensor
+
 /**
  * Abstract Sensor
  *

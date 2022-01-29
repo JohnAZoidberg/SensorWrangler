@@ -7,7 +7,7 @@ import be.glever.antplus.common.datapage.registry.AbstractDataPageRegistry
 import be.glever.antplus.power.PowerChannel
 import be.glever.antplus.power.datapage.PowerDataPageRegistry
 import be.glever.antplus.power.datapage.main.PowerDataPage10PowerOnly
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 import kotlin.random.Random
 
 class AntPowerSensor : AntPlusSensor<PowerChannel>() {

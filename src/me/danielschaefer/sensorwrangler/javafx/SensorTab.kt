@@ -20,12 +20,13 @@ import javafx.scene.text.Text
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.VirtualSensor
 import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.sensors.Averager
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
 import me.danielschaefer.sensorwrangler.sensors.Sensor
-import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.declaredMemberProperties
 

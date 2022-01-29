@@ -1,0 +1,19 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "sensors",
+    # TODO: Split AntPlus into separate package, so we can build without that
+    srcs = glob([ "*.kt" ]) + glob(["*.java"]),
+    deps = [
+        "//:lib_deps",
+        "@j_antplus//:j_antplus",
+
+        "//src/me/danielschaefer/sensorwrangler/annotations",
+        "//src/me/danielschaefer/sensorwrangler/data",
+        "//src/me/danielschaefer/sensorwrangler/util",
+    ],
+    visibility = [
+        "//src/me/danielschaefer/sensorwrangler:__pkg__",
+        "//src/me/danielschaefer/sensorwrangler/base:__pkg__",
+    ],
+)

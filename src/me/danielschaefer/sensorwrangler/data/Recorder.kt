@@ -1,6 +1,4 @@
-package me.danielschaefer.sensorwrangler.recording
-
-import me.danielschaefer.sensorwrangler.Measurement
+package me.danielschaefer.sensorwrangler.data
 
 interface Recorder {
     fun recordValue(timestamp: String, measurement: Measurement, value: Double)

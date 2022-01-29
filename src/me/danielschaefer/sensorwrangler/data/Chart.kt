@@ -1,4 +1,4 @@
-package me.danielschaefer.sensorwrangler.gui
+package me.danielschaefer.sensorwrangler.data
 
 import javafx.beans.property.ReadOnlyBooleanProperty
 import javafx.beans.property.ReadOnlyBooleanWrapper

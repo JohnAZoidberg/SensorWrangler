@@ -1,13 +1,19 @@
-load("@rules_java//java:defs.bzl", "java_binary")
+# TODO:
+# - [ ] AboutPopup
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
 
+# Library of the core functionality
+# This is what the GUI and CLI implementations depend on
+# Could be used by 3rd party applications.
 kt_jvm_library(
-    name = "app_lib",
-    srcs = glob(["**/*.kt"]) + glob(["**/*.java"]),
+    name = "sensorwrangler_core",
+    srcs = [ "Library.kt" ],
     deps = [
-        "//:gui_deps",
-        "//:lib_deps",
+        "//src/me/danielschaefer/sensorwrangler/data",
+        "//src/me/danielschaefer/sensorwrangler/recording",
+        "//src/me/danielschaefer/sensorwrangler/sensors",
+        "//src/me/danielschaefer/sensorwrangler/base",
     ],
     visibility = ["//visibility:public"],
 )
@@ -17,16 +23,30 @@ kt_jvm_library(
     srcs = [ "Cli.kt" ],
     deps = [
         "//:lib_deps",
+        ":sensorwrangler_core",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+kt_jvm_library(
+    name = "gui_lib",
+    srcs = [ "Main.kt" ],
+    deps = [
+        "//:lib_deps",
+        "//src/me/danielschaefer/sensorwrangler/javafx",
+        ":sensorwrangler_core",
     ],
     visibility = ["//visibility:public"],
 )
 
 ktlint_test(
     name = "lint_test",
+    # TODO: Doesn't work anymore because sources from sub-packages are ignored by bazel
     srcs = glob(["**/*.kt"]),
 )
 
 ktlint_fix(
     name = "lint_fix",
+    # TODO: Doesn't work anymore because sources from sub-packages are ignored by bazel
     srcs = glob(["**/*.kt"]),
 )

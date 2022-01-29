@@ -3,20 +3,13 @@ package me.danielschaefer.sensorwrangler.javafx
 import javafx.application.Application
 import javafx.application.Platform
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.SensorWrangler
-import me.danielschaefer.sensorwrangler.Settings
 import mu.KotlinLogging
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
 
-class App : Application() {
-    val wrangler = SensorWrangler()
-    val settings = Settings()
-
+class GuiApp : Application() {
     override fun start(primaryStage: Stage) {
-        instance = this
-
         // Wrap in try/catch and print everything, to see the proper stacktrace
         // even in non-debugging environments.
         // This is especially useful if it crashes right after launching.
@@ -33,7 +26,7 @@ class App : Application() {
     }
 
     private fun runMainWindow(primaryStage: Stage) {
-        MainWindow(primaryStage, wrangler)
+        MainWindow(primaryStage)
     }
 
     override fun stop() {
@@ -41,9 +34,5 @@ class App : Application() {
         // TODO: Properly close all stages
         // TODO: Stop all Executors
         exitProcess(0)
-    }
-
-    companion object {
-        lateinit var instance: App
     }
 }

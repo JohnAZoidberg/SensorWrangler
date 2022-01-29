@@ -2,9 +2,9 @@ package me.danielschaefer.sensorwrangler.sensors
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
+import me.danielschaefer.sensorwrangler.data.Measurement
 import mu.KotlinLogging
 import org.apache.commons.io.input.Tailer
 import org.apache.commons.io.input.TailerListenerAdapter

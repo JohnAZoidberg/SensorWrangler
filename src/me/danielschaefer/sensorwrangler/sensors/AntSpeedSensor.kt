@@ -8,8 +8,8 @@ import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
 import be.glever.antplus.speedcadence.datapage.main.SpeedCadenceDataPage5Motion
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
+import me.danielschaefer.sensorwrangler.data.Measurement
 import mu.KotlinLogging
 import kotlin.random.Random
 

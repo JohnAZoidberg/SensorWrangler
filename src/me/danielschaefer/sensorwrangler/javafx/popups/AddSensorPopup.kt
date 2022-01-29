@@ -16,13 +16,13 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
-import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.Measurement
+import me.danielschaefer.sensorwrangler.data.VirtualSensor
 import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
 import me.danielschaefer.sensorwrangler.javafx.SensorTab
-import me.danielschaefer.sensorwrangler.sensors.Sensor
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -58,9 +58,9 @@ class AddSensorPopup(val parentStage: Stage, val sensorTab: SensorTab? = null) :
             vgap = 10.0
         }
 
-        val sensorTypeSelection = ComboBox<KClass<out Sensor>>().apply {
+        val sensorTypeSelection = ComboBox<KClass<out VirtualSensor>>().apply {
             items.addAll(App.instance.settings.supportedSensors)
-            converter = JavaFXUtil.createSimpleClassStringConverter<Sensor>()
+            converter = JavaFXUtil.createSimpleClassStringConverter<VirtualSensor>()
 
             valueProperty().addListener(
                 ChangeListener { _, _, newChart ->

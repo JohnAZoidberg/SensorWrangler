@@ -7,7 +7,7 @@ import be.glever.antplus.fec.FecChannel
 import be.glever.antplus.fec.datapage.FecDataPageRegistry
 import be.glever.antplus.fec.datapage.main.FecDataPage16GeneralFeData
 import be.glever.antplus.fec.datapage.main.FecDataPage25Bike
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 import kotlin.random.Random
 
 class AntStationaryBike : AntPlusSensor<FecChannel>() {
