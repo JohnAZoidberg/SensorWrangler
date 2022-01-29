@@ -204,3 +204,18 @@ See the above GIF for examples.
 ### Customizable grid
 The charts are displayed in a grid, which is 2x2 in size, by default.
 The number of rows and columns can be changed in the Settings window but it will only change when saving the configuration and restarting the program.
+
+## Developing
+
+View the dependency graph between the packages in this project by running the following bazel query.
+
+Notes:
+
+- Needs graphviz (dot) installed
+- Use cquery because it respects the current platform (Operating System)
+- Remove the filter to show 3rd party dependencies
+- SVG can be viewed in a browser
+
+```Sh
+bazel cquery  --notool_deps --noimplicit_deps 'filter("^//.*:[a-zA-Z_]+$", deps(//:Gui))' --output graph | dot -Tsvg > deps.svg
+```
