@@ -16,10 +16,13 @@ import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.Picker
 import me.danielschaefer.sensorwrangler.Preference
 import me.danielschaefer.sensorwrangler.Settings
+import mu.KotlinLogging
 import java.io.File
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.declaredMemberProperties
+
+private val logger = KotlinLogging.logger {}
 
 class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
     private val contentBox = GridPane().apply {
@@ -68,7 +71,7 @@ class PreferencesTab(private val parentStage: Stage) : Tab("Preferences") {
                 }
             }
             else -> {
-                println(property.returnType)
+                logger.error { "Invalid type: ${property.returnType}" }
                 return false
             }
         }

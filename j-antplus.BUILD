@@ -22,6 +22,7 @@ java_library(
     visibility = ["//visibility:public"],
     name = "j_antplus",
     srcs = glob(["src/main/java/**/*.java"]),
-    resources = glob(["src/main/resources/**"]),
+    # Used as a library. Don't want it to override our resources
+    #resources = glob(["src/main/resources/**"]),
     deps = ["@j_antplus//:java_deps"],
 )

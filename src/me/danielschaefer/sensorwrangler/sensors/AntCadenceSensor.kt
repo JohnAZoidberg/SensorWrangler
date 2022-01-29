@@ -8,7 +8,10 @@ import be.glever.antplus.speedcadence.datapage.AbstractSpeedCadenceDataPage
 import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
+import mu.KotlinLogging
 import kotlin.random.Random
+
+private val logger = KotlinLogging.logger {}
 
 class AntCadenceSensor : AntPlusSensor<CadenceChannel>() {
     override val title: String = "AntCadenceSensor" + Random.nextInt(0, 100)
@@ -69,7 +72,7 @@ class AntCadenceSensor : AntPlusSensor<CadenceChannel>() {
             speedEventTime
         )
 
-        println("The crank is being rotated at $cadence RPM.")
+        logger.debug { "The crank is being rotated at $cadence RPM." }
         Platform.runLater {
             cadenceMeasurement.addDataPoint(cadence)
         }

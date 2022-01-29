@@ -5,7 +5,10 @@ import javafx.application.Platform
 import javafx.stage.Stage
 import me.danielschaefer.sensorwrangler.SensorWrangler
 import me.danielschaefer.sensorwrangler.Settings
+import mu.KotlinLogging
 import kotlin.system.exitProcess
+
+private val logger = KotlinLogging.logger {}
 
 class App : Application() {
     val wrangler = SensorWrangler()
@@ -20,12 +23,12 @@ class App : Application() {
         try {
             runMainWindow(primaryStage)
         } catch (e: Throwable) {
-            println("Exception: $e occured")
-            println("With message ${e.message}")
-            println("And cause: ${e.cause}")
-            println("Stacktrace:")
+            logger.error { "Exception: $e occured" }
+            logger.error { "With message ${e.message}" }
+            logger.error { "And cause: ${e.cause}" }
+            logger.error { "Stacktrace:" }
             for (x in e.stackTrace)
-                println(x)
+                logger.error { x }
         }
     }
 

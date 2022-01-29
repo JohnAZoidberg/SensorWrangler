@@ -45,9 +45,12 @@ import me.danielschaefer.sensorwrangler.gui.TableGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
+import mu.KotlinLogging
 import java.util.Date
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+
+private val logger = KotlinLogging.logger {}
 
 class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
     private val graphUpdaters: MutableMap<Node?, MutableList<() -> Unit>> = mutableMapOf()
@@ -102,6 +105,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
 
     private fun import() {
         if (!App.instance.wrangler.import(App.instance.settings.configPath)) {
+            logger.error { "Failed to import configuration because '${App.instance.settings.configPath}' was not found." }
             Alert(
                 primaryStage, "Import failed",
                 "Failed to import configuration because '${App.instance.settings.configPath}' was not found."
@@ -188,7 +192,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                                         value = null
                                     }
                                 }
-                                println("Switched from chart '$oldChart' to '$newChart'")
+                                logger.debug { "Switched from chart '$oldChart' to '$newChart'" }
                             }
                         )
                     }
@@ -519,7 +523,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                     is LineGraph -> LineChart(xAxis, fxYAxis).apply { createSymbols = chart.withDots }
                     is ScatterGraph -> ScatterChart(xAxis, fxYAxis)
                     else -> {
-                        println("Cannot display this kind of chart")
+                        logger.error { "Cannot display this kind of chart" }
                         null
                     }
                 }
@@ -580,7 +584,7 @@ class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWr
                 }
             }
             else -> {
-                println("Cannot display this kind of chart")
+                logger.error { "Cannot display this kind of chart" }
                 null
             }
         }

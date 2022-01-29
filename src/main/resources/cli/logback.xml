@@ -1,0 +1,15 @@
+<configuration>
+    <!-- For the CLI write all logs to stderr to not interfere with regular stdout prints -->
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="me.danielschaefer" level="debug"/>
+
+    <root level="debug">
+        <appender-ref ref="STDERR"/>
+    </root>
+</configuration>

@@ -3,11 +3,14 @@ package me.danielschaefer.sensorwrangler.sensors
 import com.fasterxml.jackson.annotation.JsonProperty
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
+import mu.KotlinLogging
 import java.io.IOException
 import java.net.ConnectException
 import java.net.Socket
 import kotlin.concurrent.thread
 import kotlin.random.Random
+
+private val logger = KotlinLogging.logger {}
 
 class SocketSensor : Sensor() {
     override val title: String = "SocketSensor ${Random.nextInt(0, 100)}"
@@ -49,10 +52,10 @@ class SocketSensor : Sensor() {
 
                         val value = line?.toDoubleOrNull()
 
-                        println("Read $line from $hostname:$port")
+                        logger.debug { "Read $line from $hostname:$port" }
 
                         if (value == null) {
-                            println("Invalid number was read in $title: '$line'")
+                            logger.error { "Invalid number was read in $title: '$line'" }
                             continue
                         }
 

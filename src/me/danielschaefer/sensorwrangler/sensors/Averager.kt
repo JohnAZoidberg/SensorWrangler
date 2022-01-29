@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.NamedThreadFactory
+import mu.KotlinLogging
 import java.util.Date
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+
+private val logger = KotlinLogging.logger {}
 
 class Averager : VirtualSensor() {
     @JsonProperty("sourceMeasurements")
@@ -36,7 +39,7 @@ class Averager : VirtualSensor() {
             return
 
         if (sourceMeasurements.all { it.unit != sourceMeasurements.first().unit }) {
-            println("Cannot average measurements with different units")
+            logger.error { "Cannot average measurements with different units" }
             return
         }
 

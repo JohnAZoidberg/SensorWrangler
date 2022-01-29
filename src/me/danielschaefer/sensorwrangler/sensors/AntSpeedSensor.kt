@@ -10,7 +10,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
 import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.SensorProperty
+import mu.KotlinLogging
 import kotlin.random.Random
+
+private val logger = KotlinLogging.logger {}
 
 class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
     override val registry = SpeedCadenceDataPageRegistry()
@@ -58,7 +61,7 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
             val payLoad = antMessage.payLoad
             removeToggleBit(payLoad)
             val dataPage = registry.constructDataPage(payLoad)
-            // LOG.debug(() -> "Received datapage " + dataPage.toString());
+            // logger.debug { "Received datapage ${dataPage}" }
             if (dataPage is SpeedCadenceDataPage5Motion) {
                 calcSpeedDistance(dataPage, wheelDiameter * 2.54)
             }
@@ -90,7 +93,7 @@ class AntSpeedSensor : AntPlusSensor<SpeedChannel>() {
         val kmhSpeed = speed * 3.6
         val travelledDistance = calculateDistance(circumference, curRevCount, firstSpeedRevCount)
 
-        println("The bike is currently" + (if (isMoving) "" else " not") + " moving at " + kmhSpeed + " km/h and has travelled " + travelledDistance + " m.")
+        logger.debug { "The bike is currently ${(if (isMoving) "" else " not")} moving at $kmhSpeed km/h and has travelled $travelledDistance m." }
         Platform.runLater {
             speedMeasurement.addDataPoint(kmhSpeed)
             distanceMeasurement.addDataPoint(travelledDistance)
