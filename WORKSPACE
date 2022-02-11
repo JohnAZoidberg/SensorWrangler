@@ -67,8 +67,10 @@ maven_install(
         "io.projectreactor:reactor-core:3.3.4.RELEASE",
         "org.reactivestreams:reactive-streams:1.0.3",
         "org.usb4java:usb4java:1.3.0",
+        "org.usb4java:usb4java-javax:1.3.0",
         "ch.qos.logback:logback-core:1.2.3",
         "ch.qos.logback:logback-classic:1.2.3",
+        "org.apache.commons:commons-lang3:3.8.1",
         "junit:junit:4.13", # Only for testing
     ],
     repositories = [
@@ -96,11 +98,7 @@ http_archive(
 
 new_git_repository(
     name = "j_antplus",
-    # Optionally use the bazel branch with BUILD and WORKSPACE file,
-    # or use the j-antplus.BUILD file in this repo.
-    #commit = "be48a010c5020b0c6a123847061a3569ecfbac28", # bazel branch
-
-    commit = "6c7dddc809303fd664bb3ab8f1197a40731578ef", # master branch
+    commit = "83c35b5b7fb61198fc522c331deaf6a24c04c1df", # master branch
     shallow_since = "1593867481 +0200",
     remote = "https://github.com/johnazoidberg/j-antplus",
     build_file = "@//:j-antplus.BUILD",
