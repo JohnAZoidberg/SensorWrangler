@@ -55,6 +55,6 @@ class FileSensor : Sensor() {
                 }
             }
         }
-        tailer = Tailer.create(filePath, tailerListener, 1000)
+        tailer = Tailer.create(filePath, tailerListener, 500)
     }
 }

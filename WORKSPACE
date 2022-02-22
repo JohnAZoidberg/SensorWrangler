@@ -1,5 +1,5 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 rules_kotlin_version = "v1.5.0-beta-4"
 rules_kotlin_sha = "6cbd4e5768bdfae1598662e40272729ec9ece8b7bded8f0d2c81c8ff96dc139d"
@@ -60,17 +60,17 @@ maven_install(
         "org.openjfx:javafx-graphics:linux:11.0.1",
         "org.openjfx:javafx-graphics:mac:11.0.1",
 
+
         # j-antplus dependencies
-        # Need to include them here because Bazel doesn't consider WORKSPACE of
-        # subprojects. See: https://github.com/bazelbuild/bazel/issues/1943
         "javax.usb:usb-api:1.0.2",
+        # slf4j already present above
         "io.projectreactor:reactor-core:3.3.4.RELEASE",
         "org.reactivestreams:reactive-streams:1.0.3",
         "org.usb4java:usb4java:1.3.0",
-        "org.usb4java:usb4java-javax:1.3.0",
+		"org.usb4java:usb4java-javax:1.3.0",
         "ch.qos.logback:logback-core:1.2.3",
         "ch.qos.logback:logback-classic:1.2.3",
-        "org.apache.commons:commons-lang3:3.8.1",
+		"org.apache.commons:commons-lang3:3.8.1",
         "junit:junit:4.13", # Only for testing
     ],
     repositories = [
@@ -90,16 +90,32 @@ http_archive(
 # Multiple ways of getting it.
 
 # For local development.
+# Needs a BUILD and WORKSPACE file (give in the bazel branch of JohnAZoidberg/j-antplus)
 #local_repository(
 #    name = "j_antplus",
-#    path = "/home/zoid/cloudhome/projects/j-antplus",
+#    path = "/home/zoid/cloudhome/projects/sensorwrangler/j-antplus",
 #)
 
-# Fetch from GitHub and use bazel BUILD files from there to build it
-# Still depends on this workspace!
-git_repository(
+new_git_repository(
     name = "j_antplus",
+    # Optionally use the bazel branch with BUILD and WORKSPACE file,
+    # or use the j-antplus.BUILD file in this repo.
+    #commit = "be48a010c5020b0c6a123847061a3569ecfbac28", # bazel branch
+
     commit = "83c35b5b7fb61198fc522c331deaf6a24c04c1df", # master branch
     shallow_since = "1593867481 +0200",
     remote = "https://github.com/johnazoidberg/j-antplus",
+    build_file = "@//:j-antplus.BUILD",
 )
+
+# http_archive is preferreed to new_git_repository.
+# See: https://docs.bazel.build/versions/main/external.html#repository-rules
+## TODO: Doesn't work. Not sure why. Can't find the BUILD file in the other repo
+#jantplus_rev = "be48a010c5020b0c6a123847061a3569ecfbac28"
+#http_archive(
+#    name = "j_antplus",
+#    url = "https://github.com/JohnAZoidberg/j-antplus/archive/%s.tar.gz" % jantplus_rev,
+#    #sha256 = "8d0ae32b26a8229b8bef650e56811ed6efb36b9695c182a7f1d8c878b2d1be5a",
+#    # TODO: Also doesn't work because then it can't find the dependencies
+#    #build_file = "@//:j-antplus.BUILD",
+#)

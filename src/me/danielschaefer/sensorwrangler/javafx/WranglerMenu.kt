@@ -13,6 +13,8 @@ import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.AddSensorPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
+import me.danielschaefer.sensorwrangler.javafx.popups.test.DataPointsExporter
+import java.util.*
 
 fun createMenuBar(primaryStage: Stage): MenuBar {
     return MenuBar().apply {
@@ -55,6 +57,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             items.add(
                 MenuItem("Exit").apply {
                     onAction = EventHandler {
+                        DataPointsExporter().closeWriter()
                         Platform.exit()
                     }
                 }
@@ -78,7 +81,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             )
         }
 
-        val sensorMenu = Menu("Sensors").apply {
+        val sensorMenu = Menu("Sensors/Timers").apply {
             items.add(
                 MenuItem("Add").apply {
                     onAction = EventHandler {
@@ -135,12 +138,22 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             items.add(aboutItem)
         }
 
+        val testMenu = Menu("Test").apply {
+            val exportDataPoints = MenuItem("Data Points").apply {
+                onAction = EventHandler {
+                    DataPointsExporter().extractDataPoints()
+                }
+            }
+            items.add(exportDataPoints)
+        }
+
         menus.add(fileMenu)
         menus.add(recordingMenu)
         menus.add(sensorMenu)
         menus.add(chartMenu)
         menus.add(averageMenu)
         menus.add(helpMenu)
+        menus.add(testMenu)
     }
 }
 
