@@ -142,6 +142,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             val exportDataPoints = MenuItem("Data Points").apply {
                 onAction = EventHandler {
                     DataPointsExporter().extractDataPoints()
+
                 }
             }
             items.add(exportDataPoints)
