@@ -7,3 +7,5 @@ bazel-bin
 bazel-sensorwrangler
 bazel-out
 bazel-testlogs
+tools/test.txt
+bazel-sensorwrangler_test/
