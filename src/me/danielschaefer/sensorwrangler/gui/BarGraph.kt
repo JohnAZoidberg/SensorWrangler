@@ -1,7 +1,8 @@
 package me.danielschaefer.sensorwrangler.gui
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Chart
+import me.danielschaefer.sensorwrangler.data.Measurement
 
 class BarGraph : Chart() {
     @JsonProperty("title")

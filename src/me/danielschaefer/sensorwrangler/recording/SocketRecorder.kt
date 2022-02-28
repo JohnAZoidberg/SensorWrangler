@@ -1,6 +1,7 @@
 package me.danielschaefer.sensorwrangler.recording
 
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
+import me.danielschaefer.sensorwrangler.data.Recorder
 import mu.KotlinLogging
 import java.io.OutputStreamWriter
 import java.net.ServerSocket

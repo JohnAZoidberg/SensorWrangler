@@ -16,20 +16,20 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.Chart
+import me.danielschaefer.sensorwrangler.data.Measurement
+import me.danielschaefer.sensorwrangler.data.VirtualSensor
 import me.danielschaefer.sensorwrangler.gui.AngleGraph
 import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.gui.BarDistributionGraph
 import me.danielschaefer.sensorwrangler.gui.BarGraph
-import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.PieDistributionGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
 import me.danielschaefer.sensorwrangler.gui.TableGraph
-import me.danielschaefer.sensorwrangler.javafx.App
 import me.danielschaefer.sensorwrangler.javafx.ChartTab
 import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
-import me.danielschaefer.sensorwrangler.sensors.VirtualSensor
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 

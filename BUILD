@@ -33,25 +33,17 @@ java_library(
     exports = [
         # Miscellaneous
         "@maven//:commons_io_commons_io",
-        "@maven//:joda_time_joda_time",
+        #"@maven//:joda_time_joda_time", # Unused for now
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
 
         # Configuration Import/Export
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
-
-        # Database
-        "@maven//:com_github_JetBrains_Exposed_exposed_core",
-        "@maven//:com_github_JetBrains_Exposed_exposed_jdbc",
-        "@maven//:org_postgresql_postgresql",
 
         # Logging
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:ch_qos_logback_logback_core",
         "@maven//:ch_qos_logback_logback_classic",
         "@maven//:io_github_microutils_kotlin_logging_jvm",
-
-        # ANT+
-        "@j_antplus//:j_antplus",
     ],
 )
 
@@ -84,13 +76,17 @@ java_binary(
     name = "Cli",
     main_class = "me.danielschaefer.sensorwrangler.Cli",
     classpath_resources = glob(["src/main/resources/cli/logback.xml"]),
-    runtime_deps = ["//src/me/danielschaefer/sensorwrangler:cli_lib"],
+    runtime_deps = [
+        "//src/me/danielschaefer/sensorwrangler:cli_lib"
+    ],
 )
 
 java_binary(
     name = "Gui",
     main_class = "me.danielschaefer.sensorwrangler.Main",
-    classpath_resources = glob(["src/main/resources/gui/logback.xml*"]),
+    classpath_resources = glob(["src/main/resources/gui/logback.xml"]),
     resources = glob(["src/main/resources/*"]),
-    runtime_deps = ["//src/me/danielschaefer/sensorwrangler:app_lib"],
+    runtime_deps = [
+        "//src/me/danielschaefer/sensorwrangler:gui_lib",
+    ],
 )

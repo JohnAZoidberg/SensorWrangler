@@ -2,8 +2,9 @@ package me.danielschaefer.sensorwrangler.sensors
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
-import me.danielschaefer.sensorwrangler.NamedThreadFactory
+import me.danielschaefer.sensorwrangler.data.Measurement
+import me.danielschaefer.sensorwrangler.data.VirtualSensor
+import me.danielschaefer.sensorwrangler.util.NamedThreadFactory
 import mu.KotlinLogging
 import java.util.Date
 import java.util.concurrent.Executors

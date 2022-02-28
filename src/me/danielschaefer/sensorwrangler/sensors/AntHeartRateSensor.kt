@@ -8,7 +8,7 @@ import be.glever.antplus.hrm.HRMChannel
 import be.glever.antplus.hrm.datapage.HrmDataPageRegistry
 import be.glever.antplus.hrm.datapage.main.HrmDataPage4PreviousHeartBeatEvent
 import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 import kotlin.random.Random
 
 class AntHeartRateSensor : AntPlusSensor<HRMChannel>() {

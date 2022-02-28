@@ -1,8 +1,8 @@
 package me.danielschaefer.sensorwrangler.sensors
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import me.danielschaefer.sensorwrangler.Measurement
 import me.danielschaefer.sensorwrangler.annotations.ConnectionProperty
+import me.danielschaefer.sensorwrangler.data.Measurement
 import mu.KotlinLogging
 import java.io.IOException
 import java.net.ConnectException

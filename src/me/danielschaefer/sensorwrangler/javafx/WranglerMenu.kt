@@ -7,6 +7,7 @@ import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import me.danielschaefer.sensorwrangler.base.App
 import me.danielschaefer.sensorwrangler.javafx.popups.AboutPopup
 import me.danielschaefer.sensorwrangler.javafx.popups.AddAveragePopup
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
