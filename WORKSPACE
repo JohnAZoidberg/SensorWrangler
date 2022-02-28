@@ -90,6 +90,7 @@ http_archive(
 # Multiple ways of getting it.
 
 # For local development.
+# Needs a BUILD and WORKSPACE file (give in the bazel branch of JohnAZoidberg/j-antplus)
 #local_repository(
 #    name = "j_antplus",
 #    path = "/home/zoid/cloudhome/projects/j-antplus",
@@ -99,7 +100,7 @@ http_archive(
 # Still depends on this workspace!
 git_repository(
     name = "j_antplus",
-    commit = "83c35b5b7fb61198fc522c331deaf6a24c04c1df", # master branch
+    commit = "c992400132d1c1715f5ba002b24c020f16744acf",
     shallow_since = "1593867481 +0200",
     remote = "https://github.com/johnazoidberg/j-antplus",
 )
