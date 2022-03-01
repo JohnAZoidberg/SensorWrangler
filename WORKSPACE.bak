@@ -38,6 +38,7 @@ maven_install(
         "com.github.JetBrains.Exposed:exposed-jdbc:0.18.1",
         "joda-time:joda-time:2.5",
         "org.postgresql:postgresql:42.2.5",
+		"org.json:json:20211205",
 
         # Logging (also run-time dependency of some other dependencies)
         "org.slf4j:slf4j-api:1.7.11",
@@ -103,6 +104,7 @@ new_git_repository(
     #commit = "be48a010c5020b0c6a123847061a3569ecfbac28", # bazel branch
 
     commit = "83c35b5b7fb61198fc522c331deaf6a24c04c1df", # master branch
+    shallow_since = "1593867481 +0200",
     remote = "https://github.com/johnazoidberg/j-antplus",
     build_file = "@//:j-antplus.BUILD",
 )

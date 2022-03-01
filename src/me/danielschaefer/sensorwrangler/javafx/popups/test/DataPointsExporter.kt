@@ -1,52 +1,60 @@
 package me.danielschaefer.sensorwrangler.javafx.popups.test
 
 import me.danielschaefer.sensorwrangler.javafx.App
-import java.io.File
-import java.io.FileWriter
-import java.io.Writer
-import java.io.FileReader
-import java.io.Reader
-import java.nio.file.Paths
+import java.io.*
+import java.nio.file.*
+import kotlin.io.path.createDirectory
+//import org.json.*
+
 
 class DataPointsExporter {
-    val configFile = getConfigPath()
-    private val configWriter: Writer = FileWriter(configFile,false);
-    private val configReader: Reader = FileReader(configFile)
-
-
+    //val configFile = getConfigPath()
+    //private val configReader: Reader = FileReader(configFile)
+    //val jsonReader: JSONObject = JSONObject(getConfigPath())
+    //val number = jsonReader.getInt("index")
+    val path = "C:\\Users\\Daniel\\Desktop\\Programmieren\\Projekte\\SensorWrangler\\data\\Measurement-1"
     fun extractDataPoints(){
+       /* if (!getDataPath().isDirectory) {
+            getDataPath().toPath().createDirectory()
+        }
+        val newIndex = number + 1
+        jsonReader.put("index", "$newIndex")*/
      for (sensor in App.instance.wrangler.sensors){
-         val dataFile = Paths.get(getDataPath().toString(),sensor.title.toString()+".txt").toFile()
+         val dataFile = Paths.get(path,sensor.title+".txt").toFile()
+             dataFile.createNewFile()
          val writer: Writer = FileWriter(dataFile,true);
          for (measurement in sensor.measurements){
              for (dataPoint in measurement.dataPoints){
-                    writer.write("$dataPoint");
+                    writer.write("${dataPoint.value}\n");
                  writer.flush()
              }
          }
          writer.close()
      }
+        /*val configWriter: Writer = FileWriter(configFile,true);
+        incrementConfigNumber(configWriter)
+        configWriter.close()*/
  }
-
+/*
     fun getConfigPath(): File {
         var relPath = File(System.getProperty("user.dir"))
-        return Paths.get(relPath.parent, "data", "config.txt").toFile()
+        return Paths.get(relPath.parent, "data", "config.json").toFile()
     }
 
     fun getDataPath(): File {
         var relPath = File(System.getProperty("user.dir"))
-        return Paths.get(relPath.parent, "data", "Measurement" + getConfigNumber().toString()).toFile()
+        return Paths.get(relPath.parent, "data", "Measurement$number").toFile()
     }
 
-    fun getConfigNumber(): Int {
-        val number = configReader.read().toInt()
-        configWriter.write(number+1)
-        configWriter.flush()
-        return number
+
+
+    fun incrementConfigNumber(writer: Writer){
+
     }
     fun closeWriter(){
-      configWriter.close()
       configReader.close()
-    }
+    }*/
 
 }
+
+

@@ -57,7 +57,7 @@ fun createMenuBar(primaryStage: Stage): MenuBar {
             items.add(
                 MenuItem("Exit").apply {
                     onAction = EventHandler {
-                        DataPointsExporter().closeWriter()
+
                         Platform.exit()
                     }
                 }

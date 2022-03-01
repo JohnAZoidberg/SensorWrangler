@@ -44,6 +44,7 @@ java_library(
         "@maven//:com_github_JetBrains_Exposed_exposed_jdbc",
         "@maven//:org_postgresql_postgresql",
 
+
         # Logging
         "@maven//:org_slf4j_slf4j_api",
         "@maven//:ch_qos_logback_logback_core",
