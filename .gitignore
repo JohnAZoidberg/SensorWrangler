@@ -10,3 +10,4 @@ bazel-testlogs
 tools/test.txt
 bazel-sensorwrangler_test/
 /data/
+tools/test.text
