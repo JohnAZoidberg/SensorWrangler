@@ -3,17 +3,12 @@ package me.danielschaefer.sensorwrangler.javafx
 import javafx.application.Application
 import javafx.application.Platform
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.SensorWrangler
-import me.danielschaefer.sensorwrangler.Settings
 import mu.KotlinLogging
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger {}
 
-class App : Application() {
-    val wrangler = SensorWrangler()
-    val settings = Settings()
-
+class GuiApp : Application() {
     override fun start(primaryStage: Stage) {
         instance = this
 
@@ -33,7 +28,7 @@ class App : Application() {
     }
 
     private fun runMainWindow(primaryStage: Stage) {
-        MainWindow(primaryStage, wrangler)
+        MainWindow(primaryStage)
     }
 
     override fun stop() {
@@ -44,6 +39,6 @@ class App : Application() {
     }
 
     companion object {
-        lateinit var instance: App
+        lateinit var instance: GuiApp
     }
 }

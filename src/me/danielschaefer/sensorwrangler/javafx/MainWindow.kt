@@ -30,14 +30,12 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import javafx.util.StringConverter
-import me.danielschaefer.sensorwrangler.NamedThreadFactory
-import me.danielschaefer.sensorwrangler.SensorWrangler
-import me.danielschaefer.sensorwrangler.StringUtil
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.Chart
 import me.danielschaefer.sensorwrangler.gui.AngleGraph
 import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.gui.BarDistributionGraph
 import me.danielschaefer.sensorwrangler.gui.BarGraph
-import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.PieDistributionGraph
 import me.danielschaefer.sensorwrangler.gui.ScatterGraph
@@ -45,6 +43,8 @@ import me.danielschaefer.sensorwrangler.gui.TableGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.Alert
 import me.danielschaefer.sensorwrangler.javafx.popups.StartRecordingPopup
 import me.danielschaefer.sensorwrangler.sensors.ConnectionChangeListener
+import me.danielschaefer.sensorwrangler.util.NamedThreadFactory
+import me.danielschaefer.sensorwrangler.util.StringUtil
 import mu.KotlinLogging
 import java.util.Date
 import java.util.concurrent.Executors
@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
-class MainWindow(private val primaryStage: Stage, private val wrangler: SensorWrangler) {
+class MainWindow(private val primaryStage: Stage) {
     private val graphUpdaters: MutableMap<Node?, MutableList<() -> Unit>> = mutableMapOf()
     private var paused = SimpleBooleanProperty(false).apply {}
     private var live = SimpleBooleanProperty(true)

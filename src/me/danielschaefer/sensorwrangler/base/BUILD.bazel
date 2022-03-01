@@ -1,0 +1,18 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "base",
+    srcs = glob([ "*.kt" ]),
+    # Must not depend on UI Implementations. Instead they depend on this.
+    deps = [
+        "//:lib_deps",
+        "//src/me/danielschaefer/sensorwrangler/data",
+        "//src/me/danielschaefer/sensorwrangler/gui",
+        "//src/me/danielschaefer/sensorwrangler/recording",
+        "//src/me/danielschaefer/sensorwrangler/sensors",
+    ],
+    visibility = [
+        "//src/me/danielschaefer/sensorwrangler:__pkg__",
+        "//src/me/danielschaefer/sensorwrangler/javafx:__pkg__",
+    ],
+)

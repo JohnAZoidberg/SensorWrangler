@@ -12,8 +12,8 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.Measurement
-import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.Measurement
 import me.danielschaefer.sensorwrangler.sensors.Averager
 import me.danielschaefer.sensorwrangler.sensors.Sensor
 

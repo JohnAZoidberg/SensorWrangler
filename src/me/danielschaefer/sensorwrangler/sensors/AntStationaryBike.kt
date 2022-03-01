@@ -1,5 +1,7 @@
 package me.danielschaefer.sensorwrangler.sensors
 
+import be.glever.ant.channel.AntChannelId
+import be.glever.ant.constants.AntPlusDeviceType
 import be.glever.ant.message.AntMessage
 import be.glever.ant.message.data.BroadcastDataMessage
 import be.glever.ant.usb.AntUsbDevice
@@ -7,7 +9,7 @@ import be.glever.antplus.fec.FecChannel
 import be.glever.antplus.fec.datapage.FecDataPageRegistry
 import be.glever.antplus.fec.datapage.main.FecDataPage16GeneralFeData
 import be.glever.antplus.fec.datapage.main.FecDataPage25Bike
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 import kotlin.random.Random
 
 class AntStationaryBike : AntPlusSensor<FecChannel>() {
@@ -24,17 +26,19 @@ class AntStationaryBike : AntPlusSensor<FecChannel>() {
     }
     override val measurements: List<Measurement> = listOf(powerMeasurement, cadenceMeasurement, speedMeasurement)
 
+    override val deviceType = AntPlusDeviceType.Fec
+
     private fun removeToggleBit(payload: ByteArray) {
         payload[0] = (127 and payload[0].toInt()).toByte()
     }
 
-    override fun createChannel(device: AntUsbDevice): FecChannel {
-        return FecChannel(device)
+    override fun createChannel(usbDevice: AntUsbDevice, channelId: AntChannelId): FecChannel {
+        return FecChannel(usbDevice, channelId.deviceNumber)
     }
 
     override val registry = FecDataPageRegistry()
 
-    override fun handleMessage(antMessage: AntMessage?) {
+    override fun handleDevSpecificMessage(antMessage: AntMessage?) {
         if (antMessage is BroadcastDataMessage) {
             val payLoad = antMessage.payLoad
             removeToggleBit(payLoad)

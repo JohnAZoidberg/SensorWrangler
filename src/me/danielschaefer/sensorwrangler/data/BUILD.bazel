@@ -1,0 +1,13 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+# Interfaces and abstract classes to depend on by other packages
+kt_jvm_library(
+    name = "data",
+    srcs = glob([ "*.kt" ]),
+    deps = [
+        "//:lib_deps",
+        # Depends on some data classes from JavaFX.Base
+        "@maven//:org_openjfx_javafx_base",
+    ],
+    visibility = ["//visibility:public"],
+)

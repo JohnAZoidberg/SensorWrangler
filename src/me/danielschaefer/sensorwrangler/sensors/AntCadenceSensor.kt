@@ -1,19 +1,20 @@
 package me.danielschaefer.sensorwrangler.sensors
 
-import be.glever.ant.message.AntMessage
-import be.glever.ant.message.data.BroadcastDataMessage
+import be.glever.ant.channel.AntChannelId
+import be.glever.ant.constants.AntPlusDeviceType
 import be.glever.ant.usb.AntUsbDevice
+import be.glever.antplus.common.datapage.AbstractAntPlusDataPage
 import be.glever.antplus.speedcadence.CadenceChannel
 import be.glever.antplus.speedcadence.datapage.AbstractSpeedCadenceDataPage
 import be.glever.antplus.speedcadence.datapage.SpeedCadenceDataPageRegistry
 import javafx.application.Platform
-import me.danielschaefer.sensorwrangler.Measurement
+import me.danielschaefer.sensorwrangler.data.Measurement
 import mu.KotlinLogging
 import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
 
-class AntCadenceSensor : AntPlusSensor<CadenceChannel>() {
+class AntCadenceSensor : AntSpeedCadenceSensor<CadenceChannel>() {
     override val title: String = "AntCadenceSensor" + Random.nextInt(0, 100)
 
     private val cadenceMeasurement = Measurement(this, 0, Measurement.Unit.RPM).apply {
@@ -21,35 +22,28 @@ class AntCadenceSensor : AntPlusSensor<CadenceChannel>() {
     }
     override val measurements: List<Measurement> = listOf(cadenceMeasurement)
 
+    override val deviceType = AntPlusDeviceType.Cadence
+
     private var prevCadenceRevCount = 0
     private var firstCadenceRevCount = 0
     private var prevCadenceEventTime: Long = 0
 
-    private fun removeToggleBit(payload: ByteArray) {
-        payload[0] = (127 and payload[0].toInt()).toByte()
-    }
-
-    override fun createChannel(device: AntUsbDevice): CadenceChannel {
+    override fun createChannel(usbDevice: AntUsbDevice, channelId: AntChannelId): CadenceChannel {
         // Reset everything to 0 on connect
         // TODO: Find a better place to reset them to zero
         prevCadenceRevCount = 0
         firstCadenceRevCount = 0
         prevCadenceEventTime = 0
 
-        return CadenceChannel(device)
+        return CadenceChannel(usbDevice, channelId.deviceNumber)
     }
 
     override val registry = SpeedCadenceDataPageRegistry()
 
-    override fun handleMessage(antMessage: AntMessage?) {
-        if (antMessage is BroadcastDataMessage) {
-            val payLoad = antMessage.payLoad
-            removeToggleBit(payLoad)
-
-            val dataPage = registry.constructDataPage(payLoad)
-            if (dataPage is AbstractSpeedCadenceDataPage) {
+    override fun handleSpeedCadenceDataPage(dataPage: AbstractAntPlusDataPage) {
+        when (dataPage) {
+            is AbstractSpeedCadenceDataPage ->
                 calcCadence(dataPage)
-            }
         }
     }
 

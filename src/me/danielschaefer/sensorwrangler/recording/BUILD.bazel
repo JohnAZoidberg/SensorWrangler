@@ -1,0 +1,19 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "recording",
+    srcs = glob([ "*.kt" ]),
+    deps = [
+        "//:lib_deps",
+        "//src/me/danielschaefer/sensorwrangler/data",
+
+        # Database
+        "@maven//:com_github_JetBrains_Exposed_exposed_core",
+        "@maven//:com_github_JetBrains_Exposed_exposed_jdbc",
+        "@maven//:org_postgresql_postgresql",
+    ],
+    visibility = [
+        "//src/me/danielschaefer/sensorwrangler:__pkg__",
+        "//src/me/danielschaefer/sensorwrangler/base:__pkg__",
+    ],
+)

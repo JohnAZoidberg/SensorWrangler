@@ -15,9 +15,9 @@ import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.javafx.App
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.Recorder
 import me.danielschaefer.sensorwrangler.javafx.JavaFXUtil
-import me.danielschaefer.sensorwrangler.recording.Recorder
 import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createType

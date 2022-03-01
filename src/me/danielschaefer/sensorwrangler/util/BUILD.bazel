@@ -1,0 +1,16 @@
+load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+# Package that doesn't depend on other SensorWrangler packages
+# Just collects some random utilities that other classes can depend on
+kt_jvm_library(
+    name = "util",
+    srcs = glob([ "*.kt" ]),
+    deps = [
+    ],
+    # Maybe make it public
+    visibility = [
+        "//src/me/danielschaefer/sensorwrangler:__pkg__",
+        "//src/me/danielschaefer/sensorwrangler/javafx:__pkg__",
+        "//src/me/danielschaefer/sensorwrangler/sensors:__pkg__",
+    ],
+)

@@ -16,15 +16,16 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import me.danielschaefer.sensorwrangler.StringUtil
+import me.danielschaefer.sensorwrangler.base.App
+import me.danielschaefer.sensorwrangler.data.Chart
 import me.danielschaefer.sensorwrangler.gui.AngleGraph
 import me.danielschaefer.sensorwrangler.gui.AxisGraph
 import me.danielschaefer.sensorwrangler.gui.BarGraph
-import me.danielschaefer.sensorwrangler.gui.Chart
 import me.danielschaefer.sensorwrangler.gui.DistributionGraph
 import me.danielschaefer.sensorwrangler.gui.LineGraph
 import me.danielschaefer.sensorwrangler.gui.TableGraph
 import me.danielschaefer.sensorwrangler.javafx.popups.AddChartPopup
+import me.danielschaefer.sensorwrangler.util.StringUtil
 
 class ChartTab(parentStage: Stage) : Tab("Charts") {
     val chartList: ListView<Chart>
