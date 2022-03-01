@@ -62,7 +62,7 @@ class Averager : VirtualSensor() {
                     Platform.runLater {
                         val connectedMeasurements = sourceMeasurements.filter { it.sensor.isConnected }
                         val summedNewVals = connectedMeasurements.fold(0.0) {
-                            acc, m ->
+                                acc, m ->
                             // Average data points of this measurement during the last $period milliseconds
                             val dataPoints = m.dataPoints.filter {
                                 it.timestamp > Date().time.toDouble() - period.toDouble()
