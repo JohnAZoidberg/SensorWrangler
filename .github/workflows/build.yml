@@ -1,4 +1,3 @@
-name: Build SensorWrangler with Bazel
 on:
   push:
     paths-ignore:
@@ -10,32 +9,19 @@ on:
 
 jobs:
   lint:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        bazelisk: [1.11.0]
-        bazel: [4.2.2]
+    name: Check with ktlint
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Bazelisk
-        uses: bazelbuild/setup-bazelisk@v1
+      - run: |
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/0.44.0/ktlint && chmod a+x ktlint && sudo mv ktlint /usr/local/bin/
 
-      - name: Mount bazel cache  # Optional
-        uses: actions/cache@v2
-        with:
-          path: "~/.cache/bazel"
-          key: bazel
+      - run: ktlint
 
-      - name: Build CLI
-        run: bazel test --test_output=all //src/me/danielschaefer/sensorwrangler:lint_test
-        shell: bash
-        env:
-          USE_BAZEL_VERSION: ${{ matrix.bazel }}
   build-and-upload:
+    name: Build and Upload
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
