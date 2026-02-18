@@ -14,7 +14,6 @@ class NamedThreadFactory constructor(var threadName: String) : ThreadFactory {
     }
 
     init {
-        val s = System.getSecurityManager()
-        group = if (s != null) s.threadGroup else Thread.currentThread().threadGroup
+        group = Thread.currentThread().threadGroup
     }
 }

@@ -1,5 +1,5 @@
-load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@io_bazel_rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("@rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
 
 # Library of the core functionality
 # This is what the GUI and CLI implementations depend on

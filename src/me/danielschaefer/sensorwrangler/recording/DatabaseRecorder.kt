@@ -13,11 +13,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.Connection
 
 object DataPoint : Table() {
-    // TODO: Probably the first 3 cols should be the primary key
-    val timestamp = varchar("timestamp", 50).primaryKey()
+    val timestamp = varchar("timestamp", 50)
     val sensor = varchar("sensor", 100)
     val measurement = varchar("measurement", 100)
     val value = double("value")
+
+    override val primaryKey = PrimaryKey(timestamp, sensor, measurement)
 }
 
 /**
