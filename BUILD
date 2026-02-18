@@ -1,5 +1,5 @@
-load("@rules_java//java:defs.bzl", "java_library")
-load("@io_bazel_rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options", "kt_javac_options", "define_kt_toolchain")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
+load("@rules_kotlin//kotlin:core.bzl", "kt_kotlinc_options", "kt_javac_options", "define_kt_toolchain")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,21 +19,12 @@ define_kt_toolchain(
     kotlinc_options = ":kotlinc_werror",
     javac_options = ":javac_werror",
 )
-KOTLIN_LANGUAGE_LEVEL = "1.5"
-JAVA_LANGUAGE_LEVEL = "11"
-define_kt_toolchain(
-    name = "kotlin_toolchain",
-    api_version = KOTLIN_LANGUAGE_LEVEL,  # "1.1", "1.2", "1.3", "1.4", "1.5", or "1.6"
-    jvm_target = JAVA_LANGUAGE_LEVEL, # "1.6", "1.8", "9", "10", "11", "12", or "13",
-    language_version = KOTLIN_LANGUAGE_LEVEL,  # "1.1", "1.2", "1.3", "1.4",  "1.5", or "1.6"
-)
 
 java_library(
     name = "lib_deps",
     exports = [
         # Miscellaneous
         "@maven//:commons_io_commons_io",
-        #"@maven//:joda_time_joda_time", # Unused for now
         "@maven//:org_jetbrains_kotlin_kotlin_reflect",
 
         # Configuration Import/Export

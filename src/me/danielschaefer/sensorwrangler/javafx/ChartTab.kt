@@ -58,7 +58,7 @@ class ChartTab(parentStage: Stage) : Tab("Charts") {
                         // TODO: Pass Chart object to avoid searching and possible failure
                         val chartDetailTable = TableView<TableRow>().apply {
                             // Have columns expand to fill all available space
-                            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+                            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
 
                             val firstCol = TableColumn<TableRow, Text>().apply {
                                 cellValueFactory = PropertyValueFactory("firstName")

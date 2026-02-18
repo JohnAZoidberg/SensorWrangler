@@ -95,7 +95,7 @@ class AntPowerSensor : AntPlusSensor<PowerChannel>() {
                 dataPage.riderPosition
             }
             is PowerDataPage10PowerOnly -> {
-                powerMeasurement.addDataPoint(dataPage.instantaneousPower.toDouble())
+                powerMeasurement.addDataPoint(dataPage.instantaneousPower)
                 cadenceMeasurement.addDataPoint(dataPage.instantaneousCadence.toDouble())
 
                 dataPage.pedalPowerDistribution?.let {

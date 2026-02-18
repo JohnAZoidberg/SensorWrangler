@@ -58,7 +58,7 @@ class SensorTab(parentStage: Stage) : Tab("Sensors") {
                         // TODO: Pass Sensor object to avoid searching and possible failure
                         val sensorDetailTable = TableView<TableRow>().apply {
                             // Have columns expand to fill all available space
-                            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+                            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS
 
                             val firstCol = TableColumn<TableRow, Text>().apply {
                                 cellValueFactory = PropertyValueFactory("firstName")

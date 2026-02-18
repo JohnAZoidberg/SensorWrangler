@@ -1,0 +1,11 @@
+# C++17 required by abseil
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
+
+# Java settings - use remote JDK 21 (works in FHS environment)
+build --java_runtime_version=remotejdk_21
+build --tool_java_runtime_version=remotejdk_21
+build --java_language_version=11
+
+# Skip strict Java deps for compatibility
+build --experimental_strict_java_deps=off

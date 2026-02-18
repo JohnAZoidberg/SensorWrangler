@@ -52,49 +52,51 @@ It should be easy, to add new sensors and export targets.
 
 ## Building
 
-The project targets JDK11 and Kotlin language version 1.3.
+The project uses Bazel with bzlmod for dependency management.
 
-### Building with Bazel
+### Building with Nix (Recommended)
 
-Install:
-
-- Bazel 4.2 (or higher)
-- OpenJDK11
-
-If you have Nix installed, you can get a shell with the dependencies like this:
-
-```
-nix-shell -p gnumake openjdk bazel_4
-```
-
-Run (on Windows run the `.exe` files):
+The easiest way to build on NixOS or any system with Nix installed:
 
 ```sh
-# Commandline
-bazel build //:Cli \
-  && ./bazel-bin/Cli
+# Enter development shell
+nix develop
 
-# GUI (Needs JavaFX installed)
-bazel build //:Gui \
-  && ./bazel-bin/Gui
+# Build
+bazel build //:Gui
 
-# GUI (JavaFX bundled into the JAR)
-bazel build //:Gui_deploy.jar \
-  && ./bazel-bin/Gui_deploy.jar
+# Run
+bazel run //:Gui
 ```
 
-I seem to have trouble getting Bazel on Windows to find my Java installation.
-Alternatively you can just use a JDK provided by Bazel:
+Or run directly without entering the shell:
 
 ```sh
-bazel build //:Gui --java_runtime_version=remotejdk_11
+nix run
+```
+
+### Building with Bazel (Manual Setup)
+
+Requirements:
+- Bazel 7.x or higher
+- JDK 21
+
+```sh
+# Build GUI
+bazel build //:Gui
+
+# Run GUI
+bazel run //:Gui
+
+# Build CLI
+bazel build //:Cli
+```
+
+On Windows, use the remote JDK if Bazel can't find your Java installation:
+
+```sh
+bazel build //:Gui --java_runtime_version=remotejdk_21
 bazel-bin/Gui.exe
-```
-
-Build with warnings as error:
-
-```sh
-bazel build --extra_toolchains='//:werror_toolchain' //:Gui
 ```
 
 ## Running the jar
